@@ -33,9 +33,12 @@ TEMPLATE_DEBUG = DEBUG
 
 ########## MANAGER CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
+
 ADMINS = (
-    ('Your Name', 'your_email@example.com'),
+    ('WattTime Dev Team', 'dev@watttime.org'),
+    ('Anna the tester', 'annarschneider@gmail.com')
 )
+SEND_BROKEN_LINK_EMAILS = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
