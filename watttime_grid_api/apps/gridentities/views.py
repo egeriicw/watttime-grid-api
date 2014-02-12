@@ -8,3 +8,4 @@ class BalancingAuthorityViewSet(viewsets.ModelViewSet):
     """
     queryset = GridEntity.objects.filter(entity_type__in=[GridEntity.BA, GridEntity.ISO])
     serializer_class = GridEntitySerializer
+    filter_fields = ('abbrev', 'entity_type', 'name')
