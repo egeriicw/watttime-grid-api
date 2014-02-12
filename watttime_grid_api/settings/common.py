@@ -36,7 +36,6 @@ TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ('WattTime Dev Team', 'dev@watttime.org'),
-    ('Anna the tester', 'annarschneider@gmail.com')
 )
 SEND_BROKEN_LINK_EMAILS = True
 
