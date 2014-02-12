@@ -195,6 +195,8 @@ THIRD_PARTY_APPS = (
     # Static file management:
     'compressor',
 
+    # API framework
+    'rest_framework',
 )
 
 LOCAL_APPS = (
@@ -206,6 +208,27 @@ LOCAL_APPS = (
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 ########## END APP CONFIGURATION
+
+
+########## DJANGO REST FRAMEWORK CONFIGURATION
+# See: http://www.django-rest-framework.org/#example
+REST_FRAMEWORK = {
+    # Use hyperlinked styles by default.
+    # Only used if the `serializer_class` attribute is not set on a view.
+    'DEFAULT_MODEL_SERIALIZER_CLASS':
+        'rest_framework.serializers.HyperlinkedModelSerializer',
+
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    
+    # Allow filtering
+    # http://www.django-rest-framework.org/api-guide/filtering
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
+}
+########## END DJANGO REST FRAMEWORK CONFIGURATION
 
 
 ########## LOGGING CONFIGURATION

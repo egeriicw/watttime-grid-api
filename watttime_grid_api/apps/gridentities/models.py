@@ -2,6 +2,13 @@ from django.db import models
 
 class GridEntity(models.Model):
     """Model for a player on the grid"""
+    # long name
+    name = models.CharField(max_length=40)
+
+    # short name
+    abbrev = models.CharField(max_length=8)
+    
+    # type of grid entity
     ISO = 'ISO'
     BA = 'BA'
     GEN = 'GEN'
@@ -12,5 +19,5 @@ class GridEntity(models.Model):
     )
     entity_type = models.CharField(max_length=8, choices=ENTITY_TYPE_CHOICES)
     
-    name = models.CharField(max_length=40)
-    
+    def __unicode__(self):
+        return '%s (%s)' % (self.name, self.abbrev)
