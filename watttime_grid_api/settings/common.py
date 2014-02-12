@@ -198,6 +198,9 @@ THIRD_PARTY_APPS = (
 )
 
 LOCAL_APPS = (
+    # grid entities like ISOs
+    'apps.gridentities',
+    
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
