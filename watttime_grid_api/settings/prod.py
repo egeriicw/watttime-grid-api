@@ -127,7 +127,7 @@ COMPRESS_JS_FILTERS += [
 
 ########## SECRET CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
-SECRET_KEY = environ.get('SECRET_KEY', SECRET_KEY)
+#SECRET_KEY = environ.get('SECRET_KEY', SECRET_KEY)
 ########## END SECRET CONFIGURATION
 
 ########## ALLOWED HOSTS CONFIGURATION
