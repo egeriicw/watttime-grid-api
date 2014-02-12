@@ -7,6 +7,7 @@ from fabric.api import abort, env, local, settings, task
 
 ########## GLOBALS
 env.run = 'heroku run python manage.py'
+app_name = 'watttime-grid-api'
 HEROKU_ADDONS = (
     'cloudamqp:lemur',
     'heroku-postgresql:dev',
@@ -19,9 +20,9 @@ HEROKU_ADDONS = (
 HEROKU_CONFIGS = (
     'DJANGO_SETTINGS_MODULE=watttime_grid_api.settings.prod',
     'SECRET_KEY=#i(x1_)zpdt@3)_kmrvfv!z3(re_k4%d8nfrh4u^tac$1#&c$h',
-    'AWS_ACCESS_KEY_ID=xxx',
-    'AWS_SECRET_ACCESS_KEY=xxx',
-    'AWS_STORAGE_BUCKET_NAME=xxx',
+ #   'AWS_ACCESS_KEY_ID=xxx',
+ #   'AWS_SECRET_ACCESS_KEY=xxx',
+ #   'AWS_STORAGE_BUCKET_NAME=xxx',
 )
 ########## END GLOBALS
 
@@ -92,7 +93,8 @@ def bootstrap():
         - Apply all database migrations.
         - Initialize New Relic's monitoring add-on.
     """
-    cont('heroku create', "Couldn't create the Heroku app, continue anyway?")
+    cont('heroku create %s' % app_name,
+         "Couldn't create the Heroku app, continue anyway?")
 
     for addon in HEROKU_ADDONS:
         cont('heroku addons:add %s' % addon,
