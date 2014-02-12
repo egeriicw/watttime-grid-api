@@ -29,3 +29,13 @@ class EntityAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data),
                          GridEntity.objects.filter(entity_type__in=[GridEntity.BA, GridEntity.ISO]).count())
+                         
+    def test_filter(self):
+        url = self.base_url + '/balancing_authorities/'
+        queries = [({'abbrev': 'ISNE'}, 1),
+                   ({'name': 'Midwest ISO'}, 1),
+                   ]
+        for query, n_expected in queries:
+            response = self.client.get(url, data=query)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data), n_expected)
