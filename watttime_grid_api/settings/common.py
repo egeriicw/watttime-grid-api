@@ -93,19 +93,16 @@ MEDIA_URL = '/media/'
 # See: https://github.com/kennethreitz/dj-static
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-#STATIC_ROOT = normpath(join(DJANGO_ROOT, 'static'))
+STATIC_ROOT = normpath(join(DJANGO_ROOT, 'staticfiles'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = '/static/'
 
-# INSTEAD, use dj-static
-STATIC_ROOT = 'static'
-
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-#STATICFILES_DIRS = (
+STATICFILES_DIRS = (
 #    normpath(join(DJANGO_ROOT, 'assets')),
-#    normpath(join(DJANGO_ROOT, 'static')),
-#)
+    normpath(join(DJANGO_ROOT, 'static')),
+)
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 #STATICFILES_FINDERS = (
