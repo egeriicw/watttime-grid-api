@@ -106,10 +106,6 @@ CELERY_RESULT_BACKEND = 'amqp'
 
 # INSTEAD, use dj-static
 # See: https://github.com/kennethreitz/dj-static
-INSTALLED_APPS += (
-    'dj-static',
-)
-
 STATIC_ROOT = 'staticfiles'
 
 ########## END STORAGE CONFIGURATION
