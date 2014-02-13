@@ -208,6 +208,11 @@ LOCAL_APPS = (
     # grid entities like ISOs
     'apps.gridentities',
     
+    # generation mix
+    'apps.genmix',
+    
+    # api
+    'apps.api',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
