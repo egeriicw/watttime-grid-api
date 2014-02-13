@@ -103,6 +103,15 @@ CELERY_RESULT_BACKEND = 'amqp'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 #STATIC_URL = 'https://s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME
+
+# INSTEAD, use dj-static
+# See: https://github.com/kennethreitz/dj-static
+INSTALLED_APPS += (
+    'dj-static',
+)
+
+STATIC_ROOT = 'staticfiles'
+
 ########## END STORAGE CONFIGURATION
 
 
