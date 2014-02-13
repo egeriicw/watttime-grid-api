@@ -14,5 +14,5 @@ class GenMixSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = GenMix
-        fields = ('ge', 'timestamp', 'created_at', 'url', 'sources')
+        fields = ('ge', 'timestamp', 'created_at', 'confidence_type', 'url', 'sources')
         depth = 1
