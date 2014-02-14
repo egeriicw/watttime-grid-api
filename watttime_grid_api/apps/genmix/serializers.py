@@ -1,5 +1,5 @@
 from apps.genmix.models import GenMix, Generation
-from apps.gridentities.serializers import GridEntitySerializer
+from apps.gridentities.serializers import BalancingAuthoritySerializer
 from rest_framework import serializers
 
 class GenerationSerializer(serializers.HyperlinkedModelSerializer):
@@ -10,9 +10,9 @@ class GenerationSerializer(serializers.HyperlinkedModelSerializer):
 
 class GenMixSerializer(serializers.HyperlinkedModelSerializer):
     sources = GenerationSerializer(many=True)
-    ge = GridEntitySerializer()
+    ba = BalancingAuthoritySerializer()
 
     class Meta:
         model = GenMix
-        fields = ('ge', 'timestamp', 'created_at', 'confidence_type', 'url', 'sources')
+        fields = ('ba', 'timestamp', 'created_at', 'confidence_type', 'url', 'sources')
         depth = 1

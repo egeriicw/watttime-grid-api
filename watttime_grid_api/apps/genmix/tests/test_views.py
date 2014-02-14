@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
 from apps.genmix.models import GenMix
-from apps.gridentities.models import GridEntity
+from apps.gridentities.models import BalancingAuthority
 from datetime import datetime, timedelta
 import pytz
 
@@ -10,16 +10,16 @@ class GenMixAPITest(APITestCase):
 
     def setUp(self):
         self.base_url = '/api/v1'
-        GenMix.objects.create(ge=GridEntity.objects.get(abbrev='ISNE'),
+        GenMix.objects.create(ba=BalancingAuthority.objects.get(abbrev='ISNE'),
                               timestamp=pytz.utc.localize(datetime.utcnow()),
                               confidence_type=GenMix.TRUE)
-        GenMix.objects.create(ge=GridEntity.objects.get(abbrev='CISO'),
+        GenMix.objects.create(ba=BalancingAuthority.objects.get(abbrev='CISO'),
                               timestamp=pytz.utc.localize(datetime.utcnow()),
                               confidence_type=GenMix.FORECAST_GE)
-        GenMix.objects.create(ge=GridEntity.objects.get(abbrev='CISO'),
+        GenMix.objects.create(ba=BalancingAuthority.objects.get(abbrev='CISO'),
                               timestamp=pytz.utc.localize(datetime.utcnow()) + timedelta(days=1),
                               confidence_type=GenMix.FORECAST_GE)
-        GenMix.objects.create(ge=GridEntity.objects.get(abbrev='CISO'),
+        GenMix.objects.create(ba=BalancingAuthority.objects.get(abbrev='CISO'),
                               timestamp=pytz.utc.localize(datetime.utcnow()) - timedelta(days=1),
                               confidence_type=GenMix.FORECAST_GE)
         
@@ -36,7 +36,7 @@ class GenMixAPITest(APITestCase):
     def test_filter_where_iso(self):
         url = self.base_url + '/genmix/'
         self._run_get(url, {'where': 'CISO'},
-                      GenMix.objects.filter(ge__abbrev='CISO').count()) 
+                      GenMix.objects.filter(ba__abbrev='CISO').count()) 
             
     def test_filter_how(self):
         url = self.base_url + '/genmix/'

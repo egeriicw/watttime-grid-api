@@ -1,10 +1,10 @@
 from django.db import models
-from apps.gridentities.models import GridEntity
+from apps.gridentities.models import BalancingAuthority
 
 
 class GenMix(models.Model):
-    # balancing authority or other grid entity
-    ge = models.ForeignKey(GridEntity)
+    # balancing authority
+    ba = models.ForeignKey(BalancingAuthority)
 
     # timestamp data is valid at (in UTC) (can be present, past, or future)
     timestamp = models.DateTimeField(db_index=True)
@@ -22,7 +22,7 @@ class GenMix(models.Model):
     confidence_type = models.CharField(max_length=4, choices=CONFIDENCE_CHOICES,
                                        default=TRUE)
     def __str__(self):
-        return '%s %s %s' % (self.ge, self.timestamp, self.confidence_type)
+        return '%s %s %s' % (self.ba, self.timestamp, self.confidence_type)
         
 
 class Generation(models.Model):

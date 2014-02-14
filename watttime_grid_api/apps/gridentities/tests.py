@@ -1,23 +1,23 @@
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
-from apps.gridentities.models import GridEntity
+from apps.gridentities.models import BalancingAuthority
 
-class EntityTest(TestCase):
+class BATest(TestCase):
     def test_create(self):
         """test creation of every choice"""
-        for (choice, verbose) in GridEntity.ENTITY_TYPE_CHOICES:
-            ge = GridEntity.objects.create(entity_type=choice, name='test '+verbose)
-            self.assertIsNotNone(ge)
+        for (choice, verbose) in BalancingAuthority.BA_TYPE_CHOICES:
+            ba = BalancingAuthority.objects.create(ba_type=choice, name='test '+verbose)
+            self.assertIsNotNone(ba)
             
     def test_choices(self):
         """test that all expected choices exist"""
-        choices = set(x[0] for x in GridEntity.ENTITY_TYPE_CHOICES)
-        expected_choices = set([GridEntity.ISO, GridEntity.BA, GridEntity.GEN])
+        choices = set(x[0] for x in BalancingAuthority.BA_TYPE_CHOICES)
+        expected_choices = set([BalancingAuthority.ISO, BalancingAuthority.BA])
         self.assertEqual(choices, expected_choices)
         
 
-class EntityAPITest(APITestCase):
+class BAAPITest(APITestCase):
     fixtures = ['isos.json']
     
     def setUp(self):
@@ -28,7 +28,7 @@ class EntityAPITest(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data),
-                         GridEntity.objects.filter(entity_type__in=[GridEntity.BA, GridEntity.ISO]).count())
+                         BalancingAuthority.objects.count())
                          
     def test_filter(self):
         url = self.base_url + '/balancing_authorities/'

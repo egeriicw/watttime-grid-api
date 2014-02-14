@@ -1,7 +1,7 @@
 from django.db import models
 
-class GridEntity(models.Model):
-    """Model for a player on the grid"""
+class BalancingAuthority(models.Model):
+    """Model for a balancing authority"""
     # long name
     name = models.CharField(max_length=40)
 
@@ -11,13 +11,12 @@ class GridEntity(models.Model):
     # type of grid entity
     ISO = 'ISO'
     BA = 'BA'
-    GEN = 'GEN'
-    ENTITY_TYPE_CHOICES = (
+    BA_TYPE_CHOICES = (
         (ISO, 'Independent System Operator (also use for RTOs or similar)'),
         (BA, 'non-ISO balancing authority'),
-        (GEN, 'generator')
     )
-    entity_type = models.CharField(max_length=8, choices=ENTITY_TYPE_CHOICES)
+    ba_type = models.CharField(max_length=8, choices=BA_TYPE_CHOICES)
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.abbrev)
+        

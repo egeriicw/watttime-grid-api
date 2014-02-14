@@ -1,11 +1,11 @@
 from rest_framework import viewsets
-from apps.gridentities.models import GridEntity
-from apps.gridentities.serializers import GridEntitySerializer
+from apps.gridentities.models import BalancingAuthority
+from apps.gridentities.serializers import BalancingAuthoritySerializer
 
 class BalancingAuthorityViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows balancing authorities to be viewed or edited.
     """
-    queryset = GridEntity.objects.filter(entity_type__in=[GridEntity.BA, GridEntity.ISO])
-    serializer_class = GridEntitySerializer
-    filter_fields = ('abbrev', 'entity_type', 'name')
+    queryset = BalancingAuthority.objects.all()
+    serializer_class = BalancingAuthoritySerializer
+    filter_fields = ('abbrev', 'ba_type', 'name')

@@ -1,8 +1,8 @@
-from apps.gridentities.models import GridEntity
+from apps.gridentities.models import BalancingAuthority
 from rest_framework import serializers
 
 
-class GridEntitySerializer(serializers.HyperlinkedModelSerializer):
+class BalancingAuthoritySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = GridEntity
-        fields = ('name', 'entity_type', 'url', 'abbrev')
+        model = BalancingAuthority
+        fields = ('name', 'ba_type', 'url', 'abbrev')

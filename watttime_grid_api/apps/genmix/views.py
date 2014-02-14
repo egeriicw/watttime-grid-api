@@ -1,8 +1,6 @@
 from django.db.models import Q
 from rest_framework import viewsets
-from rest_framework.decorators import link
-from rest_framework.response import Response
-from apps.gridentities.models import GridEntity
+from apps.gridentities.models import BalancingAuthority
 from apps.genmix.models import GenMix
 from apps.genmix.serializers import GenMixSerializer
 from datetime import datetime
@@ -40,9 +38,9 @@ class GenMixViewSet(BaseGenMixViewSet):
             
     def _filter_where(self, qs, where):
         try:
-            ge = GridEntity.objects.get(abbrev=where)
-            return qs.filter(ge=ge)
-        except GridEntity.DoesNotExist:
+            ba = BalancingAuthority.objects.get(abbrev=where)
+            return qs.filter(ba=ba)
+        except BalancingAuthority.DoesNotExist:
             return qs        
     
     def get_queryset(self):
