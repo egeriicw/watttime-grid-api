@@ -1,41 +1,49 @@
 from django.test import TestCase
 from django.db import IntegrityError
 from django.db.transaction import TransactionManagementError
-from apps.genmix.models import GenMix, Generation
+from apps.genmix.models import DataPoint, DataSeries, Generation
 from apps.gridentities.models import BalancingAuthority, GenType
 from datetime import datetime
 import pytz
 
 
 class TestGeneration(TestCase):
-    fixtures = ['isos.json', 'gentypes.json']
+    fixtures = ['gentypes.json']
 
     def test_failing_create(self):
         self.assertRaises(IntegrityError, Generation.objects.create)
         
     def test_create_each_fuel(self):
-        genmix = GenMix.objects.create(ba=BalancingAuthority.objects.get(pk=1),
-                                       timestamp=pytz.utc.localize(datetime.utcnow()))
+        genmix = DataPoint.objects.create(timestamp=pytz.utc.localize(datetime.utcnow()))
         for fuel in GenType.objects.all():
             Generation.objects.create(fuel=fuel, gen_MW=100, mix=genmix)
 
 
-class TestGenMix(TestCase):
+class TestSeries(TestCase):
     fixtures = ['isos.json']
     def setUp(self):
         self.ba = BalancingAuthority.objects.get(pk=1)
 
     def test_failing_create(self):
-        self.assertRaises(IntegrityError, GenMix.objects.create)
-        self.assertRaises(TransactionManagementError, GenMix.objects.create,
-                          timestamp=pytz.utc.localize(datetime.utcnow()))
-        self.assertRaises(TransactionManagementError, GenMix.objects.create,
+        self.assertRaises(IntegrityError, DataSeries.objects.create)
+        self.assertRaises(TransactionManagementError, DataSeries.objects.create,
                           ba=self.ba)
         
     def test_default_create(self):
-        genmix = GenMix.objects.create(ba=self.ba,
-                                       timestamp=pytz.utc.localize(datetime.utcnow()))
-        self.assertEqual(genmix.confidence_type, GenMix.TRUE)
-        self.assertEqual(genmix.mix.count(), 0)
-        for field in [genmix.ba, genmix.timestamp, genmix.confidence_type]:
-            self.assertIn(str(field), str(genmix))
+        ds = DataSeries.objects.create(ba=self.ba)
+        self.assertEqual(ds.series_type, DataSeries.HISTORICAL)
+        self.assertEqual(ds.datapoints.count(), 0)
+        for field in [ds.ba, ds.series_type]:
+            self.assertIn(str(field), str(ds))
+
+
+class TestPoint(TestCase):
+    def test_failing_create(self):
+        self.assertRaises(IntegrityError, DataPoint.objects.create)
+        
+    def test_default_create(self):
+        dp = DataPoint.objects.create(timestamp=pytz.utc.localize(datetime.utcnow()))
+        self.assertEqual(dp.quality, DataPoint.HISTORICAL)
+        self.assertEqual(dp.genmix.count(), 0)
+        for field in [dp.timestamp, dp.quality]:
+            self.assertIn(str(field), str(dp))

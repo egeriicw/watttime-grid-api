@@ -1,38 +1,32 @@
-from django.db.models import Q
+#from django.db.models import Q
 from rest_framework import viewsets
 from apps.gridentities.models import BalancingAuthority
-from apps.genmix.models import GenMix
-from apps.genmix.serializers import GenMixSerializer
-from datetime import datetime
-import pytz
+from apps.genmix.models import DataPoint, DataSeries
+from apps.genmix.serializers import DataSeriesSerializer, DataPointSerializer
+#from datetime import datetime
+#import pytz
 
-class BaseGenMixViewSet(viewsets.ModelViewSet):
-    """
-    Base API endpoint for generation mixes to be viewed or edited.
-    """
-    serializer_class = GenMixSerializer
 
-    class Meta:
-        abstract = True
-        
+class DataPointViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows data points to be viewed or edited.
+    """
+    queryset = DataPoint.objects.all()
+    serializer_class = DataPointSerializer
 
-class GenMixViewSet(BaseGenMixViewSet):
+
+class GenMixViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows all generation mixes to be viewed or edited.
+    API endpoint that allows generation mix data series to be viewed or edited.
     """
-    queryset = GenMix.objects.all()
+    queryset = DataSeries.objects.all()
+    serializer_class = DataSeriesSerializer
     
     def _filter_confidence(self, qs, confidence):
-        if confidence == 'true':
-            return qs.filter(confidence_type=GenMix.TRUE)
+        if confidence == 'past':
+            return qs.filter(series_type=DataSeries.HISTORICAL)
         elif confidence == 'best':
-            now = pytz.utc.localize(datetime.utcnow())
-            return qs.exclude(~Q(confidence_type=GenMix.TRUE),
-                                          Q(timestamp__lte=now))
-        elif confidence == 'best':
-            now = pytz.utc.localize(datetime.utcnow())
-            return qs.exclude(~Q(confidence_type=GenMix.TRUE),
-                                          Q(timestamp__lte=now))
+            return qs.filter(series_type=DataSeries.BEST)
         else:
             return qs
             
@@ -45,7 +39,7 @@ class GenMixViewSet(BaseGenMixViewSet):
     
     def get_queryset(self):
         # set up initial queryset
-        qs = GenMix.objects.all()
+        qs = DataSeries.objects.all()
         
         # filter by confidence
         confidence = self.request.QUERY_PARAMS.get('how', None)

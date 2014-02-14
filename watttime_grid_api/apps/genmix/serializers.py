@@ -1,4 +1,4 @@
-from apps.genmix.models import GenMix, Generation
+from apps.genmix.models import DataPoint, DataSeries, Generation
 from apps.gridentities.serializers import BalancingAuthoritySerializer
 from rest_framework import serializers
 
@@ -9,11 +9,20 @@ class GenerationSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('fuel', 'gen_MW')
 
 
-class GenMixSerializer(serializers.HyperlinkedModelSerializer):
-    mix = GenerationSerializer(many=True)
+class DataPointSerializer(serializers.HyperlinkedModelSerializer):
+    genmix = GenerationSerializer(many=True)
+
+    class Meta:
+        model = DataPoint
+        fields = ('timestamp', 'created_at', 'url', 'genmix', 'quality')
+
+
+class DataSeriesSerializer(serializers.HyperlinkedModelSerializer):
+    datapoints = DataPointSerializer(many=True)
     ba = BalancingAuthoritySerializer()
 
     class Meta:
-        model = GenMix
-        fields = ('ba', 'timestamp', 'created_at', 'confidence_type', 'url', 'mix')
-        depth = 1
+        model = DataSeries
+        fields = ('ba', 'series_type', 'url', 'datapoints')
+        depth = 2
+
