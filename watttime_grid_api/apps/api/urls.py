@@ -12,4 +12,5 @@ router.register(r'datapoints', DataPointViewSet)
 # Wire up our API using automatic URL routing.
 urlpatterns = patterns('',
     url(r'^', include(router.urls)),
+    url(r'^docs/', include('rest_framework_swagger.urls')),
 )
