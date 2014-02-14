@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from apps.gridentities.models import BalancingAuthority, GenType
 from apps.gridentities.serializers import BalancingAuthoritySerializer, GenTypeSerializer
 
-class BalancingAuthorityViewSet(viewsets.ModelViewSet):
+class BalancingAuthorityViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows balancing authorities to be viewed or edited.
     """
@@ -11,7 +11,7 @@ class BalancingAuthorityViewSet(viewsets.ModelViewSet):
     filter_fields = ('abbrev', 'ba_type', 'name')
 
 
-class GenTypeViewSet(viewsets.ModelViewSet):
+class GenTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows generation/fuel types to be viewed or edited.
     """
