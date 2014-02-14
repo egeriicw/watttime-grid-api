@@ -36,7 +36,7 @@ class Generation(models.Model):
     THERMAL = 'THRM'
     OTHER_REN = 'OREN'
     OTHER = 'OTHR'
-    SOURCE_CHOICES = (
+    FUEL_CHOICES = (
         (WIND, 'wind'),
         (SOLAR, 'solar'),
         (NATGAS, 'natural gas'),
@@ -47,7 +47,7 @@ class Generation(models.Model):
         (OTHER_REN, 'renewable (unknown type)'),
         (OTHER, 'other (unknown type'),
     )
-    fuel = models.CharField(max_length=4, choices=SOURCE_CHOICES)
+    fuel = models.CharField(max_length=4, choices=FUEL_CHOICES)
 
     # how much power was generated
     gen_MW = models.FloatField()
