@@ -1,5 +1,5 @@
 from django.db import models
-from apps.gridentities.models import BalancingAuthority, GenType
+from apps.gridentities.models import BalancingAuthority, FuelType
 
 
 class DataPoint(models.Model):
@@ -48,7 +48,7 @@ class DataSeries(models.Model):
 
 class Generation(models.Model):
     # generation source type
-    fuel = models.ForeignKey(GenType)
+    fuel = models.ForeignKey(FuelType)
 
     # generation source type
     mix = models.ForeignKey(DataPoint, related_name='genmix')

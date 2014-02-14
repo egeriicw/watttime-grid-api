@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.db import IntegrityError
 from django.db.transaction import TransactionManagementError
 from apps.genmix.models import DataPoint, DataSeries, Generation
-from apps.gridentities.models import BalancingAuthority, GenType
+from apps.gridentities.models import BalancingAuthority, FuelType
 from datetime import datetime
 import pytz
 
@@ -15,7 +15,7 @@ class TestGeneration(TestCase):
         
     def test_create_each_fuel(self):
         genmix = DataPoint.objects.create(timestamp=pytz.utc.localize(datetime.utcnow()))
-        for fuel in GenType.objects.all():
+        for fuel in FuelType.objects.all():
             Generation.objects.create(fuel=fuel, gen_MW=100, mix=genmix)
 
 

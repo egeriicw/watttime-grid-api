@@ -1,4 +1,4 @@
-from apps.gridentities.models import BalancingAuthority, GenType
+from apps.gridentities.models import BalancingAuthority, FuelType
 from rest_framework import serializers
 
 
@@ -7,6 +7,6 @@ class BalancingAuthoritySerializer(serializers.HyperlinkedModelSerializer):
         model = BalancingAuthority
         fields = ('name', 'ba_type', 'url', 'abbrev', 'link')
 
-class GenTypeSerializer(serializers.HyperlinkedModelSerializer):
+class FuelTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = GenType
+        model = FuelType

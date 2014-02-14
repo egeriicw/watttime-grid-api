@@ -24,7 +24,7 @@ class BalancingAuthority(models.Model):
         return '%s (%s)' % (self.name, self.abbrev)
         
 
-class GenType(models.Model):
+class FuelType(models.Model):
     """Model for a generation source or fuel type"""
     # name
     name = models.SlugField()

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
-from apps.gridentities.models import BalancingAuthority, GenType
+from apps.gridentities.models import BalancingAuthority, FuelType
 
 class BATest(TestCase):
     def test_create(self):
@@ -19,11 +19,11 @@ class BATest(TestCase):
 
 class FuelTest(TestCase):
     def test_full_create(self):
-        fuel = GenType(name='coal', description='coal-fired thermal power plant')
+        fuel = FuelType(name='coal', description='coal-fired thermal power plant')
         self.assertIsNotNone(fuel)
 
     def test_default_create(self):
-        fuel = GenType(name='coal')
+        fuel = FuelType(name='coal')
         self.assertEqual(fuel.description, '')
         
 

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.gridentities.models import BalancingAuthority, GenType
+from apps.gridentities.models import BalancingAuthority, FuelType
 
 admin.site.register(BalancingAuthority)
-admin.site.register(GenType)
+admin.site.register(FuelType)

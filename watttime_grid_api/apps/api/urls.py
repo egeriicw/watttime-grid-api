@@ -1,11 +1,11 @@
 from django.conf.urls import patterns, url, include
 from rest_framework import routers
 from apps.genmix.views import GenMixViewSet, DataPointViewSet
-from apps.gridentities.views import BalancingAuthorityViewSet, GenTypeViewSet
+from apps.gridentities.views import BalancingAuthorityViewSet, FuelTypeViewSet
 
 router = routers.DefaultRouter()
 router.register(r'balancing_authorities', BalancingAuthorityViewSet)
-router.register(r'fuels', GenTypeViewSet)
+router.register(r'fuels', FuelTypeViewSet)
 router.register(r'genmix', GenMixViewSet)
 router.register(r'datapoints', DataPointViewSet)
 
