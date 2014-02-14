@@ -6,7 +6,7 @@ class BalancingAuthority(models.Model):
     name = models.CharField(max_length=40)
 
     # short name
-    abbrev = models.CharField(max_length=8)
+    abbrev = models.SlugField()
     
     # type of grid entity
     ISO = 'ISO'
@@ -15,8 +15,22 @@ class BalancingAuthority(models.Model):
         (ISO, 'Independent System Operator (also use for RTOs or similar)'),
         (BA, 'non-ISO balancing authority'),
     )
-    ba_type = models.CharField(max_length=8, choices=BA_TYPE_CHOICES)
+    ba_type = models.CharField(max_length=4, choices=BA_TYPE_CHOICES)
+    
+    # link
+    link = models.URLField(blank=True, null=True)
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.abbrev)
         
+
+class GenType(models.Model):
+    """Model for a generation source or fuel type"""
+    # name
+    name = models.SlugField()
+
+    # description
+    description = models.CharField(max_length=40)
+    
+    def __unicode__(self):
+        return self.name

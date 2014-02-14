@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
-from apps.gridentities.models import BalancingAuthority
+from apps.gridentities.models import BalancingAuthority, GenType
 
 class BATest(TestCase):
     def test_create(self):
@@ -15,6 +15,16 @@ class BATest(TestCase):
         choices = set(x[0] for x in BalancingAuthority.BA_TYPE_CHOICES)
         expected_choices = set([BalancingAuthority.ISO, BalancingAuthority.BA])
         self.assertEqual(choices, expected_choices)
+        
+
+class FuelTest(TestCase):
+    def test_full_create(self):
+        fuel = GenType(name='coal', description='coal-fired thermal power plant')
+        self.assertIsNotNone(fuel)
+
+    def test_default_create(self):
+        fuel = GenType(name='coal')
+        self.assertEqual(fuel.description, '')
         
 
 class BAAPITest(APITestCase):
@@ -39,3 +49,4 @@ class BAAPITest(APITestCase):
             response = self.client.get(url, data=query)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data), n_expected)
+            

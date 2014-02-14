@@ -1,10 +1,11 @@
 from django.conf.urls import patterns, url, include
 from rest_framework import routers
 from apps.genmix.views import GenMixViewSet
-from apps.gridentities.views import BalancingAuthorityViewSet
+from apps.gridentities.views import BalancingAuthorityViewSet, GenTypeViewSet
 
 router = routers.DefaultRouter()
 router.register(r'balancing_authorities', BalancingAuthorityViewSet)
+router.register(r'fuels', GenTypeViewSet)
 router.register(r'genmix', GenMixViewSet)
 
 # Wire up our API using automatic URL routing.
