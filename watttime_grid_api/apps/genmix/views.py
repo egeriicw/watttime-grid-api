@@ -7,14 +7,6 @@ from apps.genmix.serializers import GenMixSeriesSerializer, GenMixPointSerialize
 #import pytz
 
 
-class GenMixPointViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API endpoint that allows generation mix data points to be viewed.
-    """
-    queryset = DataPoint.objects.all()
-    serializer_class = GenMixPointSerializer
-
-
 class BaseDataSeriesViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows generic data series to be viewed.
@@ -37,9 +29,12 @@ class BaseDataSeriesViewSet(viewsets.ReadOnlyModelViewSet):
         except BalancingAuthority.DoesNotExist:
             return qs        
     
-    def get_queryset(self):
+    def filter_queryset(self):
         # set up initial queryset
-        qs = DataSeries.objects.all()
+        qs = self.get_queryset()
+
+        # apply all filters in backends
+        qs = super(BaseDataSeriesViewSet, self).filter_queryset()
         
         # filter by confidence
         confidence = self.request.QUERY_PARAMS.get('how', None)
@@ -48,7 +43,7 @@ class BaseDataSeriesViewSet(viewsets.ReadOnlyModelViewSet):
         # filter by location
         where = self.request.QUERY_PARAMS.get('where', None)
         qs = self._filter_where(qs, where)
-
+        
         return qs
         
         
