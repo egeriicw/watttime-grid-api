@@ -1,8 +1,8 @@
 from rest_framework import viewsets
-from apps.genmix.models import DataSeries
+from apps.genmix.models import DataSeries, DataPoint
 from apps.carbon.models import FuelCarbonIntensity
 from apps.genmix.views import BaseDataSeriesViewSet
-from apps.carbon.serializers import CarbonSeriesSerializer, FuelCarbonIntensitySerializer
+from apps.carbon.serializers import CarbonSeriesSerializer, FuelCarbonIntensitySerializer, FullDataPointSerializer
 
 
 class FuelToCarbonViewSet(viewsets.ReadOnlyModelViewSet):
@@ -19,3 +19,12 @@ class CarbonSeriesViewSet(BaseDataSeriesViewSet):
     """
     queryset = DataSeries.objects.all()
     serializer_class = CarbonSeriesSerializer
+
+
+class FullDataPointViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows grid data points to be viewed.
+    """
+    queryset = DataPoint.objects.all()
+    serializer_class = FullDataPointSerializer
+

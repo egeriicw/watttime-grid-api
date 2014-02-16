@@ -1,6 +1,6 @@
 from apps.gridentities.serializers import BalancingAuthoritySerializer, FuelTypeSerializer
 from apps.genmix.models import DataPoint
-from apps.genmix.serializers import BaseDataSeriesSerializer, BaseDataPointSerializer
+from apps.genmix.serializers import BaseDataSeriesSerializer, BaseDataPointSerializer, GenerationSerializer
 from apps.carbon.models import FuelCarbonIntensity
 from rest_framework import serializers
 
@@ -19,8 +19,17 @@ class CarbonPointSerializer(BaseDataPointSerializer):
 
     class Meta:
         model = DataPoint
-        fields = ('timestamp', 'created_at', 'carbon', 'quality') #, 'url')
+        fields = ('timestamp', 'created_at', 'carbon', 'quality', 'url')
 
         
 class CarbonSeriesSerializer(BaseDataSeriesSerializer):
     datapoints = CarbonPointSerializer(many=True)
+
+
+class FullDataPointSerializer(BaseDataPointSerializer):
+    carbon = serializers.RelatedField(read_only=True)
+    genmix = GenerationSerializer(many=True)
+
+    class Meta:
+        model = DataPoint
+        fields = ('timestamp', 'created_at', 'carbon', 'quality', 'genmix', 'url')

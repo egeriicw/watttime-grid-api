@@ -12,7 +12,7 @@ class GenerationSerializer(serializers.HyperlinkedModelSerializer):
 class BaseDataPointSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = DataPoint
-        fields = ('timestamp', 'created_at', 'quality') #, 'url')
+        fields = ('timestamp', 'created_at', 'quality', 'url')
 
 
 class GenMixPointSerializer(BaseDataPointSerializer):
@@ -20,12 +20,12 @@ class GenMixPointSerializer(BaseDataPointSerializer):
 
     class Meta:
         model = DataPoint
-        fields = ('timestamp', 'created_at', 'genmix', 'quality') #, 'url')
+        fields = ('timestamp', 'created_at', 'genmix', 'quality', 'url')
 
 
 class BaseDataSeriesSerializer(serializers.HyperlinkedModelSerializer):
     datapoints = BaseDataPointSerializer(many=True)
-    ba = BalancingAuthoritySerializer()
+    ba = BalancingAuthoritySerializer
 
     class Meta:
         model = DataSeries

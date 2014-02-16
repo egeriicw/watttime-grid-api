@@ -22,26 +22,30 @@ class GenMixAPITest(APITestCase):
                 ds.datapoints.create(timestamp=ts)
         
     def _run_get(self, url, data, n_expected):
+        """boilerplate for testing status and number of objects in get requests"""
         response = self.client.get(url, data=data)
-        
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), n_expected)        
         return response
         
     def test_get(self):
+        """simple get should find the two objects created in setUp"""
         url = self.base_url + '/genmix/'
-        self._run_get(url, {}, 2)                         
+        self._run_get(url, {}, 2)
                          
     def test_filter_where_iso(self):
+        """filter by where=[BalancingAuthority.abbrev]"""
         url = self.base_url + '/genmix/'
         self._run_get(url, {'where': 'CISO'}, 1) 
             
     def test_filter_how(self):
+        """filter by how=[series_type]"""
         url = self.base_url + '/genmix/'
         self._run_get(url, {'how': 'best'}, 1)
         self._run_get(url, {'how': 'past'}, 1)
                       
     def test_multifilter(self):
+        """filters should act like AND"""
         url = self.base_url + '/genmix/'
         self._run_get(url, {'how': 'best', 'where': 'ISNE'}, 0)
         self._run_get(url, {'how': 'best', 'where': 'CISO'}, 1)
@@ -49,9 +53,14 @@ class GenMixAPITest(APITestCase):
         self._run_get(url, {'how': 'past', 'where': 'CISO'}, 0)
         
     def test_get_detail(self):
+        """detail returns object with correct data"""
         url = self.base_url + '/genmix/1/'
         response = self._run_get(url, {}, 3)
+        
+        # correct field names
         for field in ['datapoints', 'ba', 'series_type']:
             self.assertIn(field, response.data.keys())
-        
+            
+        # correct number of datapoints
+        self.assertEqual(len(response.data['datapoints']), 3)
         
