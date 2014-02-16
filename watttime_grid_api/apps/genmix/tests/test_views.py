@@ -23,9 +23,11 @@ class GenMixAPITest(APITestCase):
         
     def _run_get(self, url, data, n_expected):
         response = self.client.get(url, data=data)
+        
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), n_expected)        
-
+        return response
+        
     def test_get(self):
         url = self.base_url + '/genmix/'
         self._run_get(url, {}, 2)                         
@@ -45,4 +47,11 @@ class GenMixAPITest(APITestCase):
         self._run_get(url, {'how': 'best', 'where': 'CISO'}, 1)
         self._run_get(url, {'how': 'past', 'where': 'ISNE'}, 1)
         self._run_get(url, {'how': 'past', 'where': 'CISO'}, 0)
+        
+    def test_get_detail(self):
+        url = self.base_url + '/genmix/1/'
+        response = self._run_get(url, {}, 3)
+        for field in ['datapoints', 'ba', 'series_type']:
+            self.assertIn(field, response.data.keys())
+        
         

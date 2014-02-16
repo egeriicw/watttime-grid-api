@@ -214,6 +214,9 @@ LOCAL_APPS = (
     # generation mix
     'apps.genmix',
     
+    # carbon intensity
+    'apps.carbon',
+    
     # api
     'apps.api',
 )

@@ -9,20 +9,29 @@ class GenerationSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('fuel', 'gen_MW')
 
 
-class DataPointSerializer(serializers.HyperlinkedModelSerializer):
+class BaseDataPointSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = DataPoint
+        fields = ('timestamp', 'created_at', 'quality') #, 'url')
+
+
+class GenMixPointSerializer(BaseDataPointSerializer):
     genmix = GenerationSerializer(many=True)
 
     class Meta:
         model = DataPoint
-        fields = ('timestamp', 'created_at', 'url', 'genmix', 'quality')
+        fields = ('timestamp', 'created_at', 'genmix', 'quality') #, 'url')
 
 
-class DataSeriesSerializer(serializers.HyperlinkedModelSerializer):
-    datapoints = DataPointSerializer(many=True)
+class BaseDataSeriesSerializer(serializers.HyperlinkedModelSerializer):
+    datapoints = BaseDataPointSerializer(many=True)
     ba = BalancingAuthoritySerializer()
 
     class Meta:
         model = DataSeries
-        fields = ('ba', 'series_type', 'url', 'datapoints')
+        fields = ('ba', 'series_type', 'datapoints') #, 'url')
         depth = 2
 
+
+class GenMixSeriesSerializer(BaseDataSeriesSerializer):
+    datapoints = GenMixPointSerializer(many=True)

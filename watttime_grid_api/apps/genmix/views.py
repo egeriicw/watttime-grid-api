@@ -2,26 +2,26 @@
 from rest_framework import viewsets
 from apps.gridentities.models import BalancingAuthority
 from apps.genmix.models import DataPoint, DataSeries
-from apps.genmix.serializers import DataSeriesSerializer, DataPointSerializer
+from apps.genmix.serializers import GenMixSeriesSerializer, GenMixPointSerializer
 #from datetime import datetime
 #import pytz
 
 
-class DataPointViewSet(viewsets.ReadOnlyModelViewSet):
+class GenMixPointViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows data points to be viewed or edited.
+    API endpoint that allows generation mix data points to be viewed.
     """
     queryset = DataPoint.objects.all()
-    serializer_class = DataPointSerializer
+    serializer_class = GenMixPointSerializer
 
 
-class GenMixViewSet(viewsets.ReadOnlyModelViewSet):
+class BaseDataSeriesViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows generation mix data series to be viewed or edited.
+    API endpoint that allows generic data series to be viewed.
     """
-    queryset = DataSeries.objects.all()
-    serializer_class = DataSeriesSerializer
-    
+    class Meta:
+        abstract = True
+
     def _filter_confidence(self, qs, confidence):
         if confidence == 'past':
             return qs.filter(series_type=DataSeries.HISTORICAL)
@@ -50,3 +50,12 @@ class GenMixViewSet(viewsets.ReadOnlyModelViewSet):
         qs = self._filter_where(qs, where)
 
         return qs
+        
+        
+class GenMixSeriesViewSet(BaseDataSeriesViewSet):
+    """
+    API endpoint that allows generation mix data series to be viewed.
+    """
+    queryset = DataSeries.objects.all()
+    serializer_class = GenMixSeriesSerializer
+   
