@@ -26,11 +26,14 @@ class TestSeries(TestCase):
 
 
 class TestPoint(TestCase):
+    fixtures = ['isos.json']
+
     def test_failing_create(self):
         self.assertRaises(IntegrityError, DataPoint.objects.create)
         
     def test_default_create(self):
-        dp = DataPoint.objects.create(timestamp=pytz.utc.localize(datetime.utcnow()))
+        dp = DataPoint.objects.create(timestamp=pytz.utc.localize(datetime.utcnow()),
+                                      ba=BalancingAuthority.objects.get(pk=1))
         self.assertEqual(dp.quality, DataPoint.HISTORICAL)
         self.assertEqual(dp.genmix.count(), 0)
         for field in [dp.timestamp, dp.quality]:

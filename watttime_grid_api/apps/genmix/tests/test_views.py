@@ -20,7 +20,7 @@ class GenMixAPITest(APITestCase):
                                   series_type=DataSeries.BEST)
         for ds in [self.isne_true, self.ciso_forecast]:
             for ts in [now, yesterday, tomorrow]:
-                ds.datapoints.create(timestamp=ts)
+                ds.datapoints.create(timestamp=ts, ba=ds.ba)
         
     def _run_get(self, url, data, n_expected):
         """boilerplate for testing status and number of objects in get requests"""

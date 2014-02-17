@@ -21,7 +21,7 @@ class SeriesAPITest(APITestCase):
                                   series_type=DataSeries.BEST)
         for ds in [self.isne_true, self.ciso_forecast]:
             for ts in [now, yesterday, tomorrow]:
-                ds.datapoints.create(timestamp=ts)
+                ds.datapoints.create(timestamp=ts, ba=ds.ba)
 
         # set up routes
         self.base_url = '/test_series/'

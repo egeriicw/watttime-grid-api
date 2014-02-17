@@ -22,6 +22,9 @@ class DataPoint(models.Model):
     quality = models.CharField(max_length=4, choices=QUALITY_CHOICES,
                                default=HISTORICAL)
 
+    # balancing authority
+    ba = models.ForeignKey(BalancingAuthority)
+
     def __str__(self):
         return '%s %s' % (self.timestamp, self.quality)        
 
