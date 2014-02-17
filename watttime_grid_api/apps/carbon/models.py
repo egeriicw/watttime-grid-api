@@ -46,7 +46,7 @@ class Carbon(models.Model):
             return '%d' % (self.carbon)
         except TypeError: # if none
             return 'null'
-        
+                    
     def set_carbon(self):
         """Calculate carbon intensity for this data point"""
         # clear fuel carbons
@@ -81,12 +81,11 @@ class Carbon(models.Model):
             self.carbon = lb_CO2 / total_MW
         except ZeroDivisionError:
             self.carbon = None
-                    
-  #  def generation_updated(self, sender, instance, **kwargs):
-        
-# hooks for calculating carbon intensity
-def reset_carbon_on_instance(sender, instance, **kwargs):
-    instance.set_carbon()
 
-# every time a Carbon model is saved, update its value
-post_save.connect(reset_carbon_on_instance, Carbon)
+
+# every time a Generation model is saved, update its related carbon value
+def reset_carbon_on_instance_related_dp(sender, instance, **kwargs):
+    c, created = Carbon.objects.get_or_create(dp=instance.mix)
+    c.set_carbon()
+    c.save()
+post_save.connect(reset_carbon_on_instance_related_dp, Generation)
