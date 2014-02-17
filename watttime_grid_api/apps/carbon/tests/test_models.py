@@ -11,6 +11,17 @@ class TestCarbon(TestCase):
     fixtures = ['gentypes.json', 'isos.json']
     
     def setUp(self):
+        # set up data point
+        self.dp = DataPoint.objects.create(timestamp=pytz.utc.localize(datetime.utcnow()),
+                                           ba=BalancingAuthority.objects.get(pk=1))
+             
+    def add_gens(self):                              
+        # add generation to data point
+        self.dp.genmix.create(fuel=FuelType.objects.get(name='coal'), gen_MW=100)
+        self.dp.genmix.create(fuel=FuelType.objects.get(name='natgas'), gen_MW=300)
+        self.dp.genmix.create(fuel=FuelType.objects.get(name='wind'), gen_MW=200)
+
+    def add_conversions(self):
         # set up carbon intensities
         FuelCarbonIntensity.objects.create(ba=BalancingAuthority.objects.get(pk=1),
                                            fuel=FuelType.objects.get(name='coal'),
@@ -25,30 +36,26 @@ class TestCarbon(TestCase):
                                            fuel=FuelType.objects.get(name='wind'),
                                             lb_CO2_per_MW=0)
 
-        # set up data point
-        self.dp = DataPoint.objects.create(timestamp=pytz.utc.localize(datetime.utcnow()),
-                                           ba=BalancingAuthority.objects.get(pk=1))
-             
-    def add_gens(self):                              
-        # add generation to data point
-        self.dp.genmix.create(fuel=FuelType.objects.get(name='coal'), gen_MW=100)
-        self.dp.genmix.create(fuel=FuelType.objects.get(name='natgas'), gen_MW=300)
-        self.dp.genmix.create(fuel=FuelType.objects.get(name='wind'), gen_MW=200)
-
     def test_failing_create(self):
         self.assertRaises(IntegrityError, Carbon.objects.create)
         
     def test_default_create(self):
         c = Carbon.objects.create(dp=self.dp)
-        self.assertIsNone(c.carbon)
+        self.assertIsNone(c.emissions_intensity)
+        self.assertEqual(str(c), 'null')
 
     def test_null_carbon_wo_gen(self):
         c = Carbon.objects.create(dp=self.dp)
         c.set_carbon()
-        self.assertIsNone(c.carbon)
+        self.assertIsNone(c.emissions_intensity)
 
     def test_autocreate_carbon_w_gens(self):
         self.add_gens()
+        c, created = Carbon.objects.get_or_create(dp=self.dp)
+        self.assertFalse(created)
+
+    def test_autocreate_carbon_w_conversions(self):
+        self.add_conversions()
         c, created = Carbon.objects.get_or_create(dp=self.dp)
         self.assertFalse(created)
 
@@ -60,17 +67,20 @@ class TestCarbon(TestCase):
         self.assertIsNone(c.carbon)
         
     def test_autocalc_carbon(self):
+        self.add_conversions()
+
         # autocalc on first new gen
         self.dp.genmix.create(fuel=FuelType.objects.get(name='coal'), gen_MW=100)
-        self.assertEqual(Carbon.objects.get(dp=self.dp).carbon,
+        self.assertEqual(Carbon.objects.get(dp=self.dp).emissions_intensity,
                          (100 * 1000) / 100.0)
     
         # update on second new gen
         self.dp.genmix.create(fuel=FuelType.objects.get(name='natgas'), gen_MW=200)
-        self.assertEqual(Carbon.objects.get(dp=self.dp).carbon,
+        self.assertEqual(Carbon.objects.get(dp=self.dp).emissions_intensity,
                          (100 * 1000 + 200 * 500) / 300.0)
     
     def test_populated_carbon_intensities(self):
+        self.add_conversions()
         self.add_gens()
         self.assertEqual(Carbon.objects.get(dp=self.dp).fuel_carbons.count(),
                          self.dp.genmix.count())

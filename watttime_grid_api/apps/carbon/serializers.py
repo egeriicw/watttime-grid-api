@@ -16,11 +16,18 @@ class FuelCarbonIntensitySerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CarbonPointSerializer(BaseDataPointSerializer):
-    carbon = serializers.RelatedField(read_only=True)
+ #   carbon = serializers.RelatedField(read_only=True)
+    carbon = serializers.SerializerMethodField('get_carbon')
 
     class Meta:
         model = DataPoint
         fields = ('timestamp', 'created_at', 'carbon', 'quality', 'url')
+        
+    def get_carbon(self, obj):
+        try:
+            return round(obj.carbon.emissions_intensity, 1)
+        except:
+            return None
 
         
 class CarbonSeriesSerializer(BaseDataSeriesSerializer):
@@ -28,9 +35,15 @@ class CarbonSeriesSerializer(BaseDataSeriesSerializer):
 
 
 class FullDataPointSerializer(BaseDataPointSerializer):
-    carbon = serializers.RelatedField(read_only=True)
+    carbon = serializers.SerializerMethodField('get_carbon')
     genmix = GenerationSerializer(many=True)
 
     class Meta:
         model = DataPoint
         fields = ('timestamp', 'created_at', 'carbon', 'quality', 'genmix', 'url')
+
+    def get_carbon(self, obj):
+        try:
+            return round(obj.carbon.emissions_intensity, 1)
+        except:
+            return None

@@ -39,11 +39,12 @@ class Carbon(models.Model):
 
     # how much carbon was emitted
     # units: lb per MW
-    carbon = models.FloatField(null=True, blank=True)
+    emissions_intensity = models.FloatField(null=True, blank=True)
+    units = "lb/MW"
     
     def __str__(self):
         try:
-            return '%d' % (self.carbon)
+            return '%d %s' % (self.emissions_intensity, self.units)
         except TypeError: # if none
             return 'null'
                     
@@ -78,14 +79,35 @@ class Carbon(models.Model):
             
         # set carbon
         try:
-            self.carbon = lb_CO2 / total_MW
+            self.emissions_intensity = lb_CO2 / total_MW
         except ZeroDivisionError:
-            self.carbon = None
+            self.emissions_intensity = None
 
 
 # every time a Generation model is saved, update its related carbon value
-def reset_carbon_on_instance_related_dp(sender, instance, **kwargs):
+def reset_carbon_on_gen(sender, instance, **kwargs):
+    # add carbon to data point
     c, created = Carbon.objects.get_or_create(dp=instance.mix)
+    # set value for carbon
     c.set_carbon()
+    # save
     c.save()
-post_save.connect(reset_carbon_on_instance_related_dp, Generation)
+post_save.connect(reset_carbon_on_gen, Generation)
+
+
+# every time a FuelCarbonIntensity model is saved, update its related carbon value
+def reset_carbon_on_fuelcarbon(sender, instance, **kwargs):
+    # get affected data points
+    try:
+        next_instance = instance.get_next_by_valid_after()
+        dps = instance.ba.datapoint_set.filter(timestamp__gt=instance.valid_after,
+                                               timestamp__lte=next_instance.valid_after)
+    except FuelCarbonIntensity.DoesNotExist:
+        dps = instance.ba.datapoint_set.filter(timestamp__gt=instance.valid_after)
+
+    # reset carbon on each point
+    for dp in dps:
+        c, created = Carbon.objects.get_or_create(dp=dp)
+        c.set_carbon()
+        c.save()
+post_save.connect(reset_carbon_on_fuelcarbon, FuelCarbonIntensity)
