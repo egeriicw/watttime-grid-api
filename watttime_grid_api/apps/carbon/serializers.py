@@ -1,6 +1,7 @@
 from apps.gridentities.serializers import BalancingAuthoritySerializer, FuelTypeSerializer
-from apps.genmix.models import DataPoint
-from apps.genmix.serializers import BaseDataSeriesSerializer, BaseDataPointSerializer, GenerationSerializer
+from apps.griddata.models import DataPoint
+from apps.griddata.serializers import BaseDataSeriesSerializer, BaseDataPointSerializer
+from apps.genmix.serializers import GenerationSerializer
 from apps.carbon.models import FuelCarbonIntensity
 from rest_framework import serializers
 

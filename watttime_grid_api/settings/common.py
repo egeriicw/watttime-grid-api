@@ -211,6 +211,9 @@ LOCAL_APPS = (
     # grid entities like ISOs
     'apps.gridentities',
     
+    # base classes for grid data
+    'apps.griddata',
+    
     # generation mix
     'apps.genmix',
     

@@ -1,7 +1,7 @@
 from rest_framework import viewsets
-from apps.genmix.models import DataSeries, DataPoint
+from apps.griddata.models import DataSeries, DataPoint
+from apps.griddata.views import BaseDataSeriesViewSet
 from apps.carbon.models import FuelCarbonIntensity
-from apps.genmix.views import BaseDataSeriesViewSet
 from apps.carbon.serializers import CarbonSeriesSerializer, FuelCarbonIntensitySerializer, FullDataPointSerializer
 
 
