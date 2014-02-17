@@ -10,7 +10,7 @@ class GenMixAPITest(APITestCase):
     fixtures = ['isos.json']
 
     def setUp(self):
-        self.base_url = '/api/v1/genmix/'
+        self.base_url = '/api/v1/carbon/'
         now = pytz.utc.localize(datetime.utcnow())
         tomorrow = now + timedelta(days=1)
         yesterday = now - timedelta(days=1)
@@ -53,6 +53,6 @@ class GenMixAPITest(APITestCase):
         
         # test content of datapoints
         for dp in response.data['datapoints']:
-            self.assertEqual(set(['timestamp', 'created_at', 'genmix', 'quality', 'url']),
+            self.assertEqual(set(['timestamp', 'created_at', 'carbon', 'quality', 'url']),
                              set(dp.keys()))
                 
