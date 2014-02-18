@@ -2,7 +2,7 @@
 
 
 from datetime import timedelta
-from os.path import abspath, basename, dirname, join, normpath
+from os.path import abspath, basename, dirname, join, normpath, realpath
 from sys import path
 
 
@@ -61,7 +61,7 @@ DATABASES = {
 
 ########## GENERAL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
-TIME_ZONE = 'America/Los_Angeles'
+TIME_ZONE = 'UTC'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = 'en-us'
@@ -93,23 +93,32 @@ MEDIA_URL = '/media/'
 # See: https://github.com/kennethreitz/dj-static
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-STATIC_ROOT = normpath(join(DJANGO_ROOT, 'staticfiles'))
+#STATIC_ROOT = normpath(join(DJANGO_ROOT, 'staticfiles'))
+DEPLOY_PATH = dirname(realpath(__file__)) #.replace('\\','/'),
+STATIC_ROOT = join(DEPLOY_PATH, 'collected_static')
+
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = '/static/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = (
+#STATICFILES_DIRS = (
 #    normpath(join(DJANGO_ROOT, 'assets')),
-    normpath(join(DJANGO_ROOT, 'static')),
-)
+#    normpath(join(DJANGO_ROOT, 'static')),
+#)
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
-#STATICFILES_FINDERS = (
-#    'django.contrib.staticfiles.finders.FileSystemFinder',
-#    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
   #  'compressor.finders.CompressorFinder',
-#)
+)
+
+# Additional locations of static files
+STATICFILES_DIRS = (
+    join(DEPLOY_PATH, 'static'),
+)
+
 ########## END STATIC FILE CONFIGURATION
 
 
@@ -198,7 +207,7 @@ THIRD_PARTY_APPS = (
     'south',
 
     # Static file management:
-    'compressor',
+  #  'compressor',
 
     # API framework
     'rest_framework',
@@ -300,20 +309,20 @@ WSGI_APPLICATION = 'wsgi.application'
 
 ########## COMPRESSION CONFIGURATION
 # See: http://django_compressor.readthedocs.org/en/latest/settings/#django.conf.settings.COMPRESS_ENABLED
-COMPRESS_ENABLED = False
+#COMPRESS_ENABLED = False
 
 # See: http://django-compressor.readthedocs.org/en/latest/settings/#django.conf.settings.COMPRESS_CSS_HASHING_METHOD
-COMPRESS_CSS_HASHING_METHOD = 'content'
+#COMPRESS_CSS_HASHING_METHOD = 'content'
 
 # See: http://django_compressor.readthedocs.org/en/latest/settings/#django.conf.settings.COMPRESS_CSS_FILTERS
-COMPRESS_CSS_FILTERS = [
-    'compressor.filters.template.TemplateFilter',
-]
+#COMPRESS_CSS_FILTERS = [
+#    'compressor.filters.template.TemplateFilter',
+#]
 
 # See: http://django_compressor.readthedocs.org/en/latest/settings/#django.conf.settings.COMPRESS_JS_FILTERS
-COMPRESS_JS_FILTERS = [
-    'compressor.filters.template.TemplateFilter',
-]
+#COMPRESS_JS_FILTERS = [
+#    'compressor.filters.template.TemplateFilter',
+#]
 ########## END COMPRESSION CONFIGURATION
 
 
