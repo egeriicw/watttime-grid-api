@@ -16,13 +16,13 @@ class FuelToCarbonViewSet(viewsets.ReadOnlyModelViewSet):
 class CarbonSeriesViewSet(BaseDataSeriesViewSet):
     """
     API endpoint that allows carbon intensity data series to be viewed.
-    where -- An abbreviation for a balancing authority.\
+    ba -- An abbreviation for a balancing authority.\
         Options can be found at the 'balancing_authorities' endpoint.\
-        e.g., where=ISNE
-    how -- How the data should be selected.\
-        Options are 'past' for historical data\
-        or 'best' for best-guess data (historical if available, forecast if not).\
-        e.g., how=past
+        e.g., ba=ISNE
+    series_type -- How the data should be selected.\
+        Options are 'PAST' for historical data\
+        or 'BEST' for best-guess data (historical if available, forecast if not).\
+        e.g., series_type=PAST
     """
     queryset = DataSeries.objects.all()
     serializer_class = CarbonSeriesSerializer

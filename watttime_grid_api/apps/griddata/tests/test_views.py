@@ -3,6 +3,7 @@ from rest_framework.test import APITestCase
 from apps.griddata.models import DataSeries
 from apps.gridentities.models import BalancingAuthority
 from datetime import datetime, timedelta
+from dateutil.parser import parse as dateutil_parse
 import pytz
 
 
@@ -12,15 +13,15 @@ class SeriesAPITest(APITestCase):
 
     def setUp(self):
         # create sample data
-        now = pytz.utc.localize(datetime.utcnow())
-        tomorrow = now + timedelta(days=1)
-        yesterday = now - timedelta(days=1)
+        self.now = pytz.utc.localize(datetime.utcnow())
+        self.tomorrow = self.now + timedelta(days=1)
+        self.yesterday = self.now - timedelta(days=1)
         self.isne_true = DataSeries.objects.create(ba=BalancingAuthority.objects.get(abbrev='ISNE'),
                                   series_type=DataSeries.HISTORICAL)
         self.ciso_forecast = DataSeries.objects.create(ba=BalancingAuthority.objects.get(abbrev='CISO'),
                                   series_type=DataSeries.BEST)
         for ds in [self.isne_true, self.ciso_forecast]:
-            for ts in [now, yesterday, tomorrow]:
+            for ts in [self.now, self.yesterday, self.tomorrow]:
                 ds.datapoints.create(timestamp=ts, ba=ds.ba)
 
         # set up routes
@@ -29,6 +30,8 @@ class SeriesAPITest(APITestCase):
     def _run_get(self, url, data, n_expected):
         """boilerplate for testing status and number of objects in get requests"""
         response = self.client.get(url, data=data)
+        if response.status_code is not status.HTTP_200_OK:
+            print response.data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), n_expected)        
         return response
@@ -41,21 +44,21 @@ class SeriesAPITest(APITestCase):
     def test_filter_where_iso(self):
         """filter by where=[BalancingAuthority.abbrev]"""
         url = self.base_url
-        self._run_get(url, {'where': 'CISO'}, 1) 
+        self._run_get(url, {'ba': 'CISO'}, 1) 
             
     def test_filter_how(self):
         """filter by how=[series_type]"""
         url = self.base_url
-        self._run_get(url, {'how': 'best'}, 1)
-        self._run_get(url, {'how': 'past'}, 1)
-                      
+        self._run_get(url, {'series_type': 'BEST'}, 1)
+        self._run_get(url, {'series_type': 'PAST'}, 1)
+        
     def test_multifilter(self):
         """filters should act like AND"""
         url = self.base_url
-        self._run_get(url, {'how': 'best', 'where': 'ISNE'}, 0)
-        self._run_get(url, {'how': 'best', 'where': 'CISO'}, 1)
-        self._run_get(url, {'how': 'past', 'where': 'ISNE'}, 1)
-        self._run_get(url, {'how': 'past', 'where': 'CISO'}, 0)
+        self._run_get(url, {'series_type': 'BEST', 'ba': 'ISNE'}, 0)
+        self._run_get(url, {'series_type': 'BEST', 'ba': 'CISO'}, 1)
+        self._run_get(url, {'series_type': 'PAST', 'ba': 'ISNE'}, 1)
+        self._run_get(url, {'series_type': 'PAST', 'ba': 'CISO'}, 0)
         
     def test_get_detail(self):
         """detail returns object with correct data"""
@@ -69,3 +72,24 @@ class SeriesAPITest(APITestCase):
         # correct number of datapoints
         self.assertEqual(len(response.data['datapoints']), 3)
         
+    def test_filter_start(self):
+        """filter by start=DATETIME"""
+        url = self.base_url
+        
+        # start time inclusive
+        response = self._run_get(url, {'start_at': self.now.isoformat()}, 2)
+        for ds in response.data:
+            self.assertEqual(len(ds['datapoints']), 2)
+            for dp in ds['datapoints']:
+                self.assertGreaterEqual(dateutil_parse(dp['timestamp']), self.now)
+
+    def test_filter_end(self):
+        """filter by end=DATETIME"""
+        url = self.base_url
+        
+        # end time inclusive
+        response = self._run_get(url, {'end_at': self.now.isoformat()}, 2)
+        for ds in response.data:
+            self.assertEqual(len(ds['datapoints']), 2)
+            for dp in ds['datapoints']:
+                self.assertLessEqual(dateutil_parse(dp['timestamp']), self.now)
