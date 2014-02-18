@@ -1,12 +1,13 @@
 from django.db import models
 
+
 class BalancingAuthority(models.Model):
     """Model for a balancing authority"""
     # long name
     name = models.CharField(max_length=40)
 
     # short name
-    abbrev = models.SlugField()
+    abbrev = models.SlugField(unique=True)
     
     # type of grid entity
     ISO = 'ISO'
@@ -19,7 +20,7 @@ class BalancingAuthority(models.Model):
     
     # link
     link = models.URLField(blank=True, null=True)
-    
+        
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.abbrev)
         
@@ -27,7 +28,7 @@ class BalancingAuthority(models.Model):
 class FuelType(models.Model):
     """Model for a generation source or fuel type"""
     # name
-    name = models.SlugField()
+    name = models.SlugField(unique=True)
 
     # description
     description = models.CharField(max_length=40)
