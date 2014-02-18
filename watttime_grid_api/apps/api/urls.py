@@ -9,7 +9,7 @@ router.register(r'balancing_authorities', BalancingAuthorityViewSet)
 router.register(r'fuels', FuelTypeViewSet)
 router.register(r'genmix', GenMixSeriesViewSet, base_name='genmix')
 router.register(r'datapoints', FullDataPointViewSet, base_name='datapoint')
-router.register(r'fuel_to_carbon', FuelToCarbonViewSet)
+#router.register(r'fuel_to_carbon', FuelToCarbonViewSet)
 router.register(r'carbon', CarbonSeriesViewSet, base_name='carbon')
 
 # Wire up our API using automatic URL routing.

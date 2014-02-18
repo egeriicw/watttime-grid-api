@@ -7,6 +7,13 @@ from apps.griddata.serializers import BaseDataPointSerializer, BaseDataSeriesSer
 class BaseDataSeriesViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows generic data series to be viewed.
+    where -- An abbreviation for a balancing authority.\
+        Options can be found at the 'balancing_authorities' endpoint.\
+        e.g., where=ISNE
+    how -- How the data should be selected.\
+        Options are 'past' for historical data\
+        or 'best' for best-guess data (historical if available, forecast if not).\
+        e.g., how=past
     """
     queryset = DataSeries.objects.all()
     serializer_class = BaseDataSeriesSerializer
