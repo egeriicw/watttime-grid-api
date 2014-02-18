@@ -2,6 +2,7 @@ from django.db import models
 from apps.gridentities.models import FuelType
 from apps.griddata.models import DataPoint
 
+
 class Generation(models.Model):
     # generation source type
     fuel = models.ForeignKey(FuelType)
@@ -11,6 +12,9 @@ class Generation(models.Model):
 
     # how much power was generated
     gen_MW = models.FloatField()
+    
+    class Meta:
+        unique_together = ('fuel', 'mix')
     
     def __str__(self):
         return '%s: %.1f MW' % (self.fuel, self.gen_MW)
