@@ -94,29 +94,24 @@ MEDIA_URL = '/media/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
 #STATIC_ROOT = normpath(join(DJANGO_ROOT, 'staticfiles'))
-DEPLOY_PATH = dirname(realpath(__file__)) #.replace('\\','/'),
-STATIC_ROOT = join(DEPLOY_PATH, 'collected_static')
+STATIC_ROOT = 'collected_static'
 
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = '/static/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-#STATICFILES_DIRS = (
+STATICFILES_DIRS = (
 #    normpath(join(DJANGO_ROOT, 'assets')),
-#    normpath(join(DJANGO_ROOT, 'static')),
-#)
+    normpath(join(DJANGO_ROOT, 'static')),
+)
+print STATICFILES_DIRS
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
   #  'compressor.finders.CompressorFinder',
-)
-
-# Additional locations of static files
-STATICFILES_DIRS = (
-    join(DEPLOY_PATH, 'static'),
 )
 
 ########## END STATIC FILE CONFIGURATION
