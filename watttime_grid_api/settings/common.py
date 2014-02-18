@@ -105,7 +105,6 @@ STATICFILES_DIRS = (
 #    normpath(join(DJANGO_ROOT, 'assets')),
     normpath(join(DJANGO_ROOT, 'static')),
 )
-print STATICFILES_DIRS
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = (
