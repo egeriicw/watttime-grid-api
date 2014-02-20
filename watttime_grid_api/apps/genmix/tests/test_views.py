@@ -14,9 +14,9 @@ class GenMixAPITest(APITestCase):
         now = pytz.utc.localize(datetime.utcnow())
         tomorrow = now + timedelta(days=1)
         yesterday = now - timedelta(days=1)
-        self.isne_true = DataSeries.objects.create(ba=BalancingAuthority.objects.get(abbrev='ISNE'),
+        self.isne_true = DataSeries.objects.create(ba=BalancingAuthority.objects.get(abbrev='ISONE'),
                                   series_type=DataSeries.HISTORICAL)
-        self.ciso_forecast = DataSeries.objects.create(ba=BalancingAuthority.objects.get(abbrev='CISO'),
+        self.ciso_forecast = DataSeries.objects.create(ba=BalancingAuthority.objects.get(abbrev='CAISO'),
                                   series_type=DataSeries.BEST)
         for ds in [self.isne_true, self.ciso_forecast]:
             for ts in [now, yesterday, tomorrow]:

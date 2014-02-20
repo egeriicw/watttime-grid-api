@@ -16,9 +16,9 @@ class SeriesAPITest(APITestCase):
         self.now = pytz.utc.localize(datetime.utcnow())
         self.tomorrow = self.now + timedelta(days=1)
         self.yesterday = self.now - timedelta(days=1)
-        self.isne_true = DataSeries.objects.create(ba=BalancingAuthority.objects.get(abbrev='ISNE'),
+        self.isne_true = DataSeries.objects.create(ba=BalancingAuthority.objects.get(abbrev='ISONE'),
                                   series_type=DataSeries.HISTORICAL)
-        self.ciso_forecast = DataSeries.objects.create(ba=BalancingAuthority.objects.get(abbrev='CISO'),
+        self.ciso_forecast = DataSeries.objects.create(ba=BalancingAuthority.objects.get(abbrev='CAISO'),
                                   series_type=DataSeries.BEST)
         for ds in [self.isne_true, self.ciso_forecast]:
             for ts in [self.now, self.yesterday, self.tomorrow]:
@@ -44,7 +44,7 @@ class SeriesAPITest(APITestCase):
     def test_filter_where_iso(self):
         """filter by where=[BalancingAuthority.abbrev]"""
         url = self.base_url
-        self._run_get(url, {'ba': 'CISO'}, 1) 
+        self._run_get(url, {'ba': 'CAISO'}, 1) 
             
     def test_filter_how(self):
         """filter by how=[series_type]"""
@@ -55,10 +55,10 @@ class SeriesAPITest(APITestCase):
     def test_multifilter(self):
         """filters should act like AND"""
         url = self.base_url
-        self._run_get(url, {'series_type': 'BEST', 'ba': 'ISNE'}, 0)
-        self._run_get(url, {'series_type': 'BEST', 'ba': 'CISO'}, 1)
-        self._run_get(url, {'series_type': 'PAST', 'ba': 'ISNE'}, 1)
-        self._run_get(url, {'series_type': 'PAST', 'ba': 'CISO'}, 0)
+        self._run_get(url, {'series_type': 'BEST', 'ba': 'ISONE'}, 0)
+        self._run_get(url, {'series_type': 'BEST', 'ba': 'CAISO'}, 1)
+        self._run_get(url, {'series_type': 'PAST', 'ba': 'ISONE'}, 1)
+        self._run_get(url, {'series_type': 'PAST', 'ba': 'CAISO'}, 0)
         
     def test_get_detail(self):
         """detail returns object with correct data"""
