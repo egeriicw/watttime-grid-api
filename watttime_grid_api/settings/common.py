@@ -283,6 +283,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'apps.clients' : {
+            'handlers': ['mail_admins', 'console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
     }
 }
 ########## END LOGGING CONFIGURATION
