@@ -35,6 +35,53 @@ class TestPoint(TestCase):
         dp = DataPoint.objects.create(timestamp=pytz.utc.localize(datetime.utcnow()),
                                       ba=BalancingAuthority.objects.get(pk=1))
         self.assertEqual(dp.quality, DataPoint.HISTORICAL)
+        self.assertEqual(dp.freq, DataPoint.HOURLY)
+        self.assertEqual(dp.market, DataPoint.RTHR)
+        self.assertEqual(dp.is_marginal, False)
         self.assertEqual(dp.genmix.count(), 0)
-        for field in [dp.timestamp, dp.quality]:
+        for field in [dp.timestamp, dp.quality, dp.ba.abbrev, dp.market, dp.freq]:
             self.assertIn(str(field), str(dp))
+            
+    def test_unique(self):
+        now = pytz.utc.localize(datetime.utcnow())
+        dp = DataPoint.objects.create(timestamp=now, freq=DataPoint.HOURLY,
+                                      ba=BalancingAuthority.objects.get(pk=1),
+                                        quality=DataPoint.HISTORICAL, market=DataPoint.RT5M,
+                                        is_marginal=False)
+
+        change_ts = DataPoint.objects.create(timestamp=pytz.utc.localize(datetime.utcnow()), freq=DataPoint.HOURLY,
+                                      ba=BalancingAuthority.objects.get(pk=1),
+                                        quality=DataPoint.HISTORICAL, market=DataPoint.RT5M,
+                                        is_marginal=False)
+
+        change_fq = DataPoint.objects.create(timestamp=now, freq=DataPoint.FIVEMIN,
+                                      ba=BalancingAuthority.objects.get(pk=2),
+                                        quality=DataPoint.HISTORICAL, market=DataPoint.RT5M,
+                                        is_marginal=False)
+
+        change_ba = DataPoint.objects.create(timestamp=now, freq=DataPoint.HOURLY,
+                                      ba=BalancingAuthority.objects.get(pk=2),
+                                        quality=DataPoint.HISTORICAL, market=DataPoint.RT5M,
+                                        is_marginal=False)
+
+        change_ql = DataPoint.objects.create(timestamp=now, freq=DataPoint.HOURLY,
+                                      ba=BalancingAuthority.objects.get(pk=2),
+                                        quality=DataPoint.FORECAST_BA, market=DataPoint.RT5M,
+                                        is_marginal=False)
+
+        change_mk = DataPoint.objects.create(timestamp=now, freq=DataPoint.HOURLY,
+                                      ba=BalancingAuthority.objects.get(pk=1),
+                                        quality=DataPoint.HISTORICAL, market=DataPoint.RTHR,
+                                        is_marginal=False)
+
+        change_mg = DataPoint.objects.create(timestamp=now, freq=DataPoint.HOURLY,
+                                      ba=BalancingAuthority.objects.get(pk=2),
+                                        quality=DataPoint.HISTORICAL, market=DataPoint.RT5M,
+                                        is_marginal=True)
+
+        # can't reuse everything
+        self.assertRaises(IntegrityError, DataPoint.objects.create,
+                          timestamp=now, freq=DataPoint.HOURLY,
+                                      ba=BalancingAuthority.objects.get(pk=1),
+                                        quality=DataPoint.HISTORICAL, market=DataPoint.RT5M,
+                                        is_marginal=False)

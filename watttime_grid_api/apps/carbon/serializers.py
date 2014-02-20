@@ -37,10 +37,12 @@ class CarbonSeriesSerializer(BaseDataSeriesSerializer):
 class FullDataPointSerializer(BaseDataPointSerializer):
     carbon = serializers.SerializerMethodField('get_carbon')
     genmix = GenerationSerializer(many=True)
+    ba = BalancingAuthoritySerializer()
 
     class Meta:
         model = DataPoint
-        fields = ('timestamp', 'created_at', 'carbon', 'quality', 'genmix', 'url')
+        fields = ('timestamp', 'created_at', 'carbon', 'quality', 'genmix', 'url',
+                  'market', 'freq', 'is_marginal', 'ba')
 
     def get_carbon(self, obj):
         try:

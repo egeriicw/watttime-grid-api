@@ -24,7 +24,9 @@ class Command(BaseCommand):
             
             # insert data
             dp, dp_created = DataPoint.objects.get_or_create(ba=ba,
-                                                             timestamp=gen_dp['timestamp'])
+                                                             timestamp=gen_dp['timestamp'],
+                                                             freq=gen_dp['freq'],
+                                                             market=gen_dp['market'])
             gen, gen_created = Generation.objects.get_or_create(mix=dp, fuel=fuel,
                                                                 gen_MW=gen_dp['gen_MW'])
             

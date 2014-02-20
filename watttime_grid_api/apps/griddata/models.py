@@ -21,12 +21,47 @@ class DataPoint(models.Model):
     )
     quality = models.CharField(max_length=4, choices=QUALITY_CHOICES,
                                default=HISTORICAL)
+                               
+    # frequency
+    HOURLY = '1hr'
+    FIVEMIN = '5min'
+    IRREGULAR = 'n/a'
+    FREQ_CHOICES = (
+        (HOURLY, 'hourly frequency'),
+        (FIVEMIN, '5-minute frequency'),
+        (IRREGULAR, 'irregular frequency'),
+    )
+    freq = models.CharField(max_length=4, choices=FREQ_CHOICES,
+                               default=HOURLY)
+
+    # market
+    RTHR = 'RTHR'
+    RT5M = 'RT5M'
+    DAHR = 'DAHR'
+    MARKET_CHOICES = (
+        (RTHR, 'real-time hourly market'),
+        (RT5M, 'real-time 5-minute market'),
+        (DAHR, 'day-ahead hourly market'),
+    )    
+    market = models.CharField(max_length=4, choices=MARKET_CHOICES,
+                               default=RTHR)
+    
+    # marginal
+    is_marginal = models.BooleanField(default=False)
 
     # balancing authority
     ba = models.ForeignKey(BalancingAuthority)
 
+    class Meta:
+        unique_together = ('timestamp', 'quality', 'freq', 'market', 'is_marginal', 'ba')
+
     def __str__(self):
-        return '%s %s' % (self.timestamp, self.quality)        
+        if self.is_marginal:
+            return ' '.join([self.ba.abbrev, str(self.timestamp), self.quality,
+                             self.freq, self.market, 'marginal'])
+        else:
+            return ' '.join([self.ba.abbrev, str(self.timestamp), self.quality,
+                             self.freq, self.market])
 
 
 class DataSeries(models.Model):
