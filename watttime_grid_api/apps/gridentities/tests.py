@@ -58,7 +58,7 @@ class BAAPITest(APITestCase):
     def test_filter(self):
         url = self.base_url + '/balancing_authorities/'
         queries = [({'abbrev': 'ISONE'}, 1),
-                   ({'name': 'Midwest ISO'}, 1),
+                   ({'ba_type': 'ISO'}, 8),
                    ]
         for query, n_expected in queries:
             response = self.client.get(url, data=query)
