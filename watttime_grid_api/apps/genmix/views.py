@@ -15,6 +15,6 @@ class GenMixSeriesViewSet(BaseDataSeriesViewSet):
         or 'BEST' for best-guess data (historical if available, forecast if not).\
         e.g., series_type=PAST
     """
-    queryset = DataSeries.objects.all()
+  #  queryset = DataSeries.objects.all()
     serializer_class = GenMixSeriesSerializer
    

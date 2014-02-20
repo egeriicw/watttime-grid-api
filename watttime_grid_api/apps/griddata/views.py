@@ -89,7 +89,7 @@ class BaseDataSeriesViewSet(viewsets.ReadOnlyModelViewSet):
         or 'BEST' for best-guess data (historical if available, forecast if not).\
         e.g., series_type=PAST
     """
-    queryset = DataSeries.objects.all()
+    queryset = DataSeries.objects.all().prefetch_related('datapoints')
     serializer_class = BaseDataSeriesSerializer
    # filter_backends = (BaseDataSeriesFilterBackend, filters.DjangoFilterBackend,)
     filter_class = BaseDataSeriesFilter

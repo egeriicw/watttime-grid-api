@@ -25,7 +25,7 @@ class CarbonSeriesViewSet(BaseDataSeriesViewSet):
         or 'BEST' for best-guess data (historical if available, forecast if not).\
         e.g., series_type=PAST
     """
-    queryset = DataSeries.objects.all()
+   # queryset = DataSeries.objects.all()
     serializer_class = CarbonSeriesSerializer
 
 
@@ -33,6 +33,6 @@ class FullDataPointViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows grid data points to be viewed.
     """
-    queryset = DataPoint.objects.all()
+    queryset = DataPoint.objects.all().prefetch_related('carbon', 'genmix')
     serializer_class = FullDataPointSerializer
 
