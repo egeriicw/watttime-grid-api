@@ -15,10 +15,11 @@ class FuelToCarbonViewSet(viewsets.ReadOnlyModelViewSet):
 
 class CarbonSeriesViewSet(BaseDataSeriesViewSet):
     """
-    API endpoint that allows carbon intensity data series to be viewed.
+    API endpoint that allows carbon intensity data series to be viewed.\
+        All carbon values have units of lb CO2 emitted per MW power produced.
     ba -- An abbreviation for a balancing authority.\
         Options can be found at the 'balancing_authorities' endpoint.\
-        e.g., ba=ISNE
+        e.g., ba=ISONE
     series_type -- How the data should be selected.\
         Options are 'PAST' for historical data\
         or 'BEST' for best-guess data (historical if available, forecast if not).\
