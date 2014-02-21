@@ -5,7 +5,10 @@ from apps.griddata.models import DataPoint
 from apps.genmix.models import Generation
 from datetime import datetime
 import pytz
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 class FuelCarbonIntensity(models.Model):
     # fuel source type
@@ -68,6 +71,9 @@ class Carbon(models.Model):
                 # if a single conversion factor is missing, clear everything
                 self.fuel_carbons.clear()
                 self.carbon = None
+                logger.error('No carbon intensity found for %s in %s after %s' % (gen.fuel.name,
+                                                                                    self.dp.ba.abbrev,
+                                                                                    self.dp.timestamp))
                 return
 
             # add to sums

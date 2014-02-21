@@ -288,6 +288,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'apps.carbon' : {
+            'handlers': ['mail_admins', 'console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
     }
 }
 ########## END LOGGING CONFIGURATION

@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.db import IntegrityError
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint, DataSeries
 from apps.clients import client_factory
@@ -55,8 +56,14 @@ class Command(BaseCommand):
                                                              timestamp=gen_dp['timestamp'],
                                                              freq=gen_dp['freq'],
                                                              market=gen_dp['market'])
-            gen, gen_created = Generation.objects.get_or_create(mix=dp, fuel=fuel,
-                                                                gen_MW=gen_dp['gen_MW'])
+            try:
+                gen = Generation.objects.create(mix=dp, fuel=fuel, gen_MW=gen_dp['gen_MW'])
+                gen_created = True
+            except IntegrityError:
+                gen = Generation.objects.get(mix=dp, fuel=fuel)
+                gen.gen_MW = gen_dp['gen_MW']
+                gen.save()
+                gen_created = False
             
             # update counters
             if dp_created:
