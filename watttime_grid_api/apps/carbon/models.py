@@ -71,7 +71,7 @@ class Carbon(models.Model):
                 # if a single conversion factor is missing, clear everything
                 self.fuel_carbons.clear()
                 self.carbon = None
-                logger.error('No carbon intensity found for %s in %s after %s' % (gen.fuel.name,
+                logger.error('No carbon intensity found for %s in %s at %s' % (gen.fuel.name,
                                                                                     self.dp.ba.abbrev,
                                                                                     self.dp.timestamp))
                 return

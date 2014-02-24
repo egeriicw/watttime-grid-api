@@ -14,17 +14,20 @@ class DataPoint(models.Model):
     HISTORICAL = 'PAST'
     FORECAST_BA = 'FCBA'
     TYPICAL = 'TYP'
+    PRELIM_HISTORICAL = 'PREH'
     QUALITY_CHOICES = (
         (HISTORICAL, 'historical data'),
         (FORECAST_BA, 'forecast provided by the balancing authority'),
-        (TYPICAL, 'typical data based on time of year')
+        (TYPICAL, 'typical data based on time of year'),
+        (PRELIM_HISTORICAL, 'preliminary historical data')
     )
     quality = models.CharField(max_length=4, choices=QUALITY_CHOICES,
                                default=HISTORICAL)
                                
     # frequency
     HOURLY = '1hr'
-    FIVEMIN = '5min'
+    FIVEMIN = '5m'
+    TENMIN = '10m'
     IRREGULAR = 'n/a'
     FREQ_CHOICES = (
         (HOURLY, 'hourly frequency'),
