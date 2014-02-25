@@ -9,10 +9,10 @@ app = Celery('watttime_grid_api')
 
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
-app.config_from_object('django.conf:settings')
+settings.configure()
+app.config_from_object(settings)
 
 # autodiscover tasks in any app
-settings.configure()
 app.autodiscover_tasks(settings.INSTALLED_APPS, related_name='tasks')
 
 

@@ -4,7 +4,6 @@
 from datetime import timedelta
 from os.path import abspath, basename, dirname, join, normpath, realpath
 from sys import path
-import djcelery
 
 
 ########## PATH CONFIGURATION
@@ -209,9 +208,7 @@ THIRD_PARTY_APPS = (
     
     # API documentation
     'rest_framework_swagger',
-    
-    # celery management commands
-    'djcelery',
+
 )
 
 LOCAL_APPS = (

@@ -1,9 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
-from django.db import IntegrityError
-from apps.gridentities.models import BalancingAuthority, FuelType
-from apps.griddata.models import DataPoint, DataSeries
-from apps.clients import client_factory
-from apps.genmix.models import Generation
+from apps.griddata.models import DataPoint
+from apps.clients.tasks import get_generation
+from apps.genmix.tasks import insert_generation
 from dateutil.parser import parse as dateutil_parse
 import pytz
 from optparse import make_option
@@ -38,40 +36,21 @@ class Command(BaseCommand):
             self.stdout.write('Getting the latest data...')
             
         # get data
-        c = client_factory(ba_name)
-        data = c.get_generation(latest=latest, start_at=start_at, end_at=end_at,
-                                market=options['market'])
-        self.stdout.write('Got the data, inserting...')
+        data = get_generation(ba_name,
+                              latest=latest, start_at=start_at, end_at=end_at,
+                              market=options['market'])
+        self.stdout.write('Got %d data points, inserting...' % len(data))
         
         # process data
         n_new_dps = 0
         n_new_gens = 0
         for gen_dp in data:
-            # get metadata
-            ba = BalancingAuthority.objects.get(abbrev=gen_dp['ba_name'])
-            fuel = FuelType.objects.get(name=gen_dp['fuel_name'])
-            
-            # insert data
-            dp, dp_created = DataPoint.objects.get_or_create(ba=ba,
-                                                             timestamp=gen_dp['timestamp'],
-                                                             freq=gen_dp['freq'],
-                                                             market=gen_dp['market'])
-            try:
-                gen = Generation.objects.create(mix=dp, fuel=fuel, gen_MW=gen_dp['gen_MW'])
-                gen_created = True
-            except IntegrityError:
-                gen = Generation.objects.get(mix=dp, fuel=fuel)
-                gen.gen_MW = gen_dp['gen_MW']
-                gen.save()
-                gen_created = False
+            # insert one observation into database
+            gen_created, dp_created = insert_generation(gen_dp)
             
             # update counters
             if dp_created:
                 n_new_dps += 1
-                ds, ds_created = DataSeries.objects.get_or_create(ba=ba,
-                                                                  series_type=DataSeries.HISTORICAL)
-                ds.datapoints.add(dp)
-                ds.save()
             if gen_created:
                 n_new_gens += 1
             
