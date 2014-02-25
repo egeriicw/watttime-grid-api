@@ -284,14 +284,14 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'apps.clients' : {
-            'handlers': ['mail_admins', 'console'],
+        'apps' : {
+            'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
         },
-        'apps.carbon' : {
-            'handlers': ['mail_admins', 'console'],
-            'level': 'ERROR',
+        'apps' : {
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': True,
         },
     }
