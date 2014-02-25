@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from apps.griddata.models import DataPoint
-from apps.clients.tasks import get_generation
-from apps.genmix.tasks import insert_generation
+from apps.genmix.tasks import update
 from dateutil.parser import parse as dateutil_parse
 import pytz
 from optparse import make_option
@@ -35,24 +34,7 @@ class Command(BaseCommand):
             start_at, end_at = None, None
             self.stdout.write('Getting the latest data...')
             
-        # get data
-        data = get_generation(ba_name,
-                              latest=latest, start_at=start_at, end_at=end_at,
-                              market=options['market'])
-        self.stdout.write('Got %d data points, inserting...' % len(data))
-        
-        # process data
-        n_new_dps = 0
-        n_new_gens = 0
-        for gen_dp in data:
-            # insert one observation into database
-            gen_created, dp_created = insert_generation(gen_dp)
-            
-            # update counters
-            if dp_created:
-                n_new_dps += 1
-            if gen_created:
-                n_new_gens += 1
-            
-        # log
-        self.stdout.write('Inserted %d new generation value(s) at %d new data point(s) in %s.' % (n_new_gens, n_new_dps, ba_name))
+        # run task
+        update(ba_name,
+               latest=latest, start_at=start_at, end_at=end_at,
+               market=options['market'])

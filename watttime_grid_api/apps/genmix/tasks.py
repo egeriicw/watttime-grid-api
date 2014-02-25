@@ -1,10 +1,14 @@
 from __future__ import absolute_import
-from celery import shared_task
+from celery import shared_task, group
 from django.db import IntegrityError
+from apps.clients.tasks import get_generation
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.genmix.models import Generation
 from apps.griddata.models import DataPoint, DataSeries
+import logging
 
+# set up logger
+logger = logging.getLogger(__name__)
 
 @shared_task
 def insert_generation(gen_obs):
@@ -33,5 +37,19 @@ def insert_generation(gen_obs):
         ds.datapoints.add(dp)
         ds.save()
 
-    return gen_created, dp_created
+    return gen_created, dp_created    
+
+@shared_task
+def update(ba_name, **kwargs):    
+    # get data
+    logger.info('Getting data for %s with args %s' % (ba_name, kwargs))
+    data = get_generation.delay(ba_name, **kwargs).get()
+
+    # insert data
+    logger.info('Got %d data points, inserting...' % len(data))    
+    res = group([insert_generation.s(x) for x in data])().get()
     
+    # check for inserts
+    n_new_gens = sum([x[0] for x in res])
+    n_new_dps = sum([x[1] for x in res])
+    logger.info('Inserted %d new generation value(s) at %d new data point(s).' % (n_new_gens, n_new_dps))
