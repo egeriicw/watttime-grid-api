@@ -31,7 +31,11 @@ class FuelType(models.Model):
     name = models.SlugField(unique=True)
 
     # description
-    description = models.CharField(max_length=40)
+    description = models.CharField(max_length=200)
+    
+    # flags
+    is_renewable = models.NullBooleanField(blank=True, null=True)
+    is_fossil = models.NullBooleanField(blank=True, null=True)
     
     def __unicode__(self):
         return self.name
