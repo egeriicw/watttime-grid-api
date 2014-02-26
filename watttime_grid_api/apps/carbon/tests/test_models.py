@@ -71,12 +71,12 @@ class TestCarbon(TestCase):
 
         # autocalc on first new gen
         self.dp.genmix.create(fuel=FuelType.objects.get(name='coal'), gen_MW=100)
-        self.assertEqual(Carbon.objects.get(dp=self.dp).emissions_intensity,
+        self.assertAlmostEqual(Carbon.objects.get(dp=self.dp).emissions_intensity,
                          (100 * 1000) / 100.0)
     
         # update on second new gen
         self.dp.genmix.create(fuel=FuelType.objects.get(name='natgas'), gen_MW=200)
-        self.assertEqual(Carbon.objects.get(dp=self.dp).emissions_intensity,
+        self.assertAlmostEqual(Carbon.objects.get(dp=self.dp).emissions_intensity,
                          (100 * 1000 + 200 * 500) / 300.0)
     
     def test_populated_carbon_intensities(self):

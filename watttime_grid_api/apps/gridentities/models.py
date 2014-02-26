@@ -4,10 +4,10 @@ from django.db import models
 class BalancingAuthority(models.Model):
     """Model for a balancing authority"""
     # long name
-    name = models.CharField(max_length=40)
+    name = models.CharField(max_length=200)
 
     # short name
-    abbrev = models.SlugField(unique=True)
+    abbrev = models.CharField(max_length=10, unique=True)
     
     # type of grid entity
     ISO = 'ISO'
@@ -20,6 +20,9 @@ class BalancingAuthority(models.Model):
     
     # link
     link = models.URLField(blank=True, null=True)
+    
+    # notes
+    notes = models.TextField(default='')
         
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.abbrev)
