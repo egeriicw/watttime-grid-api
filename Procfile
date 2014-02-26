@@ -1,3 +1,3 @@
 web: python manage.py collectstatic --noinput; newrelic-admin run-program gunicorn -c gunicorn.py.ini wsgi:application
-scheduler: celery worker -B -A watttime_grid_api -l info -E --maxtasksperchild=1000
-worker: celery worker -A watttime_grid_api -l info -E --maxtasksperchild=1000
+scheduler: celery worker -B -A watttime_grid_api -l info -E --maxtasksperchild=1000 --concurrency=1
+worker: celery worker -A watttime_grid_api -l info -E --maxtasksperchild=1000 --concurrency=1
