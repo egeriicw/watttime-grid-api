@@ -2,6 +2,7 @@
 *~
 *.db
 celerybeat-schedule
+.env
 
 # C extensions
 *.so

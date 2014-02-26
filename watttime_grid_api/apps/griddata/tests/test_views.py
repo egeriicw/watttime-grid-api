@@ -31,7 +31,7 @@ class SeriesAPITest(APITestCase):
         """boilerplate for testing status and number of objects in get requests"""
         response = self.client.get(url, data=data)
         if response.status_code is not status.HTTP_200_OK:
-            print response.data
+            print response.data, url
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), n_expected)        
         return response
@@ -62,7 +62,8 @@ class SeriesAPITest(APITestCase):
         
     def test_get_detail(self):
         """detail returns object with correct data"""
-        url = self.base_url + '1/'
+        pk = DataSeries.objects.all()[0].id
+        url = self.base_url + '%d/' % pk
         response = self._run_get(url, {}, 3)
         
         # correct field names

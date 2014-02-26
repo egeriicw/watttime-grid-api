@@ -36,7 +36,8 @@ class CarbonAPITest(APITestCase):
                          
     def test_get_detail(self):
         """detail returns object with correct data"""
-        url = self.base_url + '1/'
+        pk = DataSeries.objects.all()[0].id
+        url = self.base_url + '%d/' % pk
         response = self._run_get(url, {}, 3)
         
         # correct field names
