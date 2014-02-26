@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from celery import shared_task, group
+from celery import shared_task, subtask, group
 from django.db import IntegrityError
 from apps.clients.tasks import get_generation
 from apps.gridentities.models import BalancingAuthority, FuelType
@@ -37,17 +37,23 @@ def insert_generation(gen_obs):
         ds.datapoints.add(dp)
         ds.save()
 
-    return gen_created, dp_created    
+    return gen_created, dp_created
+    
+@shared_task
+def cmap(it, callback):
+    # Map a callback over an iterator and return as a group
+    # see http://stackoverflow.com/questions/13271056/how-to-chain-a-celery-task-that-returns-a-list-into-a-group
+    callback = subtask(callback)
+    return group(callback.clone([arg,]) for arg in it)()
 
 @shared_task
 def update(ba_name, **kwargs):    
-    # get data
+    # pre-log
     logger.info('%s: Getting data with args %s' % (ba_name, kwargs))
-    data = get_generation.delay(ba_name, **kwargs).get()
-
-    # insert data
-    logger.info('%s: Got %d data points, inserting...' % (ba_name, len(data)))
-    res = group([insert_generation.s(x) for x in data])().get()
+    
+    # run chain
+    chain = (get_generation.s(ba_name, **kwargs) | cmap.s(insert_generation.s()))
+    res = chain().get().join()
     
     # check for inserts
     n_new_gens = sum([x[0] for x in res])
