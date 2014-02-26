@@ -50,12 +50,12 @@ def cmap(it, callback):
 def update(ba_name, **kwargs):    
     # pre-log
     logger.info('%s: Getting data with args %s' % (ba_name, kwargs))
+   # prev_latest_date = Generation.objects.filter(mix__ba__abbrev=ba_name).latest().datetime
     
     # run chain
     chain = (get_generation.s(ba_name, **kwargs) | cmap.s(insert_generation.s()))
-    res = chain().get().join()
+    res = chain()
     
     # check for inserts
-    n_new_gens = sum([x[0] for x in res])
-    n_new_dps = sum([x[1] for x in res])
-    logger.info('%s: Inserted %d new generation value(s) at %d new data point(s).' % (ba_name, n_new_gens, n_new_dps))
+ #   new_latest_date = Generation.objects.filter(mix__ba__abbrev=ba_name).latest().datetime
+  #  logger.info('%s: Inserted %d new generation value(s) at %d new data point(s).' % (ba_name, n_new_gens, n_new_dps))
