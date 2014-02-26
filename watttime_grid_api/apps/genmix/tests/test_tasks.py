@@ -17,7 +17,7 @@ class TestInsert(TestCase):
 
     def setUp(self):
         self.dp_dict = {'freq': '5m', 'ba_name': 'MISO', 'market': 'RT5M',
-              'fuel_name': 'coal', 'gen_MW': u'58906',
+              'fuel_name': 'coal', 'gen_MW': 58906,
               'timestamp': pytz.utc.localize(datetime.utcnow())}
 
     def test_insert_one(self):
