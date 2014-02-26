@@ -53,8 +53,9 @@ def insert_generation(gen_obs):
 def cmap(it, callback):
     # Map a callback over an iterator and return as a group
     # see http://stackoverflow.com/questions/13271056/how-to-chain-a-celery-task-that-returns-a-list-into-a-group
-    callback = subtask(callback)
-    return group(callback.clone([arg,]) for arg in it)()
+  #  callback = subtask(callback)
+  #  return group(callback.clone([arg,]) for arg in it)()
+    return [callback(x) for x in it]
 
 @shared_task
 def update(ba_name, **kwargs):    
@@ -63,9 +64,9 @@ def update(ba_name, **kwargs):
    # prev_latest_date = Generation.objects.filter(mix__ba__abbrev=ba_name).latest().datetime
     
     # run chain
-    chain = (get_generation.s(ba_name, **kwargs) | cmap.s(insert_generation.s()))
+    chain = (get_generation.s(ba_name, **kwargs) | cmap.s(insert_generation))
     res = chain()
-    
+    return res
     # check for inserts
  #   new_latest_date = Generation.objects.filter(mix__ba__abbrev=ba_name).latest().datetime
   #  logger.info('%s: Inserted %d new generation value(s) at %d new data point(s).' % (ba_name, n_new_gens, n_new_dps))
