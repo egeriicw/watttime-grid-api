@@ -62,7 +62,8 @@ BROKER_TRANSPORT = 'amqplib'
 # connections total.
 #
 # See: http://docs.celeryproject.org/en/latest/configuration.html#broker-pool-limit
-BROKER_POOL_LIMIT = 3
+# https://devcenter.heroku.com/articles/cloudamqp
+BROKER_POOL_LIMIT = 1
 
 # See: http://docs.celeryproject.org/en/latest/configuration.html#broker-connection-max-retries
 BROKER_CONNECTION_MAX_RETRIES = 0
@@ -71,7 +72,7 @@ BROKER_CONNECTION_MAX_RETRIES = 0
 BROKER_URL = environ.get('RABBITMQ_URL') or environ.get('CLOUDAMQP_URL')
 
 # See: http://docs.celeryproject.org/en/latest/configuration.html#celery-result-backend
-CELERY_RESULT_BACKEND = 'amqp'
+#CELERY_RESULT_BACKEND = 'amqp'
 ########## END CELERY CONFIGURATION
 
 

@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.signals import post_save
+from django.db import IntegrityError
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
 from apps.genmix.models import Generation
@@ -70,7 +71,7 @@ class Carbon(models.Model):
             except FuelCarbonIntensity.DoesNotExist:
                 # if a single conversion factor is missing, clear everything
                 self.fuel_carbons.clear()
-                self.carbon = None
+                self.emissions_intensity = None
                 logger.error('No carbon intensity found for %s in %s at %s' % (gen.fuel.name,
                                                                                     self.dp.ba.abbrev,
                                                                                     self.dp.timestamp))
