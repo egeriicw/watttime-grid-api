@@ -42,14 +42,14 @@ def insert_generation(gen_obs):
 @shared_task
 def update(ba_name, **kwargs):    
     # get data
-    logger.info('Getting data for %s with args %s' % (ba_name, kwargs))
+    logger.info('%s: Getting data with args %s' % (ba_name, kwargs))
     data = get_generation.delay(ba_name, **kwargs).get()
 
     # insert data
-    logger.info('Got %d data points, inserting...' % len(data))    
+    logger.info('%s: Got %d data points, inserting...' % (ba_name, len(data)))
     res = group([insert_generation.s(x) for x in data])().get()
     
     # check for inserts
     n_new_gens = sum([x[0] for x in res])
     n_new_dps = sum([x[1] for x in res])
-    logger.info('Inserted %d new generation value(s) at %d new data point(s).' % (n_new_gens, n_new_dps))
+    logger.info('%s: Inserted %d new generation value(s) at %d new data point(s).' % (ba_name, n_new_gens, n_new_dps))

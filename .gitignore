@@ -1,6 +1,7 @@
 *.py[cod]
 *~
 *.db
+celerybeat-schedule
 
 # C extensions
 *.so
