@@ -28,12 +28,14 @@ def insert_generation(gen_obs):
     gens = Generation.objects.filter(mix=dp, fuel=fuel)
     if gens.count() == 1:
         gen = gens.get()
-        gen.gen_MW = 200
+        gen.gen_MW = gen_obs['gen_MW']
         gen.save()
         gen_created = False
+        logger.info('Generation for %s with %s updated to %s MW' % (dp, fuel, gen.gen_MW))
     elif gens.count() == 0:
         gen = Generation.objects.create(mix=dp, fuel=fuel, gen_MW=gen_obs['gen_MW'])
         gen_created = True
+        logger.info('Generation for %s with %s inserted with %s MW' % (dp, fuel, gen.gen_MW))
     else:
         logger.error('Uncaught integrity error in Generation? %s' % gens)
         gen_created = False
