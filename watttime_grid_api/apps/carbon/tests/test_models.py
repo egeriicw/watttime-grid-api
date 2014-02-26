@@ -3,6 +3,7 @@ from django.db import IntegrityError
 from apps.griddata.models import DataPoint
 from apps.gridentities.models import FuelType, BalancingAuthority
 from apps.carbon.models import Carbon, FuelCarbonIntensity
+from apps.genmix.models import Generation
 from datetime import datetime
 import pytz
 
@@ -64,7 +65,7 @@ class TestCarbon(TestCase):
         self.add_gens()
         c = Carbon.objects.get(dp=self.dp)
         c.set_carbon()
-        self.assertIsNone(c.carbon)
+        self.assertIsNone(c.emissions_intensity)
         
     def test_autocalc_carbon(self):
         self.add_conversions()
@@ -73,11 +74,13 @@ class TestCarbon(TestCase):
         self.dp.genmix.create(fuel=FuelType.objects.get(name='coal'), gen_MW=100)
         self.assertEqual(Carbon.objects.get(dp=self.dp).emissions_intensity,
                          (100 * 1000) / 100.0)
+        self.assertEqual(self.dp.carbon.fuel_carbons.count(), 1)
     
         # update on second new gen
         self.dp.genmix.create(fuel=FuelType.objects.get(name='natgas'), gen_MW=200)
         self.assertEqual(Carbon.objects.get(dp=self.dp).emissions_intensity,
                          (100 * 1000 + 200 * 500) / 300.0)
+        self.assertEqual(self.dp.carbon.fuel_carbons.count(), 2)
     
     def test_populated_carbon_intensities(self):
         self.add_conversions()
@@ -85,3 +88,13 @@ class TestCarbon(TestCase):
         self.assertEqual(Carbon.objects.get(dp=self.dp).fuel_carbons.count(),
                          self.dp.genmix.count())
         
+    def test_passing_on_dup_gen(self):
+        self.add_conversions()
+        self.add_gens()
+        coal = FuelType.objects.get(name='coal')
+        gens = Generation.objects.filter(mix=self.dp, fuel=coal)
+        self.assertEqual(gens.count(), 1)
+        gen = gens.get()
+        gen.gen_MW = 200
+        gen.save()
+            

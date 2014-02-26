@@ -4,7 +4,7 @@ from apps.genmix.models import Generation
 
 
 class TestCommand(TestCase):
-    fixtures = ['isos', 'gentypes']
+    fixtures = ['isos', 'gentypes', 'fuelcarbonintensities']
     
     def _run_test(self, ba_name, **kwargs):
         self.assertEqual(Generation.objects.filter(mix__ba__abbrev=ba_name).count(), 0)

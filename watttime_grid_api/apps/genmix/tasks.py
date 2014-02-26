@@ -16,18 +16,26 @@ def insert_generation(gen_obs):
     ba = BalancingAuthority.objects.get(abbrev=gen_obs['ba_name'])
     fuel = FuelType.objects.get(name=gen_obs['fuel_name'])
     
-    # insert data
+    # insert DataPoint
     dp, dp_created = DataPoint.objects.get_or_create(ba=ba,
                                                      timestamp=gen_obs['timestamp'],
                                                      freq=gen_obs['freq'],
                                                      market=gen_obs['market'])
-    try:
+                                                     
+    # insert Generation
+    # do this instead of try: ... except IntegrityError: ...
+    #     because IntegrityError has different behavior on sqlite3 and postgres
+    gens = Generation.objects.filter(mix=dp, fuel=fuel)
+    if gens.count() == 1:
+        gen = gens.get()
+        gen.gen_MW = 200
+        gen.save()
+        gen_created = False
+    elif gens.count() == 0:
         gen = Generation.objects.create(mix=dp, fuel=fuel, gen_MW=gen_obs['gen_MW'])
         gen_created = True
-    except IntegrityError:
-        gen = Generation.objects.get(mix=dp, fuel=fuel)
-        gen.gen_MW = gen_obs['gen_MW']
-        gen.save()
+    else:
+        logger.error('Uncaught integrity error in Generation? %s' % gens)
         gen_created = False
     
     # update counters
