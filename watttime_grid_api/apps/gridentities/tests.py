@@ -1,8 +1,11 @@
 from django.test import TestCase
 from django.db import IntegrityError
+from django.contrib.gis.geos import Point
+from django.contrib.gis.measure import D
 from rest_framework import status
 from rest_framework.test import APITestCase
 from apps.gridentities.models import BalancingAuthority, FuelType, PowerPlant
+
 
 class BATest(TestCase):
     def test_create(self):
@@ -53,7 +56,26 @@ class PowerPlantTest(TestCase):
         from apps.gridentities import load
         load.run(verbose=False)
         self.assertEqual(PowerPlant.objects.all().count(), 1324)
+        
+    def test_nearest(self):
+        # load
+        from apps.gridentities import load
+        load.run(verbose=False)
+        
+        # Boston
+        point = Point(-71.03, 42.21)
+        
+        # number nearby
+        nearby_pps = PowerPlant.objects.filter(coord__distance_lt=(point, D(mi=100)))
+        self.assertEqual(nearby_pps.count(), 21)
+        
+        # sort by distance
+        nearby_pps_sorted = nearby_pps.distance(point).order_by('distance')
+        self.assertLess(nearby_pps_sorted[0].distance, nearby_pps_sorted[1].distance)
 
+        # identity of closest
+        self.assertEqual(nearby_pps_sorted[0].code, '6049')
+        
 
 class BAAPITest(APITestCase):
     fixtures = ['isos.json']
