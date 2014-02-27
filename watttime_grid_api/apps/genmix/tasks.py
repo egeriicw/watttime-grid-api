@@ -23,15 +23,11 @@ def insert_generation(gen_obs):
                                                      market=gen_obs['market'])
                                                      
     # insert Generation
+    # get_or_create will update an existing entry with the new gen value
     gen, gen_created = Generation.objects.get_or_create(mix=dp, fuel=fuel,
                                                         defaults={'gen_MW': gen_obs['gen_MW']})
     if gen_created:
         logger.info('Generation for %s with %s inserted with %s MW' % (dp, fuel, gen.gen_MW))
-    else:
-        if gen.gen_MW != gen_obs['gen_MW']:
-            gen.gen_MW = gen_obs['gen_MW']
-            gen.save()
-            logger.info('Generation for %s with %s updated to %s MW' % (dp, fuel, gen.gen_MW))
     
     # add to dataseries
     if dp_created:
