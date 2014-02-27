@@ -23,30 +23,24 @@ def insert_generation(gen_obs):
                                                      market=gen_obs['market'])
                                                      
     # insert Generation
-    # do this instead of try: ... except IntegrityError: ...
-    #     because IntegrityError has different behavior on sqlite3 and postgres
-    gens = Generation.objects.filter(mix=dp, fuel=fuel)
-    if gens.count() == 1:
-        gen = gens.get()
-        gen.gen_MW = gen_obs['gen_MW']
-        gen.save()
-        gen_created = False
-        logger.info('Generation for %s with %s updated to %s MW' % (dp, fuel, gen.gen_MW))
-    elif gens.count() == 0:
-        gen = Generation.objects.create(mix=dp, fuel=fuel, gen_MW=gen_obs['gen_MW'])
-        gen_created = True
+    gen, gen_created = Generation.objects.get_or_create(mix=dp, fuel=fuel,
+                                                        defaults={'gen_MW': gen_obs['gen_MW']})
+    if gen_created:
         logger.info('Generation for %s with %s inserted with %s MW' % (dp, fuel, gen.gen_MW))
     else:
-        logger.error('Uncaught integrity error in Generation? %s' % gens)
-        gen_created = False
+        if gen.gen_MW != gen_obs['gen_MW']:
+            gen.gen_MW = gen_obs['gen_MW']
+            gen.save()
+            logger.info('Generation for %s with %s updated to %s MW' % (dp, fuel, gen.gen_MW))
     
-    # update counters
+    # add to dataseries
     if dp_created:
         ds, ds_created = DataSeries.objects.get_or_create(ba=ba,
                                                           series_type=DataSeries.HISTORICAL)
         ds.datapoints.add(dp)
         ds.save()
 
+    # return
     return gen_created, dp_created
     
 @shared_task
