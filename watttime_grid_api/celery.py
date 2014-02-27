@@ -35,7 +35,16 @@ app.conf.CELERYBEAT_SCHEDULE.update({
         'schedule': crontab(minute=EVERY_FIVE_PLUS_ONE),
         'args': [ba_name.upper()],
         'kwargs': {'latest': True, 'market': 'RT5M'},
-    } for ba_name in ['BPA', 'ISONE', 'MISO', 'SPP']
+    } for ba_name in ['ISONE', 'MISO', 'PJM']
+})
+EVERY_FIVE_PLUS_TWO = ','.join([str(i*5+2) for i in range(12)])
+app.conf.CELERYBEAT_SCHEDULE.update({
+    'update-%s-genmix-latest' % ba_name.lower(): {
+        'task': 'apps.genmix.tasks.update',
+        'schedule': crontab(minute=EVERY_FIVE_PLUS_TWO),
+        'args': [ba_name.upper()],
+        'kwargs': {'latest': True, 'market': 'RT5M'},
+    } for ba_name in ['BPA']
 })
 
 # tasks every 10 min
@@ -57,5 +66,19 @@ app.conf.CELERYBEAT_SCHEDULE.update({
         'schedule': crontab(minute='33'),
         'args': ['ERCOT'],
         'kwargs': {'latest': True, 'market': 'RTHR'},
+    },
+    # yesterday in SPP every hour (should be once, just after midnight UTC)
+    'update-spp-genmix-yesterday': {
+        'task': 'apps.genmix.tasks.update',
+        'schedule': crontab(minute='33'),
+        'args': ['SPP'],
+        'kwargs': {'yesterday': True, 'market': 'RT5M'},
+    },
+    # yesterday in CAISO every hour (should be once, just after midnight Pacific time)
+    'update-caiso-genmix-yesterday': {
+        'task': 'apps.genmix.tasks.update',
+        'schedule': crontab(minute='33'),
+        'args': ['SPP'],
+        'kwargs': {'yesterday': True, 'market': 'RTHR'},
     },
 })
