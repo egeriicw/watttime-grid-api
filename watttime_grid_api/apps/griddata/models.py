@@ -57,6 +57,8 @@ class DataPoint(models.Model):
 
     class Meta:
         unique_together = ('timestamp', 'quality', 'freq', 'market', 'is_marginal', 'ba')
+        ordering = ['-timestamp', 'ba', 'quality']
+        get_latest_by = 'timestamp'
 
     def __str__(self):
         if self.is_marginal:

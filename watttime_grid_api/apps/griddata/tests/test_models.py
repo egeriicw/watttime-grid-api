@@ -3,7 +3,7 @@ from django.db import IntegrityError
 from django.db.transaction import TransactionManagementError
 from apps.griddata.models import DataPoint, DataSeries
 from apps.gridentities.models import BalancingAuthority
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 
 
@@ -85,3 +85,25 @@ class TestPoint(TestCase):
                                       ba=BalancingAuthority.objects.get(pk=1),
                                         quality=DataPoint.HISTORICAL, market=DataPoint.RT5M,
                                         is_marginal=False)
+                                        
+    def test_latest_and_ordering(self):
+        now = pytz.utc.localize(datetime.utcnow())
+        dp1 = DataPoint.objects.create(timestamp=now, freq=DataPoint.HOURLY,
+                                      ba=BalancingAuthority.objects.get(pk=1),
+                                        quality=DataPoint.HISTORICAL, market=DataPoint.RT5M,
+                                        is_marginal=False)
+        
+        dp2 = DataPoint.objects.create(timestamp=now-timedelta(hours=1),
+                                       freq=DataPoint.HOURLY,
+                                      ba=BalancingAuthority.objects.get(pk=1),
+                                        quality=DataPoint.HISTORICAL, market=DataPoint.RT5M,
+                                        is_marginal=False)
+                                        
+        # test latest
+        self.assertEqual(DataPoint.objects.earliest(), dp2)
+        self.assertEqual(DataPoint.objects.latest(), dp1)
+        
+        # test ordering: latest first
+        self.assertEqual(DataPoint.objects.all()[1], DataPoint.objects.earliest())
+        self.assertEqual(DataPoint.objects.all()[0], DataPoint.objects.latest())
+        
