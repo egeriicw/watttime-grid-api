@@ -78,7 +78,7 @@ app.conf.CELERYBEAT_SCHEDULE.update({
     'update-caiso-genmix-yesterday': {
         'task': 'apps.genmix.tasks.update',
         'schedule': crontab(minute='33'),
-        'args': ['SPP'],
+        'args': ['CAISO'],
         'kwargs': {'yesterday': True, 'market': 'RTHR'},
     },
 })
