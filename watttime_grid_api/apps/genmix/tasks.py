@@ -51,22 +51,23 @@ def insert_generation(gen_obs):
     
 @shared_task
 def cmap(it, callback):
-    # Map a callback over an iterator and return as a group
-    # see http://stackoverflow.com/questions/13271056/how-to-chain-a-celery-task-that-returns-a-list-into-a-group
-  #  callback = subtask(callback)
-  #  return group(callback.clone([arg,]) for arg in it)()
+    """Apply a task to each element of a task result, in series"""
+    # NOT this solution http://stackoverflow.com/questions/13271056/how-to-chain-a-celery-task-that-returns-a-list-into-a-group
     return [callback(x) for x in it]
+    
+@shared_task
+def log_update(res_list, ba_name):
+    n_new_gen = sum([x[0] for x in res_list])
+    n_new_dp = sum([x[1] for x in res_list])
+    logger.info('%s: Created %d new generations at %d new datapoints' % (ba_name, n_new_gen, n_new_dp))
+    return n_new_gen > 0
 
 @shared_task
 def update(ba_name, **kwargs):    
     # pre-log
     logger.info('%s: Getting data with args %s' % (ba_name, kwargs))
-   # prev_latest_date = Generation.objects.filter(mix__ba__abbrev=ba_name).latest().datetime
     
     # run chain
-    chain = (get_generation.s(ba_name, **kwargs) | cmap.s(insert_generation))
+    chain = (get_generation.s(ba_name, **kwargs) | cmap.s(insert_generation) | log_update.s(ba_name))
     res = chain()
     return res
-    # check for inserts
- #   new_latest_date = Generation.objects.filter(mix__ba__abbrev=ba_name).latest().datetime
-  #  logger.info('%s: Inserted %d new generation value(s) at %d new data point(s).' % (ba_name, n_new_gens, n_new_dps))

@@ -10,11 +10,8 @@ class TestUpdate(TestCase):
 
     def test_update(self):
         res = tasks.update('CAISO', latest=True).get()
-        n_new_gen = sum([x[0] for x in res])
-        n_new_dp = sum([x[1] for x in res])
-        self.assertGreater(n_new_gen, 1)
-        self.assertEqual(n_new_dp, 1)
-
+        self.assertEqual(res, True)
+        
 
 class TestInsert(TestCase):
     fixtures = ['isos', 'gentypes', 'fuelcarbonintensities']
