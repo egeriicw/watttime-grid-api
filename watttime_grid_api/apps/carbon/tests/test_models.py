@@ -36,6 +36,8 @@ class TestCarbon(TestCase):
         FuelCarbonIntensity.objects.create(ba=BalancingAuthority.objects.get(pk=1),
                                            fuel=FuelType.objects.get(name='wind'),
                                             lb_CO2_per_MW=0)
+        FuelCarbonIntensity.objects.create(fuel=FuelType.objects.get(name='wind'),
+                                            lb_CO2_per_MW=0)
 
     def test_failing_create(self):
         self.assertRaises(IntegrityError, Carbon.objects.create)

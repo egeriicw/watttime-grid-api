@@ -16,7 +16,7 @@ class FuelCarbonIntensity(models.Model):
     fuel = models.ForeignKey(FuelType)
 
     # balancing authority
-    ba = models.ForeignKey(BalancingAuthority)
+    ba = models.ForeignKey(BalancingAuthority, null=True, blank=True)
     
     # conversion between generation and emissions
     lb_CO2_per_MW = models.FloatField()
@@ -63,9 +63,16 @@ class Carbon(models.Model):
         
         # accumulate emissions for all generations
         for gen in self.dp.genmix.all():
+            # get conversion factors for this fuel and BA
+            fuel_to_carbons = FuelCarbonIntensity.objects.filter(fuel=gen.fuel,
+                                                                 ba=self.dp.ba)
+            
+            # if empty, get for null BA
+            if not fuel_to_carbons.exists():
+                fuel_to_carbons = FuelCarbonIntensity.objects.filter(fuel=gen.fuel,
+                                                                     ba=None)
+
             try:
-                # get conversion factors for this fuel and BA
-                fuel_to_carbons = FuelCarbonIntensity.objects.filter(fuel=gen.fuel, ba=self.dp.ba)
                 # the best one is the latest before the data point
                 fuel_to_carbon = fuel_to_carbons.filter(valid_after__lte=self.dp.timestamp).latest()
             except FuelCarbonIntensity.DoesNotExist:
@@ -105,12 +112,18 @@ post_save.connect(reset_carbon_on_gen, Generation)
 # every time a FuelCarbonIntensity model is saved, update its related carbon value
 def reset_carbon_on_fuelcarbon(sender, instance, **kwargs):
     # get affected data points
+    dps = DataPoint.objects.filter(timestamp__gt=instance.valid_after)
+    
+    # filter by balancing authority, if any
+    if instance.ba:
+        dps = dps.filter(ba=instance.ba)
+        
+    # filter by later valid fuel carbon
     try:
         next_instance = instance.get_next_by_valid_after()
-        dps = instance.ba.datapoint_set.filter(timestamp__gt=instance.valid_after,
-                                               timestamp__lte=next_instance.valid_after)
+        dps = dps.filter(timestamp__lte=next_instance.valid_after)
     except FuelCarbonIntensity.DoesNotExist:
-        dps = instance.ba.datapoint_set.filter(timestamp__gt=instance.valid_after)
+        pass
 
     # reset carbon on each point
     for dp in dps:
