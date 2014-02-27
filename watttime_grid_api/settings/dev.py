@@ -26,6 +26,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DATABASES = {
     'default': dj_database_url.config(default=os.environ['DATABASE_URL'])
 }
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+
 ########## END DATABASE CONFIGURATION
 
 

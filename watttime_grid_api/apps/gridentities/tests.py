@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.test import APITestCase
-from apps.gridentities.models import BalancingAuthority, FuelType
+from apps.gridentities.models import BalancingAuthority, FuelType, PowerPlant
 
 class BATest(TestCase):
     def test_create(self):
@@ -41,6 +41,19 @@ class FuelTest(TestCase):
         fuel = FuelType.objects.create(name='coal')
         self.assertRaises(IntegrityError, FuelType.objects.create, name='coal')
         
+        
+class PowerPlantTest(TestCase):
+    def test_null_create(self):
+        pp = PowerPlant()
+        self.assertEqual(pp.code, '')
+        self.assertEqual(pp.coord, None)
+        
+    def test_load(self):
+        # like loading data from a fixture
+        from apps.gridentities import load
+        load.run(verbose=False)
+        self.assertEqual(PowerPlant.objects.all().count(), 1324)
+
 
 class BAAPITest(APITestCase):
     fixtures = ['isos.json']

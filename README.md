@@ -6,19 +6,32 @@ An API for the power grid. See the code in action at http://watttime-grid-api.he
 
 Quickstart dev environment
 -----------
-Clone this, then install the requirements:
+Start a postgres server (eg http://postgresapp.com/) and create a database called <code>mydbname</code>.
 
+Clone this repo and install the requirements:
+
+      cd watttime-grid-api
       mkvirtualenv watttime-grid-api
       pip install -r reqs/dev.txt
 
-Set up the environment variables. You can use foreman
+Also install the GeoDjango requirements. See the platform-specific instructions at 
+https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/,
+I used homebrew:
+
+       brew install postgresql
+       brew install postgis
+       brew install libgeoip
+       psql mydbname
+       # CREATE EXTENSION postgis;
+
+Set up the environment variables. You can put then in a <code>.env</code> file and use foreman
 (get it at https://github.com/ddollar/foreman or as part of the Heroku CLI)
 or put them in your bash profile or whatever.
 If you're not using foreman, remove the 'foreman run' from all following commands.
 
       echo DATABASE_URL=postgres://localhost/mydbname > .env
 
-Set up the database by starting a postgres server (eg http://postgresapp.com/), then:
+Create database tables for the models (create user when prompted):
 
       foreman run ./manage.py syncdb
       foreman run ./manage.py migrate
@@ -27,6 +40,9 @@ Test the site:
 
       foreman run ./manage.py test
       foreman run ./manage.py loaddata isos gentypes fuelcarbonintensities griddata
+      foreman run ./manage.py shell
+      >>> from apps.gridentities import load
+      >>> load.run()
       foreman run ./manage.py runserver
 
 To run tasks with celery, run <code>rabbitmq-server &</code>, then

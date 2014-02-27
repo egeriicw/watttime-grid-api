@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.gis.db import models as geomodels
 
 
 class BalancingAuthority(models.Model):
@@ -26,7 +27,7 @@ class BalancingAuthority(models.Model):
         
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.abbrev)
-        
+
 
 class FuelType(models.Model):
     """Model for a generation source or fuel type"""
@@ -42,3 +43,21 @@ class FuelType(models.Model):
     
     def __unicode__(self):
         return self.name
+
+
+class PowerPlant(geomodels.Model):
+    """Model for a power plant or other point generation source"""
+    # unique id code
+    code = geomodels.CharField(max_length=4, unique=True)
+    
+    # lat-long
+    coord = geomodels.PointField()
+    
+    # fuel type
+    fuel = geomodels.ForeignKey(FuelType, null=True, blank=True)
+
+    # geo manager
+    objects = geomodels.GeoManager()
+    
+    def __unicode__(self):
+        return '%s (%s)' % (self.code, self.coord)        

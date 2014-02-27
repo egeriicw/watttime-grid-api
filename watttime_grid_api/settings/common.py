@@ -187,6 +187,9 @@ DJANGO_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Geo:
+    'django.contrib.gis',    
 
     # Useful template tags:
     'django.contrib.humanize',
