@@ -2,6 +2,18 @@ from django.db import models
 from django.contrib.gis.db import models as geomodels
 
 
+class ServiceArea(geomodels.Model):
+    """Model for a region serviced by an unspecified grid entity"""
+    # polygon boundaries
+    geom = geomodels.MultiPolygonField()
+    
+    # manager
+    objects = geomodels.GeoManager()
+
+    def __unicode__(self):
+        return 'center lat=%.3f, lon=%.3f' % self.geom.centroid.tuple
+
+
 class BalancingAuthority(models.Model):
     """Model for a balancing authority"""
     # long name
@@ -24,10 +36,18 @@ class BalancingAuthority(models.Model):
     
     # notes
     notes = models.TextField(default='')
+
+    # info from shapefile
+    area_sq_mi = models.FloatField(blank=True, null=True)
+    bal_auth_id = models.IntegerField(unique=True, blank=True, null=True)
+    rec_id = models.IntegerField(unique=True, blank=True, null=True)
+    
+    # service area
+    service_area = models.ForeignKey(ServiceArea, blank=True, null=True)
         
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.abbrev)
-
+        
 
 class FuelType(models.Model):
     """Model for a generation source or fuel type"""
