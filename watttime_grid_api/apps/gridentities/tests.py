@@ -2,8 +2,6 @@ from django.test import TestCase
 from django.db import IntegrityError
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
-from rest_framework import status
-from rest_framework.test import APITestCase
 from apps.gridentities.models import BalancingAuthority, FuelType, PowerPlant
 
 
@@ -113,42 +111,3 @@ class PowerPlantTest(TestCase):
         self.assertEqual(nearby_pps_sorted[0].code, '6049')
         
 
-class BAAPITest(APITestCase):
-    fixtures = ['bageom.json']
-    
-    def setUp(self):
-        self.base_url = '/api/v1'
-        
-    def test_get(self):
-        url = self.base_url + '/balancing_authorities/'
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data),
-                         BalancingAuthority.objects.count())
-                         
-    def test_filter(self):
-        url = self.base_url + '/balancing_authorities/'
-        
-        queries = [({'abbrev': 'ISONE'}, 1),
-                   ({'ba_type': 'ISO'}, 8),
-                   ]
-        for query, n_expected in queries:
-            response = self.client.get(url, data=query)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(response.data), n_expected)
-            
-    def test_geofilter(self):
-        url = self.base_url + '/balancing_authorities/'
-        
-        # Amherst
-        point = Point(-72.5196616, 42.3722951)
-        
-        # formats
-        formatted_points = [point.geojson, point.wkt]
-        print formatted_points
-        queries = [({'loc': frm}, 1) for frm in formatted_points]
-        
-        for query, n_expected in queries:
-            response = self.client.get(url, data=query)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(response.data), n_expected)
