@@ -114,7 +114,7 @@ class PowerPlantTest(TestCase):
         
 
 class BAAPITest(APITestCase):
-    fixtures = ['isos.json']
+    fixtures = ['bageom.json']
     
     def setUp(self):
         self.base_url = '/api/v1'
@@ -130,6 +130,8 @@ class BAAPITest(APITestCase):
         url = self.base_url + '/balancing_authorities/'
         queries = [({'abbrev': 'ISONE'}, 1),
                    ({'ba_type': 'ISO'}, 8),
+                    ({'loc': { "type": "Point", # Amherst
+                               "coordinates": [ -72.5196616, 42.3722951 ] }}, 1)
                    ]
         for query, n_expected in queries:
             response = self.client.get(url, data=query)

@@ -1,6 +1,8 @@
 from rest_framework import viewsets
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.gridentities.serializers import BalancingAuthoritySerializer, FuelTypeSerializer
+from apps.gridentities.filters import BalancingAuthorityFilter
+
 
 class BalancingAuthorityViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -13,7 +15,7 @@ class BalancingAuthorityViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = BalancingAuthority.objects.all()
     serializer_class = BalancingAuthoritySerializer
-    filter_fields = ('abbrev', 'ba_type')
+    filter_class = BalancingAuthorityFilter
 
 
 class FuelTypeViewSet(viewsets.ReadOnlyModelViewSet):
