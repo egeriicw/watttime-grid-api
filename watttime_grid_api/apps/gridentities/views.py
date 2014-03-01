@@ -12,6 +12,9 @@ class BalancingAuthorityViewSet(viewsets.ReadOnlyModelViewSet):
         Choices are 'ISO' for Independent System Operator (also used for RTOs or similar),\
         or 'BA' for any other balancing authority.\
         e.g., ba_type=ISO
+    loc -- Location within balancing authority, in GeoJSON or WKT.\
+        e.g., loc={"type": "Point", "coordinates": [ -72.519, 42.372]}\
+        or loc=POINT (-72.519 42.372)
     """
     queryset = BalancingAuthority.objects.all()
     serializer_class = BalancingAuthoritySerializer

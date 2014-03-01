@@ -128,13 +128,27 @@ class BAAPITest(APITestCase):
                          
     def test_filter(self):
         url = self.base_url + '/balancing_authorities/'
+        
         queries = [({'abbrev': 'ISONE'}, 1),
                    ({'ba_type': 'ISO'}, 8),
-                    ({'loc': { "type": "Point", # Amherst
-                               "coordinates": [ -72.5196616, 42.3722951 ] }}, 1)
                    ]
         for query, n_expected in queries:
             response = self.client.get(url, data=query)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data), n_expected)
             
+    def test_geofilter(self):
+        url = self.base_url + '/balancing_authorities/'
+        
+        # Amherst
+        point = Point(-72.5196616, 42.3722951)
+        
+        # formats
+        formatted_points = [point.geojson, point.wkt]
+        print formatted_points
+        queries = [({'loc': frm}, 1) for frm in formatted_points]
+        
+        for query, n_expected in queries:
+            response = self.client.get(url, data=query)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data), n_expected)

@@ -17,6 +17,4 @@ class BalancingAuthorityFilter(filters.FilterSet):
     
     class Meta:
         model = BalancingAuthority
-        fields = ['abbrev', 'loc']
-        
-
+        fields = ['abbrev', 'loc', 'ba_type']
