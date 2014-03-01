@@ -2,7 +2,7 @@ import os
 from django.contrib.gis.utils import LayerMapping
 from django.contrib.gis.gdal import DataSource, geometries
 from django.contrib.gis import geos
-from models import PowerPlant, BalancingAuthority, ServiceArea
+from models import PowerPlant, BalancingAuthority
 
 # See https://docs.djangoproject.com/en/1.6/ref/contrib/gis/tutorial/#layermapping
 # and https://docs.djangoproject.com/en/1.6/ref/contrib/gis/tutorial/#importing-spatial-data
@@ -51,19 +51,24 @@ def run_balancing_authority():
             
         # create service area
         if isinstance(ba.geom, geometries.MultiPolygon):
-            sa = ServiceArea.objects.create(geom=ba.geom.wkt)
+            mpoly = ba.geom.wkt
         else:
             # awkwardly coerce into MultiPolygon
             # see http://gis.stackexchange.com/questions/13498/can-polygons-be-generalized-to-multipolygons-in-geodjango
-            mp = geos.MultiPolygon(geos.fromstr(str(ba.geom)))
-            sa = ServiceArea.objects.create(geom=mp)
+            mpoly = geos.MultiPolygon(geos.fromstr(str(ba.geom)))
             
         # create or update BA
         defaults = {k: ba.get(v) for k, v in balancingauthority_mapping.iteritems()}
-        defaults['service_area'] = sa
+        defaults['geom'] = mpoly
         ba_db, created = BalancingAuthority.objects.get_or_create(abbrev=abbrev,
                                                                   defaults=defaults)
+        
+        # set other attrs
         if not ba_db.ba_type:
             ba_db.ba_type = 'BA'
+            ba_db.save()
+        if not created:
+            for k, v in defaults.iteritems():
+                setattr(ba_db, k, v)
             ba_db.save()
             

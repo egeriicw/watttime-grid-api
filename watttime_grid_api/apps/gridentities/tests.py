@@ -40,7 +40,7 @@ class BATest(TestCase):
         
         # test service areas created
         for ba in BalancingAuthority.objects.all():
-            self.assertGreater(ba.service_area.geom.num_points, 1)
+            self.assertGreater(ba.geom.num_points, 1)
             self.assertIn(ba.ba_type, dict(ba.BA_TYPE_CHOICES).keys())
             
     def test_service_area_contains(self):
@@ -49,18 +49,22 @@ class BATest(TestCase):
 
         # service area contains its own centroid
         ba = BalancingAuthority.objects.get(abbrev='ISONE')
-        poly = ba.service_area.geom
+        poly = ba.geom
         self.assertTrue(poly.contains(poly.centroid))
         
     def test_service_area_filter_contains(self):
         from apps.gridentities import load
         load.run_balancing_authority()
+        
+        points = [BalancingAuthority.objects.get(abbrev='ISONE').geom.centroid,
+                  Point(-72.5196616, 42.3722951) # Amherst
+                  ]
 
         # BA's service area contains its own centroid
-        point = BalancingAuthority.objects.get(abbrev='ISONE').service_area.geom.centroid
-        containers = BalancingAuthority.objects.filter(service_area__geom__contains=point)
-        self.assertEqual(containers.count(), 1)
-        self.assertEqual(containers[0].abbrev, 'ISONE')
+        for point in points:
+            containers = BalancingAuthority.objects.filter(geom__contains=point)
+            self.assertEqual(containers.count(), 1)
+            self.assertEqual(containers[0].abbrev, 'ISONE')
         
 
 class FuelTest(TestCase):

@@ -8,13 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'ServiceArea'
-        db.create_table(u'gridentities_servicearea', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('geom', self.gf('django.contrib.gis.db.models.fields.MultiPolygonField')()),
-        ))
-        db.send_create_signal(u'gridentities', ['ServiceArea'])
-
         # Adding field 'BalancingAuthority.area_sq_mi'
         db.add_column(u'gridentities_balancingauthority', 'area_sq_mi',
                       self.gf('django.db.models.fields.FloatField')(null=True, blank=True),
@@ -30,16 +23,13 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.IntegerField')(unique=True, null=True, blank=True),
                       keep_default=False)
 
-        # Adding field 'BalancingAuthority.service_area'
-        db.add_column(u'gridentities_balancingauthority', 'service_area',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['gridentities.ServiceArea'], null=True, blank=True),
+        # Adding field 'BalancingAuthority.geom'
+        db.add_column(u'gridentities_balancingauthority', 'geom',
+                      self.gf('django.contrib.gis.db.models.fields.MultiPolygonField')(null=True, blank=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'ServiceArea'
-        db.delete_table(u'gridentities_servicearea')
-
         # Deleting field 'BalancingAuthority.area_sq_mi'
         db.delete_column(u'gridentities_balancingauthority', 'area_sq_mi')
 
@@ -49,8 +39,8 @@ class Migration(SchemaMigration):
         # Deleting field 'BalancingAuthority.rec_id'
         db.delete_column(u'gridentities_balancingauthority', 'rec_id')
 
-        # Deleting field 'BalancingAuthority.service_area'
-        db.delete_column(u'gridentities_balancingauthority', 'service_area_id')
+        # Deleting field 'BalancingAuthority.geom'
+        db.delete_column(u'gridentities_balancingauthority', 'geom')
 
 
     models = {
@@ -60,12 +50,12 @@ class Migration(SchemaMigration):
             'area_sq_mi': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'ba_type': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
             'bal_auth_id': ('django.db.models.fields.IntegerField', [], {'unique': 'True', 'null': 'True', 'blank': 'True'}),
+            'geom': ('django.contrib.gis.db.models.fields.MultiPolygonField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'link': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'notes': ('django.db.models.fields.TextField', [], {'default': "''"}),
-            'rec_id': ('django.db.models.fields.IntegerField', [], {'unique': 'True', 'null': 'True', 'blank': 'True'}),
-            'service_area': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['gridentities.ServiceArea']", 'null': 'True', 'blank': 'True'})
+            'rec_id': ('django.db.models.fields.IntegerField', [], {'unique': 'True', 'null': 'True', 'blank': 'True'})
         },
         u'gridentities.fueltype': {
             'Meta': {'object_name': 'FuelType'},
@@ -80,11 +70,6 @@ class Migration(SchemaMigration):
             'code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '4'}),
             'coord': ('django.contrib.gis.db.models.fields.PointField', [], {}),
             'fuel': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['gridentities.FuelType']", 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
-        u'gridentities.servicearea': {
-            'Meta': {'object_name': 'ServiceArea'},
-            'geom': ('django.contrib.gis.db.models.fields.MultiPolygonField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         }
     }
