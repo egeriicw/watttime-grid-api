@@ -8,7 +8,7 @@ import pytz
 
 
 class SeriesAPITest(APITestCase):
-    fixtures = ['isos.json']
+    fixtures = ['bageom.json']
     urls = 'apps.griddata.tests.test_urls'
 
     def setUp(self):
@@ -72,6 +72,18 @@ class SeriesAPITest(APITestCase):
             
         # correct number of datapoints
         self.assertEqual(len(response.data['datapoints']), 3)
+
+    def test_filter_point_loc(self):
+        """filter by lat/lon"""
+        url = self.base_url
+        
+        # Amherst
+        geojson = { "type": "Point",
+                   "coordinates": [ -72.5196616, 42.3722951 ] }
+        response = self._run_get(url, {'loc': geojson}, 1)
+        
+        for ds in response.data:
+            self.assertEqual(ds['ba']['abbrev'], 'ISONE')
         
     def test_filter_start(self):
         """filter by start=DATETIME"""

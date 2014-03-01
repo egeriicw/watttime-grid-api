@@ -8,7 +8,7 @@ import pytz
 
 
 class TestSeries(TestCase):
-    fixtures = ['isos.json']
+    fixtures = ['bageom.json']
     def setUp(self):
         self.ba = BalancingAuthority.objects.get(pk=1)
 
@@ -23,7 +23,31 @@ class TestSeries(TestCase):
         self.assertEqual(ds.datapoints.count(), 0)
         for field in [ds.ba, ds.series_type]:
             self.assertIn(str(field), str(ds))
+            
+    def test_filter_in_ba(self):
+        isone = BalancingAuthority.objects.get(abbrev='ISONE')
+        DataSeries.objects.create(ba=isone)
+        
+        # passing
+        self.assertEqual(DataSeries.objects.filter(ba=isone).count(), 1)
 
+        # passing
+        self.assertEqual(DataSeries.objects.filter(ba__geom=isone.geom).count(), 1)
+        
+        # failing
+        qs = DataSeries.objects.filter(ba__geom__contains_properly=isone.geom.centroid)
+        self.assertEqual(qs.count(), 1)
+
+    def test_filter_in_dp(self):
+        ds = DataSeries.objects.create(ba=self.ba)
+        now = pytz.utc.localize(datetime.utcnow())
+        dp = DataPoint.objects.create(timestamp=now, ba=self.ba)
+        ds.datapoints.add(dp)
+        self.assertEqual(ds.datapoints.count(), 1)
+        
+        qs = DataSeries.objects.filter(datapoints__timestamp__gte=now)
+        self.assertEqual(qs.count(), 1)
+        
 
 class TestPoint(TestCase):
     fixtures = ['isos.json']
