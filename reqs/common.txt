@@ -4,7 +4,7 @@ celery==3.1.7
 django-compressor==1.3
 djangorestframework==2.3.12
 djangorestframework-chain==0.1.3
-django-rest-swagger==0.1.11
+django-rest-swagger==0.1.13
 django-filter==0.7
 dj-database-url==0.2.2
 requests==2.1.0
