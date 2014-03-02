@@ -41,7 +41,7 @@ SERVER_EMAIL = EMAIL_HOST_USER
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 # and https://devcenter.heroku.com/articles/postgis
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ['DATABASE_URL'])
+    'default': dj_database_url.config(default=environ['DATABASE_URL'])
 }
 DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 ########## END DATABASE CONFIGURATION
