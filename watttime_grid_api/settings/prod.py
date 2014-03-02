@@ -40,9 +40,7 @@ SERVER_EMAIL = EMAIL_HOST_USER
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 # and https://devcenter.heroku.com/articles/postgis
-DATABASES = {
-    'default': dj_database_url.config(default=environ['DATABASE_URL'])
-}
+DATABASES['default'] =  dj_database_url.config()
 DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 ########## END DATABASE CONFIGURATION
 
@@ -63,7 +61,8 @@ CACHES = {
         'remove_failed': 4
     }
   }
-}########## END CACHE CONFIGURATION
+}
+########## END CACHE CONFIGURATION
 
 
 ########## CELERY CONFIGURATION
