@@ -4,7 +4,7 @@
 from os import environ
 
 from memcacheify import memcacheify
-from postgresify import postgresify
+import dj_database_url
 #from S3 import CallingFormat
 
 from common import *
@@ -38,7 +38,12 @@ SERVER_EMAIL = EMAIL_HOST_USER
 
 
 ########## DATABASE CONFIGURATION
-DATABASES = postgresify()
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
+# and https://devcenter.heroku.com/articles/postgis
+DATABASES = {
+    'default': dj_database_url.config(default=os.environ['DATABASE_URL'])
+}
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 ########## END DATABASE CONFIGURATION
 
 
