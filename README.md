@@ -7,12 +7,9 @@ An API for the power grid. See the code in action at http://watttime-grid-api.he
 Quickstart dev environment
 -----------
 Start a postgres server (eg http://postgresapp.com/) and create a database called <code>mydbname</code>.
+You'll also need libmemcached:
 
-Clone this repo and install the requirements:
-
-      cd watttime-grid-api
-      mkvirtualenv watttime-grid-api
-      pip install -r reqs/dev.txt
+       brew install libmemcached
 
 Also install the GeoDjango requirements. See the platform-specific instructions at 
 https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/,
@@ -23,6 +20,12 @@ I used homebrew:
        brew install libgeoip
        psql mydbname
        # CREATE EXTENSION postgis;
+
+Clone this repo and install the requirements:
+
+      cd watttime-grid-api
+      mkvirtualenv watttime-grid-api
+      pip install -r reqs/dev.txt
 
 Set up the environment variables. You can put then in a <code>.env</code> file and use foreman
 (get it at https://github.com/ddollar/foreman or as part of the Heroku CLI)

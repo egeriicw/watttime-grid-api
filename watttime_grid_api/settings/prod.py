@@ -49,8 +49,21 @@ DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 ########## CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
-CACHES = memcacheify()
-########## END CACHE CONFIGURATION
+environ['MEMCACHE_SERVERS'] = environ.get('MEMCACHIER_SERVERS', '').replace(',', ';')
+environ['MEMCACHE_USERNAME'] = environ.get('MEMCACHIER_USERNAME', '')
+environ['MEMCACHE_PASSWORD'] = environ.get('MEMCACHIER_PASSWORD', '')
+
+CACHES = {
+  'default': {
+    'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
+    'TIMEOUT': 1000,
+    'BINARY': True,
+    'OPTIONS': {
+        'tcp_nodelay': True,
+        'remove_failed': 4
+    }
+  }
+}########## END CACHE CONFIGURATION
 
 
 ########## CELERY CONFIGURATION
