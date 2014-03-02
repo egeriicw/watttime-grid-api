@@ -8,7 +8,7 @@ from apps.carbon.models import FuelCarbonIntensity
 class BalancingAuthoritySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = BalancingAuthority
-        fields = ('name', 'ba_type', 'url', 'abbrev', 'link')
+        fields = ('name', 'ba_type', 'url', 'abbrev', 'link', 'notes')
 
 
 class FuelTypeSerializer(serializers.HyperlinkedModelSerializer):

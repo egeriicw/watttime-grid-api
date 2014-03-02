@@ -98,7 +98,7 @@ class DataPointsAPITest(APITestCase):
         if response.status_code is not status.HTTP_200_OK:
             print response.data, url
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), n_expected)        
+        self.assertEqual(len(response.data['results']), n_expected)        
         return response
         
     def test_data_created(self):
@@ -108,27 +108,28 @@ class DataPointsAPITest(APITestCase):
         
     def test_get(self):
         """get list"""
-        url = self.base_url
-        self._run_get(url, {}, self.n_isos*self.n_times*self.n_at_time)
-                         
+        # max per page is 12
+        response = self._run_get(self.base_url, {}, 12)
+        
+        # test keys
+        expected_keys = set(['results', 'previous', 'next', 'count'])
+        self.assertEqual(expected_keys, set(response.data.keys()))
+
     def test_filter_ba_abbrev(self):
         """can filter by BA name"""
-        url = self.base_url
-        response = self._run_get(url, {'ba': 'CAISO'}, self.n_times*self.n_at_time) 
+        response = self._run_get(self.base_url, {'ba': 'CAISO'}, self.n_times*self.n_at_time) 
                     
-        for dp in response.data:
+        for dp in response.data['results']:
             self.assertEqual(dp['ba'], 'CAISO')
         
     def test_filter_ba_loc(self):
         """can filter by location within BA"""
-        url = self.base_url
-        
         # Amherst
         geojson = { "type": "Point",
                    "coordinates": [ -72.5196616, 42.3722951 ] }
-        response = self._run_get(url, {'loc': geojson}, self.n_times*self.n_at_time)
+        response = self._run_get(self.base_url, {'loc': geojson}, self.n_times*self.n_at_time)
         
-        for dp in response.data:
+        for dp in response.data['results']:
             self.assertEqual(dp['ba'], 'ISONE')
         
     def test_multifilter(self):
@@ -139,67 +140,62 @@ class DataPointsAPITest(APITestCase):
         """detail returns object with correct data"""
         pk = DataPoint.objects.all()[0].id
         url = self.base_url + '%d/' % pk
-        response = self._run_get(url, {}, 8)
+        response = response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)       
         
         # correct field names
-        for field in ['ba', 'timestamp', 'genmix', 'carbon', 'created_at',
-                      'url', 'freq', 'market']:
-            self.assertIn(field, response.data.keys())
+        expected_keys = set(['ba', 'timestamp', 'genmix', 'carbon', 'created_at',
+                             'url', 'freq', 'market'])
+        self.assertEqual(expected_keys, set(response.data.keys()))
             
     def test_filter_start_iso(self):
-        url = self.base_url
-        
         # like '2006-10-25T14:30:59+00:00'
         dtstr = self.now.isoformat()
 
         # start time inclusive
-        response = self._run_get(url, {'start_at': dtstr},
+        response = self._run_get(self.base_url, {'start_at': dtstr},
                                        self.n_isos*(self.n_times-1)*self.n_at_time)
 
-        for dp in response.data:
+        for dp in response.data['results']:
             self.assertGreaterEqual(dp['timestamp'], self.now)
 
     def test_filter_start_day(self):
-        url = self.base_url
-        
         # like '2006-10-25'
         dtstr = self.now.strftime('%Y-%m-%d')
 
         # start time inclusive
-        response = self._run_get(url, {'start_at': dtstr},
+        response = self._run_get(self.base_url, {'start_at': dtstr},
                                        self.n_isos*(self.n_times-1)*self.n_at_time)
-        for dp in response.data:
+        for dp in response.data['results']:
             self.assertGreaterEqual(dp['timestamp'], self.now)
 
     def test_filter_start_hmz(self):
-        url = self.base_url
-        
         # like '2006-10-25T14:30+0000'
         dtstr = self.now.strftime('%Y-%m-%dT%H:%M%z')
 
         # start time inclusive
-        response = self._run_get(url, {'start_at': dtstr},
+        response = self._run_get(self.base_url, {'start_at': dtstr},
                                        self.n_isos*(self.n_times-1)*self.n_at_time)
-        for dp in response.data:
+        for dp in response.data['results']:
             self.assertGreaterEqual(dp['timestamp'], self.now)
 
     def test_filter_start_hmsz(self):
-        url = self.base_url
-        
         # like '2006-10-25T14:30:59+0000'
         dtstr = self.now.strftime('%Y-%m-%dT%H:%M:%S%z')
         
         # start time inclusive
-        response = self._run_get(url, {'start_at': dtstr},
+        response = self._run_get(self.base_url, {'start_at': dtstr},
                                        self.n_isos*(self.n_times-1)*self.n_at_time)
-        for dp in response.data:
+        for dp in response.data['results']:
             self.assertGreaterEqual(dp['timestamp'], self.now)
 
     def test_filter_end(self):
-        url = self.base_url
-        
         # end time inclusive
-        response = self._run_get(url, {'end_at': self.now.isoformat()},
+        response = self._run_get(self.base_url, {'end_at': self.now.isoformat()},
                                        self.n_isos*(self.n_times-1)*self.n_at_time)
-        for dp in response.data:
+        for dp in response.data['results']:
             self.assertLessEqual(dp['timestamp'], self.now)
+            
+    def test_paginate(self):
+        for n in range(1, self.n_isos*self.n_times*self.n_at_time):
+            response = self._run_get(self.base_url, {'page_size': n}, n)

@@ -46,7 +46,13 @@ class DataPointViewSet(viewsets.ReadOnlyModelViewSet):
         e.g., end_at=2014-02-20 \
         or end_at=2014-02-20T16:45:30-0800 \
         or end_at=2014-02-20T16:45:30-08:00
+    page_size -- Number of data points to return on each page.\
+        default is page_size=12
     """
     queryset = DataPoint.objects.all()
     serializer_class = serializers.DataPointSerializer
     filter_class = filters.DataPointFilter
+    
+    # turn on pagination
+    paginate_by = 12
+    paginate_by_param = 'page_size'
