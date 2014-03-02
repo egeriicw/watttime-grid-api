@@ -154,3 +154,9 @@ CELERY_RESULT_BACKEND = 'amqp'
 ALLOWED_HOSTS = ['.herokuapp.com']
 ########## END ALLOWED HOST CONFIGURATION
 
+
+########## GEODJANGO CONFIGURATION
+# See: https://github.com/cirlabs/heroku-buildpack-geodjango
+GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
+########## END GEODJANGO CONFIGURATION
