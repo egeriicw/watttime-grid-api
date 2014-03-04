@@ -1,0 +1,37 @@
+#django-rest-swagger {
+    background: #99DFF9; 
+    color: #6D6371; 
+    text-align:right; 
+    padding: 7px 0; 
+    font-size: 0.8em
+}
+#django-rest-swagger a {
+    color: #002C3C;
+    text-decoration: none;
+}
+#header {
+  background-color: #002C3C;
+  padding: 14px;
+}
+#header a#logo {
+  background: transparent url(../images/wordlogo_sm.png) no-repeat left center;
+  padding: 20px 200px 20px 40px;
+}
+#header form#api_selector .input a#explore {
+  display: block;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 6px 8px;
+  font-size: 0.9em;
+  color: white;
+  background-color: #8DC63F;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -o-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+}
+#header form#api_selector .input a#explore:hover {
+  background-color: #8DC63F;
+}
