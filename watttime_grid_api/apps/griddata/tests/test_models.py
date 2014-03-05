@@ -25,6 +25,7 @@ class TestSeries(TestCase):
             self.assertIn(str(field), str(ds))
             
     def test_filter_in_ba(self):
+        """FAILING: ba__geom__contains_properly doesn't work"""
         isone = BalancingAuthority.objects.get(abbrev='ISONE')
         DataSeries.objects.create(ba=isone)
         
