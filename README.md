@@ -1,7 +1,7 @@
 watttime-grid-api
 =================
 
-An API for the power grid. See the code in action at http://watttime-grid-api.herokuapp.com/api/v1!
+An API for the power grid. See the code in action at http://watttime-grid-api.herokuapp.com/!
 
 
 Quickstart dev environment
@@ -49,6 +49,6 @@ Test the site:
       foreman run ./manage.py runserver
 
 To run tasks with celery, run <code>rabbitmq-server &</code>, then
-<code>celery -A watttime_grid_api worker -l info</code>
+<code>celery -A watttime_grid_api worker -B -l info</code>
 or
 <code>foreman start</code> (if you have <code>newrelic-admin</code> installed locally).
