@@ -45,7 +45,7 @@ Test the site:
       foreman run ./manage.py loaddata isos gentypes fuelcarbonintensities griddata
       foreman run ./manage.py shell
       >>> from apps.gridentities import load
-      >>> load.run()
+      >>> load.run_balancing_authority()
       foreman run ./manage.py runserver
 
 To run tasks with celery, run <code>rabbitmq-server &</code>, then
