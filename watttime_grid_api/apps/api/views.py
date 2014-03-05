@@ -51,6 +51,11 @@ class DataPointViewSet(viewsets.ReadOnlyModelViewSet):
     freq -- Time series frequency.\
         Options are '5m', '10m', '1hr', 'n/a'.\
         e.g., freq=1hr
+    market -- Market from which the data were gathered.\
+        Options are 'RT5M' for real-time 5 minute,\
+        'RTHR' for real-time hourly,\
+        or 'DAHR' for day-ahead hourly.
+        e.g., market=RT5M
     """
     queryset = DataPoint.objects.all()
     serializer_class = serializers.DataPointSerializer

@@ -45,8 +45,8 @@ class DataPointFilter(filters.FilterSet):
                                              
     # filters for balancing authority
     ba = django_filters.CharFilter(name='ba__abbrev')
-    loc = GeometryFilter(name='ba__geom', lookup_type='contains')
+  #  loc = GeometryFilter(name='ba__geom', lookup_type='contains')
 
     class Meta:
         model = DataPoint
-        fields = ['start_at', 'end_at', 'ba', 'loc', 'freq', 'market']
+        fields = ['start_at', 'end_at', 'ba', 'freq', 'market']
