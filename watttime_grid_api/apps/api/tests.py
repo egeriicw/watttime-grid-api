@@ -14,7 +14,7 @@ class TestDocs(TestCase):
         c = Client()
         response = c.get('/api/v1/docs/')
         self.assertEqual(response.status_code, 200)
-        for test_str in ['django-rest-swagger']:
+        for test_str in ['swagger-ui-wrap']:
             self.assertIn(test_str, response.content)
 
 
