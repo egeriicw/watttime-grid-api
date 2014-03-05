@@ -3,6 +3,16 @@ watttime-grid-api
 
 An API for the power grid. See the code in action at http://watttime-grid-api.herokuapp.com/!
 
+What's included
+---------------
+All the Django apps are in `watttime_grid_api/apps`. These are
+* `gridentities`: provides models for metadata and descriptions of geographic entities (`BalancingAuthority` and `PowerPlant`) and data types (`FuelType`); standalone
+* `griddata`: provides models for time series data (`DataPoint`); depends on `gridentities`
+* `clients`: provides clients that scrape and parse external data sources, celery tasks for running clients, and a client factory function; depends on `griddata`
+* `genmix`: provides a `Generation` model that associates generation mix observations to `DataPoint`s, and management commands and celery tasks for pulling the data; depends on `gridentities`, `griddata`, and `clients`
+* `carbon`: provides `Carbon` and `FuelCarbonIntensity` models that associate carbon intensity observations to `DataPoint`s, and hooks for calculating the data; depends on `gridentities`, `griddata`, and `genmix`
+* `api`: implements a Django REST Framework API to all other apps; depends on `gridentities`, `griddata`, `genmix`, and `carbon`
+
 
 Quickstart dev environment
 -----------
