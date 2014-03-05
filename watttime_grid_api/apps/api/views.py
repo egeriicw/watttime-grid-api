@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
+from apps.carbon.models import FuelCarbonIntensity
 from apps.api import serializers, filters
 
 
@@ -64,3 +65,12 @@ class DataPointViewSet(viewsets.ReadOnlyModelViewSet):
     # turn on pagination
     paginate_by = 12
     paginate_by_param = 'page_size'
+
+
+class FuelToCarbonViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows fuel-to-carbon conversions to be viewed.
+    """
+    queryset = FuelCarbonIntensity.objects.all()
+    serializer_class = serializers.FuelCarbonIntensitySerializer
+
