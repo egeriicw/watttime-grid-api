@@ -33,6 +33,7 @@ class DataPoint(models.Model):
         (HOURLY, 'hourly frequency'),
         (FIVEMIN, '5-minute frequency'),
         (IRREGULAR, 'irregular frequency'),
+        (TENMIN, '10-minute frequency'),
     )
     freq = models.CharField(max_length=4, choices=FREQ_CHOICES,
                                default=HOURLY)

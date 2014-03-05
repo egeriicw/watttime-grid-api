@@ -131,3 +131,13 @@ class TestPoint(TestCase):
         self.assertEqual(DataPoint.objects.all()[1], DataPoint.objects.earliest())
         self.assertEqual(DataPoint.objects.all()[0], DataPoint.objects.latest())
         
+    def test_expected_freq_choices(self):
+        expected_choices = set(['5m', '10m','1hr', 'n/a'])
+        actual_choices = set(dict(DataPoint.FREQ_CHOICES).keys())
+        self.assertEqual(expected_choices, actual_choices)
+        
+    def test_expected_market_choices(self):
+        expected_choices = set(['RT5M', 'RTHR', 'DAHR'])
+        actual_choices = set(dict(DataPoint.MARKET_CHOICES).keys())
+        self.assertEqual(expected_choices, actual_choices)
+        
