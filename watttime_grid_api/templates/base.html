@@ -3,18 +3,18 @@
 <html>
 <head>
   <title>WattTime Grid API Docs</title>
+{% block head %}
+{% endblock %}
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
   <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
   <link href='{% static "css/rest_framework_swagger.css" %}' media='screen' rel='stylesheet' type='text/css'/>
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-{% block head %}
-{% endblock %}
 </head>
 
 <body>
     <!-- Fixed navbar -->
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-      <div class="container">
+      <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="sr-only">Toggle navigation</span>
@@ -31,13 +31,20 @@
         </div>
         <div class="navbar-collapse collapse navbar-right">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="{% url 'home' %}#purpose">Purpose</a></li>
-            <li><a href="{% url 'home' %}#data">Data</a></li>
-            <li><a href="{% url 'home' %}#sources">Sources</a></li>
-            <li><a href="{% url 'home' %}#use">Use</a></li>
-            <li><a href="{% url 'home' %}#about">About</a></li>
-            <li><a href="{% url 'home' %}#contact">Contact</a></li>
-            <li><a href="{% url 'django.swagger.base.view' %}">Docs/Demo</a></li>
+            <!-- dropdown for faq
+            <li class="dropdown">
+              <a href="{% url 'home' %}" class="dropdown-toggle" data-toggle="dropdown">FAQ <b class="caret"></b></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="{% url 'home' %}#purpose">Purpose</a></li>
+                <li><a href="{% url 'home' %}#data">Data</a></li>
+                <li><a href="{% url 'home' %}#sources">Sources</a></li>
+                <li><a href="{% url 'home' %}#use">Use</a></li>
+              </ul>
+            </li>
+             end dropdown for faq -->
+            <li><a href="{% url 'home' %}">API Home</a></li>
+            <li><a href="{% url 'django.swagger.base.view' %}">Try it!</a></li>
+            <li><a href="{% url 'contact' %}">Contact</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -45,6 +52,23 @@
 
 {% block content %}
 {% endblock %}
+
+<script type="text/javascript">
+$(function () {
+  var $win = $(window);
+  $win.resize(function () {
+      if ($win.width() > 768)
+          $(".navbar-nav > .dropdown > a").attr("data-toggle", "");
+      else
+          $(".navbar-nav > .dropdown > a").attr("data-toggle", "dropdown");
+  }).resize();
+  $(".dropdown-menu").find("input, button").each(function () {
+      $(this).click(function (e) {
+          e.stopPropagation();
+      });
+  });
+});
+</script>
 
 </body>
 

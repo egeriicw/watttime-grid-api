@@ -45,6 +45,15 @@ body { padding-top: 70px; }
 .navbar-default .navbar-link:hover {
 	color: #ffbbbc;
 }
+.navbar-nav .dropdown:hover > .dropdown-menu { 
+  display: block; 
+}
+.navbar-nav .dropdown:hover > a[data-toggle=dropdown] + .dropdown-menu { 
+  display: none;
+}
+.navbar-nav .dropdown.open > a[data-toggle=dropdown] + .dropdown-menu { 
+  display: block; 
+}
 
 @media (max-width: 767px) {
 	.navbar-default .navbar-nav .open .dropdown-menu > li > a {
