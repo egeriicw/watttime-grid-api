@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container" id="body" role="main">
+
+<div class="row" id="purpose">
+    <h1>Why WattTime Grid API?</h1>
+    <p>
+        Ever wanted to know...
+    </p>
+    <ul>
+        <li>What is the carbon footprint of my electricity, right here, right now?</li>
+        <li>What time of day has the cleanest energy in New England?</li>
+        <li>How variable is wind power production in the Midwest?</li>
+        <li>Is California on track to meet its <a href="http://www.energy.ca.gov/portfolio/">33%-by-2020 renewable portfolio standard</a>?</li>
+    </ul>
+    <p>
+        It turns out that the data to answer these questions is freely and openly available,
+        but only a few energy geeks know where to find it and how to use it.
+        Even worse, the different data sources across North America
+        provide the information in wildly different formats.
+    </p>
+    <p>
+        The goal of the WattTime Grid API is to make it easier for app developers
+        to build cool tools that make real-time electricity data
+        accessible, exciting, and actionable.
+        It's also useful for data analysts who want a single portal
+        that provides energy cleanliness data in a simple, queryable, standardized format.
+    </p>
+</div>
+
+<div class="row" id="data">
+    <h1>What data is available?</h1>
+    <p>
+        Geographically, the data is organized the same way the grid is:
+        into "balancing authorities" that manage the electricity market for a given service area.
+        The bigger balancing authorities, called
+        Independent Services Operators and Regional Transmission Organizations
+        (<a href="//www.isorto.org/">ISOs/RTOs</a>),
+        together cover about 2/3 of US electricity consumers.        
+    </p>
+    <p>
+        The API provides data for 7 ISO/RTO-like regions (and metadata for many others):
+    </p>
+    <dl class="dl-horizontal">
+        <dt>CAISO</dt><dd>California</dd>
+        <dt>BPA</dt><dd>Pacific Northwest</dd>
+        <dt>MISO</dt><dd>Upper Midwest</dd>
+        <dt>SPP</dt><dd>Central Midwest</dd>
+        <dt>ERCOT</dt><dd>Texas</dd>
+        <dt>ISONE</dt><dd>New England</dd>
+        <dt>PJM</dt><dd>Mid-Atlantic</dd>
+    </dl>    
+    <div class="well well-sm">
+        Tip: You can find out what region a user is in by providing geospatial parameters to the
+        <a href="{% url 'django.swagger.base.view' %}#!/balancing_authorities">balancing_authorities</a>
+        endpoint.
+    </div>
+
+    <p>
+        As befits a real-time data service, most of the data is
+        time series oriented—what's happening on the regional grid at a particular moment?
+        In addition to metadata about the data provenance,
+        two kinds of data types are provided for each time series data point:
+    </p>
+    <dl class="dl-horizontal">
+        <dt>Generation mix</dt>
+        <dd>
+            The power on the grid is generated from different fuel sources at different times;
+            sometimes there's more coal, other times there's more wind.
+            (Wind and other renewables also count as fuels in this case.)
+            The API provides the number of megawatts generated from each fuel.
+            Pie charts or <a href="//bl.ocks.org/mbostock/4060954">streamgraphs</a>, anyone?
+        </dd>
+        <dt>Carbon footprint</dt>
+        <dd>
+            Because the generation mix is constantly changing,
+            the carbon impact of electricity use is constantly changing too.
+            The API provides carbon emissions intensity in pounds of CO<sub>2</sub> per megawatt-hour.
+            Combine with a user's <a href="//www.greenbuttondata.org/">Green Button data</a>
+            for a high-resolution carbon footprint analysis!
+        </dd>
+    </dl>
+    <div class="well well-sm">
+        Tip: You can select specific date ranges by providing start and end time parameters to the
+        <a href="{% url 'django.swagger.base.view' %}#!/datapoints">datapoints</a>
+        endpoint.
+    </div>
+</div>
+
+<div class="row" id="sources">
+    <h1>Where does the data come from?</h1>
+    <p>  
+        Power generation data is pulled straight from the ISOs in real time,
+        as frequently as they release it:
+        every 5 minutes in ISONE, MISO, PJM, and BPA;
+        every 10 minutes in CAISO;
+        and every hour in ERCOT.
+        Plus, every morning,
+        SPP releases yesterday's 5-minutely data,
+        and CAISO releases yesterday's detailed hourly data.
+        We combine all this with carbon intensity data from the EPA
+        to calculate the carbon impact of energy use in each place at each time.
+    </p>
+</div>
+
+<div class="row" id="use">
+    <h1>How can I use the API?</h1>
+    <p>
+        Get started by checking out the
+        <a href="{% url 'django.swagger.base.view' %}">interactive documentation</a>
+        and the
+        <a href="//groups.google.com/forum/#!forum/watttime-api-users">user group</a>.
+        It's a standard RESTful JSON API, so you can make HTTP requests to API endpoints
+        using any of your favorite tools, from iOS to d3.js to curl.
+    </p>
+    <p>
+        Right now, the API is completely free and open:
+        no authorization, no rate limits, no fees.
+        Please be respectful of our limited server resources.
+        Data availability terms are subject to change without notice,
+        although of course we'll do our best to keep the
+        <a href="//groups.google.com/forum/#!forum/watttime-api-users">user group</a>
+        informed about any upcoming changes.
+    </p>
+</div>
+
+<div class="row" id="about">
+    <h1>Who made this?</h1>
+    <p>
+        WattTime Grid API is a project of <a href="//watttime.org/">WattTime</a>,
+        a nonprofit startup in Berkeley, CA.
+        Our mission is to empower people and smart devices to get their electricity
+        from energy sources they believe in by using energy at the times when it's cleanest.
+    </p>
+    </p>
+        The backend uses
+        <a href="//www.django-rest-framework.org/">Django REST Framework</a>,
+        and the frontend uses
+        <a href="//github.com/marcgibbons/django-rest-swagger/">Django REST Swagger</a>
+        and <a href="//getbootstrap.com/">Bootstrap</a>.
+    </p>
+</div>
+
+<div class="row" id="contact">
+    <h1>How can I get in touch?</h1>
+    <div class="list-group">
+      <a href="mailto:anna@watttime.org" class="list-group-item list-group-item-success">
+        Community manager: anna@watttime.org
+      </a>
+      <a href="//groups.google.com/forum/#!forum/watttime-api-users" class="list-group-item list-group-item-info">
+        User list: watttime-api-users@googlegroups.com
+      </a>
+      <a href="mailto:dev@watttime.org" class="list-group-item list-group-item-danger">
+        Bug reports and tech support: dev@watttime.org
+      </a>
+      <a href="//github.com/WattTime/watttime-grid-api/" class="list-group-item list-group-item-warning">
+        Pull requests: https://github.com/WattTime/watttime-grid-api/
+      </a>
+    </div>
+</div>
+
+</div> <!-- end body container -->
+
+{% endblock %}

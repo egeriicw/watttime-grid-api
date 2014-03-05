@@ -1,7 +1,6 @@
+{% extends 'base.html' %}
 {% load staticfiles %}
-<!DOCTYPE html>
-<html>
-<head>
+{% block head %}
   <title>WattTime Grid API Docs</title>
   <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
   <link href='{% static "rest_framework_swagger/css/highlight.default.css" %}' media='screen' rel='stylesheet' type='text/css'/>
@@ -56,28 +55,9 @@
   });
 
   </script>
-</head>
+{% endblock %}
 
-<body>
-<div id='header'>
-  <div class="swagger-ui-wrap">
-    <a id="logo" href="http://watttime.org/"></a>
-
-    <form id='api_selector'>
-      <div class='input'><input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"/></div>
-   <!--   <div class='input'><input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/></div> -->
-      <div class='input'><a id="explore" href="#">Explore</a></div>
-    </form>
-  </div>
-</div>
-
-<div id="django-rest-swagger">
-  <div class="swagger-ui-wrap">
-    making open grid data more open |
-    docs via <a href="https://github.com/marcgibbons/django-rest-swagger/">Django REST Swagger</a>
-  </div>
-</div>
-
+{% block content %}
 <div id="message-bar" class="swagger-ui-wrap">
   &nbsp;
 </div>
@@ -92,6 +72,4 @@
 <div id="swagger-ui-container" class="swagger-ui-wrap">
 </div>
 
-</body>
-
-</html>
+{% endblock %}
