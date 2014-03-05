@@ -48,6 +48,9 @@ class DataPointViewSet(viewsets.ReadOnlyModelViewSet):
         or end_at=2014-02-20T16:45:30-08:00
     page_size -- Number of data points to return on each page.\
         default is page_size=12
+    freq -- Time series frequency.\
+        Options are '5m', '10m', '1hr', 'n/a'.\
+        e.g., freq=1hr
     """
     queryset = DataPoint.objects.all()
     serializer_class = serializers.DataPointSerializer

@@ -76,6 +76,8 @@ class DataPointsAPITest(APITestCase):
                 DataPoint.objects.create(timestamp=ts, ba=ba,
                                          market=DataPoint.RT5M, freq=DataPoint.IRREGULAR)
                 DataPoint.objects.create(timestamp=ts, ba=ba,
+                                         market=DataPoint.RT5M, freq=DataPoint.TENMIN)
+                DataPoint.objects.create(timestamp=ts, ba=ba,
                                          market=DataPoint.RTHR, freq=DataPoint.HOURLY)
                                          
         # add sample gens to data points
@@ -86,7 +88,7 @@ class DataPointsAPITest(APITestCase):
         # number of expected objects of different types
         self.n_isos = 2
         self.n_times = 3
-        self.n_at_time = 3
+        self.n_at_time = 4
         self.n_gen = 2
 
         # set up routes
@@ -199,3 +201,23 @@ class DataPointsAPITest(APITestCase):
     def test_paginate(self):
         for n in range(1, self.n_isos*self.n_times*self.n_at_time):
             response = self._run_get(self.base_url, {'page_size': n}, n)
+
+    def test_filter_freq(self):
+        for freq in ['5m', '1hr', 'n/a', '10m']:
+            n_expected = DataPoint.objects.filter(freq=freq, ba__abbrev='CAISO').count()
+            self.assertGreater(n_expected, 1)
+            self.assertIn(freq, dict(DataPoint.FREQ_CHOICES).keys())
+            params = {'freq': freq, 'ba': 'CAISO', 'page_size': n_expected}
+            response = self._run_get(self.base_url, params, n_expected)
+            for dp in response.data['results']:
+                self.assertEqual(dp['freq'], freq)
+                
+    def test_filter_market(self):
+        for market in ['RT5M', 'RTHR']:
+            n_expected = DataPoint.objects.filter(market=market, ba__abbrev='CAISO').count()
+            self.assertGreater(n_expected, 1)
+            params = {'market': market, 'ba': 'CAISO', 'page_size': n_expected}
+            response = self._run_get(self.base_url, params, n_expected)
+            for dp in response.data['results']:
+                self.assertEqual(dp['market'], market)
+                

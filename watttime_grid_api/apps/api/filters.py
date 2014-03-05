@@ -49,4 +49,4 @@ class DataPointFilter(filters.FilterSet):
 
     class Meta:
         model = DataPoint
-        fields = ['start_at', 'end_at', 'ba', 'loc']
+        fields = ['start_at', 'end_at', 'ba', 'loc', 'freq', 'market']
