@@ -43,13 +43,25 @@
 {% block content %}
 
 <div class="container" id="body" role="main">
-    <h1>Grid feed status</h1>
-    <p class="lead">
-        How clean is my energy? Are the live feeds up to date?
-    </p>
+    <div class="row">
+        <h1>Grid feed status</h1>
+        <p class="lead">
+            How clean is my energy? Are the live feeds up to date?
+        </p>
+    </div>
 
-   {% leaflet_map "map" callback="main_map_init" creatediv=False %}
-   <div id="map" style="height: 500px;"></div>
+    <div class="row">
+       {% leaflet_map "map" callback="main_map_init" creatediv=False %}
+       <div id="map" style="height: 500px;"></div>
+    </div>
+
+    <div class="row">
+        <div class="well well-sm">
+            Want to help improve our data?
+            We'd love more accurate balancing authority shapefiles!
+            Please <a href="mailto:anna@watttime.org">get in touch</a>.
+        </div>
+    </div>
 
     <script type="text/javascript">
         function getColor(val) {
