@@ -211,6 +211,9 @@ THIRD_PARTY_APPS = (
     
     # API documentation
     'rest_framework_swagger',
+    
+    # mapping
+    'leaflet',
 
 )
 
