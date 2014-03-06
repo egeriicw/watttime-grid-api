@@ -1,7 +1,7 @@
 from django.contrib.gis import admin
 from django.conf.urls import patterns, include, url
-from django.views.generic import TemplateView, ListView
-from djgeojson.views import GeoJSONLayerView
+from django.views.generic import TemplateView
+from django.db.models import Count
 from apps.gridentities.models import BalancingAuthority
 import json
 from datetime import datetime
@@ -14,11 +14,8 @@ class GeoJSONTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(GeoJSONTemplateView, self).get_context_data(**kwargs)
         geojson = {}
-     #   geojson["crs"] = {"type": "link",
-     #                       "properties": {"href": "http://spatialreference.org/ref/epsg/4326/", "type": "proj4"}}
-     #   geojson["type"] = "FeatureCollection"
         geojson["features"] = []
-        for row in BalancingAuthority.objects.all():
+        for row in BalancingAuthority.objects.annotate(num_dp=Count('datapoint')).filter(num_dp__gt=0):
             try:
                 dp = row.datapoint_set.filter(quality="PAST").latest()
                 carbon_val = round(dp.carbon.emissions_intensity, 1)
@@ -54,10 +51,6 @@ urlpatterns = patterns('',
     url(r'^map/',
         GeoJSONTemplateView.as_view(template_name="map.html"),
         name='map'),
-    url(r'^ba.geojson',
-        GeoJSONLayerView.as_view(model=BalancingAuthority,
-                                 properties=('abbrev', 'name')),
-        name='ba_geom'),
 
     # api
     url(r'^api/v1/', include('apps.api.urls')),

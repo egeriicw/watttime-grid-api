@@ -1,16 +1,19 @@
 {% extends 'base.html' %}
 
+{% block title %}Home{% endblock%}
+
 {% block content %}
 
 <div class="container" id="body" role="main">
 
 <div class="row" id="purpose">
-    <h1>Why WattTime Grid API?</h1>
+    <h1>Why WattTime Impact API?</h1>
     <p>
         Ever wanted to know...
     </p>
     <ul>
-        <li>What is the carbon footprint of my electricity, right here, right now?</li>
+        <li>What is the carbon footprint of my electricity,
+            <a href="{% url 'map' %}">right here, right now</a>?</li>
         <li>What time of day has the cleanest energy in New England?</li>
         <li>How variable is wind power production in the Midwest?</li>
         <li>Is California on track to meet its <a href="http://www.energy.ca.gov/portfolio/">33%-by-2020 renewable portfolio standard</a>?</li>
@@ -22,7 +25,7 @@
         provide the information in wildly different formats.
     </p>
     <p>
-        The goal of the WattTime Grid API is to make it easier for app developers
+        The goal of the WattTime Impact API is to make it easier for app developers
         to build cool tools that make real-time electricity data
         accessible, exciting, and actionable.
         It's also useful for data analysts who want a single portal
