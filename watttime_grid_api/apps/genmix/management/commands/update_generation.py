@@ -37,4 +37,5 @@ class Command(BaseCommand):
         # run task
         update.apply_async(args=[ba_name],
                            kwargs={'latest': latest, 'start_at': start_at, 'end_at': end_at, 'market': options['market']},
-                           queue='management')
+#                           queue='management'
+                           )
