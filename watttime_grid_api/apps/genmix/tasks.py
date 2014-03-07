@@ -27,7 +27,7 @@ def insert_generation(gen_obs):
     gen, gen_created = Generation.objects.get_or_create(mix=dp, fuel=fuel,
                                                         defaults={'gen_MW': gen_obs['gen_MW']})
     if gen_created:
-        logger.info('Generation for %s with %s inserted with %s MW' % (dp, fuel, gen.gen_MW))
+        logger.debug('Generation for %s with %s inserted with %s MW' % (dp, fuel, gen.gen_MW))
     
     # add to dataseries
     if dp_created:

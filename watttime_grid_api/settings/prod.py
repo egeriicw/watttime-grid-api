@@ -164,9 +164,16 @@ GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
 
 ########## LOGGING CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
-LOGGING['loggers']['apps'] = {
+LOGGING['loggers'] = {
+    'apps' : {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
-        }
+        },
+    'apps.genmix.tasks' : {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+}
 ########## END LOGGING CONFIGURATION
