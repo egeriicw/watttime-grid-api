@@ -151,7 +151,8 @@ CELERY_RESULT_BACKEND = 'amqp'
 
 ########## ALLOWED HOSTS CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['.herokuapp.com']
+ALLOWED_HOSTS = ['.herokuapp.com',
+                 '.watttime.org']
 ########## END ALLOWED HOST CONFIGURATION
 
 
