@@ -291,11 +291,6 @@ LOGGING = {
             'propagate': True,
         },
         'apps' : {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'apps' : {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,

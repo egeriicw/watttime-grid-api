@@ -9,8 +9,9 @@ class TestUpdate(TestCase):
     fixtures = ['isos', 'gentypes']
 
     def test_update(self):
-        res = tasks.update('CAISO', latest=True).get()
-        self.assertEqual(res, True)
+        self.assertEqual(Generation.objects.filter(mix__ba__abbrev='CAISO').count(), 0)
+        tasks.update('CAISO', latest=True)
+        self.assertGreater(Generation.objects.filter(mix__ba__abbrev='CAISO').count(), 0)
         
 
 class TestInsert(TestCase):

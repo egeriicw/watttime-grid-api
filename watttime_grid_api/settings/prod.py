@@ -160,3 +160,12 @@ ALLOWED_HOSTS = ['.herokuapp.com']
 GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
 GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
 ########## END GEODJANGO CONFIGURATION
+
+########## LOGGING CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
+LOGGING['loggers']['apps'] = {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        }
+########## END LOGGING CONFIGURATION

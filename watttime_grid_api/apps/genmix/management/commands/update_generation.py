@@ -35,6 +35,6 @@ class Command(BaseCommand):
             self.stdout.write('Getting the latest data...')
             
         # run task
-        update(ba_name,
-               latest=latest, start_at=start_at, end_at=end_at,
-               market=options['market'])
+        update.apply_async(args=[ba_name],
+                           kwargs={'latest': latest, 'start_at': start_at, 'end_at': end_at, 'market': options['market']},
+                           queue='management')

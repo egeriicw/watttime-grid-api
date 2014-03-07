@@ -45,19 +45,17 @@ def cmap(it, callback):
     # NOT this solution http://stackoverflow.com/questions/13271056/how-to-chain-a-celery-task-that-returns-a-list-into-a-group
     return [callback(x) for x in it]
     
-@shared_task
+@shared_task(ignore_result=True)
 def log_update(res_list, ba_name):
     n_new_gen = sum([x[0] for x in res_list])
     n_new_dp = sum([x[1] for x in res_list])
     logger.info('%s: Created %d new generations at %d new datapoints' % (ba_name, n_new_gen, n_new_dp))
-    return n_new_gen > 0
-
-@shared_task
+    
+@shared_task(ignore_result=True)
 def update(ba_name, **kwargs):    
     # pre-log
     logger.info('%s: Getting data with args %s' % (ba_name, kwargs))
     
     # run chain
     chain = (get_generation.s(ba_name, **kwargs) | cmap.s(insert_generation) | log_update.s(ba_name))
-    res = chain()
-    return res
+    chain()
