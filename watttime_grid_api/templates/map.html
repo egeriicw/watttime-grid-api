@@ -65,20 +65,22 @@
 
     <script type="text/javascript">
         function getColor(val) {
-            return val > 1800  ? 'rgb(215,25,28)'   :
-                   val > 1200  ? 'rgb(253,174,97)'  :
-                   val > 600   ? 'rgb(166,217,106)' :
-                   val > 0     ? 'rgb(26,150,65)'   :
+            return val > 2000  ? 'rgb(215,48,39)'   :
+                   val > 1600  ? 'rgb(252,141,89)'  :
+                   val > 1200  ? 'rgb(254,224,139)' :
+                   val > 800   ? 'rgb(217,239,139)' :
+                   val > 400   ? 'rgb(145,207,96)'  :
+                   val > 0     ? 'rgb(26,152,80)'   :
                                  'rgb(50,50,50)';
         }
 
         function style(feature) {
             return {
                 fillColor: getColor(feature.properties.carbon),
-                weight: 0.5,
+                weight: 1,
                 opacity: 1,
                 color: 'white',
-             //   dashArray: '3',
+                dashArray: '3',
                 fillOpacity: 0.7
             };
         }
@@ -115,14 +117,17 @@
                   labels.push('<i style="background:' + getColor(-1) + '"></i> ' +
 					'no data');
                   labels.push('<i style="background:' + getColor(1) + '"></i> ' +
-					'0-600 lb CO<sub>2</sub>/MW');
-                  labels.push('<i style="background:' + getColor(601) + '"></i> ' +
-					'600-1200 lb CO<sub>2</sub>/MW');
+					'0-400 lb CO<sub>2</sub>/MW');
+                  labels.push('<i style="background:' + getColor(401) + '"></i> ' +
+					'400-800 lb CO<sub>2</sub>/MW');
+                  labels.push('<i style="background:' + getColor(801) + '"></i> ' +
+					'800-1200 lb CO<sub>2</sub>/MW');
                   labels.push('<i style="background:' + getColor(1201) + '"></i> ' +
-					'1200-1800 lb CO<sub>2</sub>/MW');
+					'1200-1600 lb CO<sub>2</sub>/MW');
+                  labels.push('<i style="background:' + getColor(1601) + '"></i> ' +
+					'1600-2000 lb CO<sub>2</sub>/MW');
                   labels.push('<i style="background:' + getColor(2001) + '"></i> ' +
-					'1800+ lb CO<sub>2</sub>/MW');
-
+					'2000+ lb CO<sub>2</sub>/MW');
 			div.innerHTML = labels.join('<br>');
 			return div;
 		};
