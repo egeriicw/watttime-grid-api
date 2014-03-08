@@ -9,26 +9,24 @@
 <div class="row" id="purpose">
     <h1>Why WattTime Impact API?</h1>
     <p>
-        Ever wanted to know...
+        The CO2 intensity of electricity varies in real time throughout the day. Ever wanted to know...
     </p>
     <ul>
+        <li>What time of day has the cleanest energy in New England?</li>
         <li>What is the carbon footprint of my electricity,
             <a href="{% url 'map' %}">right here, right now</a>?</li>
-        <li>What time of day has the cleanest energy in New England?</li>
-        <li>How variable is wind power production in the Midwest?</li>
         <li>Is California on track to meet its <a href="http://www.energy.ca.gov/portfolio/">33%-by-2020 renewable portfolio standard</a>?</li>
     </ul>
     <p>
-        It turns out that the data to answer these questions are freely and openly available,
-        but only a few energy geeks know where to find it and how to use it.
-        Even worse, the different data sources across North America
-        provide the information in wildly different formats.
+        It turns out that for most parts of the US, the data to answer 
+        questions like these are freely and openly available. But these 
+        data are scattered in wildly different formats across a wide 
+        variety of sources, not all of which are easy to find.
     </p>
     <p>
         The goal of the WattTime Impact API is to make it easier for app developers
-        to build cool tools that make real-time electricity data
-        accessible, exciting, and actionable.
-        It's also useful for data analysts who want a single portal
+        to build cool tools that make real-time electricity data accessible, 
+        exciting, and actionable. It's also useful for data analysts who want a single portal
         that provides energy cleanliness data in a simple, queryable, standardized format.
     </p>
 </div>
@@ -37,14 +35,14 @@
     <h1>What data are available?</h1>
     <p>
         Geographically, the data are organized the same way the grid is:
-        into "balancing authorities" that manage the electricity market for a given service area.
+        into "balancing authorities" that manage supply and demand for a given service area.
         The bigger balancing authorities, called
         Independent Services Operators and Regional Transmission Organizations
         (<a href="//www.isorto.org/">ISOs/RTOs</a>),
         together cover about 2/3 of US electricity consumers.        
     </p>
     <p>
-        The API provides data for 7 ISO/RTO-like regions (and metadata for many others):
+        The API provides data for nearly every ISO/RTO region in the country (and metadata for many others):
     </p>
     <dl class="dl-horizontal">
         <dt>CAISO</dt><dd>California</dd>
@@ -55,6 +53,10 @@
         <dt>ISONE</dt><dd>New England</dd>
         <dt>PJM</dt><dd>Mid-Atlantic</dd>
     </dl>    
+    <p>
+        The only ISO/RTO region not included in our API is New York ISO, which does not make its real-time
+        fuel mix information public.
+    </p>
     <div class="well well-sm">
         Tip: You can find out what region a user is in by providing geospatial parameters to the
         <a href="{% url 'django.swagger.base.view' %}#!/balancing_authorities">balancing_authorities</a>
