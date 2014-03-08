@@ -57,11 +57,11 @@ app.conf.CELERYBEAT_SCHEDULE.update({
 })
 
 # tasks every 10 min
-EVERY_TEN_PLUS_ONE = ','.join([str(i*10+1) for i in range(6)])
+EVERY_TEN_PLUS_TWO = ','.join([str(i*10+2) for i in range(6)])
 app.conf.CELERYBEAT_SCHEDULE.update({
     'update-%s-genmix-latest' % ba_name.lower(): {
         'task': 'apps.genmix.tasks.update',
-        'schedule': crontab(minute=EVERY_TEN_PLUS_ONE),
+        'schedule': crontab(minute=EVERY_TEN_PLUS_TWO),
         'args': [ba_name.upper()],
         'kwargs': {'latest': True, 'market': 'RT5M'},
     } for ba_name in ['CAISO']
