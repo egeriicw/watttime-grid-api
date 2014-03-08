@@ -34,7 +34,7 @@ def insert_generation(gen_obs):
         series, series_created = DataSeries.objects.get_or_create(ba=ba, series_type=DataSeries.CURRENT)
         try:
             if dp.timestamp > series.datapoints.latest().timestamp:
-                series.datapoints.delete()
+                series.datapoints.clear()
                 series.datapoints.add(dp)
         except DataPoint.DoesNotExist: # no datapoints in series
             series.datapoints.add(dp)
