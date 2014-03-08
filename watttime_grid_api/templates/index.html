@@ -55,7 +55,7 @@
         <dt>PJM</dt><dd>Mid-Atlantic</dd>
     </dl>    
     <p>
-        The only ISO/RTO region we are unable to support is New York ISO, which does not make its real-time
+        The only ISO/RTO region we are unable to support is NYISO (the New York ISO), which does not make its real-time
         fuel mix information public.
     </p>
     <div class="well well-sm">
@@ -65,7 +65,7 @@
     </div>
 
     <p>
-        As befits a real-time data service, there is also time-series oriented data—what's
+        As befits a real-time data service, there are also time-series oriented data—what's
         happening on the regional grid at a particular moment?
         In addition to metadata about data provenance,
         two kinds of data types are provided for each time series data point:
@@ -106,8 +106,17 @@
         Plus, every morning,
         SPP releases yesterday's 5-minutely data,
         and CAISO releases yesterday's detailed hourly data.
-        We combine all this with carbon intensity data from the EPA
+        We combine all this with 
+        <a href="//www.eia.gov/tools/faqs/faq.cfm?id=74&t=11">CO2 emissions factors</a>
+        from the Energy Information Administration
         to calculate the carbon impact of energy use in each place at each time.
+    </p>
+    <p>
+        In a few cases we have to use approximations if a region combines two fuel types.
+        For example, BPA's data focuses primarily on its substantial renewable energy resources 
+        and doesn't distinguish between different types of thermal power plants. These 
+        approximations are all clearly marked in our data stream. Stay tuned
+        for further improvements in our ability to disaggregate different fuel types.
     </p>
 </div>
 
