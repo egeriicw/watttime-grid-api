@@ -1,4 +1,5 @@
 from django.test import TestCase
+from apps.griddata.models import DataSeries
 from apps.genmix import tasks
 from apps.genmix.models import Generation
 from datetime import datetime
@@ -36,4 +37,15 @@ class TestInsert(TestCase):
     def test_insert_two(self):
         tasks.insert_generation(self.dp_dict)
         tasks.insert_generation(self.dp_dict)
+        
+    def test_insert_series(self):
+        self.assertEqual(DataSeries.objects.count(), 0)
+        tasks.insert_generation(self.dp_dict)
+        
+        self.assertEqual(DataSeries.objects.count(), 1)
+        self.assertEqual(DataSeries.objects.get(series_type=DataSeries.CURRENT).datapoints.count(), 1)
+
+        tasks.insert_generation(self.dp_dict)
+        self.assertEqual(DataSeries.objects.count(), 1)
+        self.assertEqual(DataSeries.objects.get(series_type=DataSeries.CURRENT).datapoints.count(), 1)
         

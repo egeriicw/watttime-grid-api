@@ -4,7 +4,7 @@ from django.db import IntegrityError
 from apps.clients.tasks import get_generation
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.genmix.models import Generation
-from apps.griddata.models import DataPoint
+from apps.griddata.models import DataPoint, DataSeries
 import logging
 
 # set up logger
@@ -28,7 +28,17 @@ def insert_generation(gen_obs):
                                                         defaults={'gen_MW': gen_obs['gen_MW']})
     if gen_created:
         logger.debug('Generation for %s with %s inserted with %s MW' % (dp, fuel, gen.gen_MW))
-    
+
+    # add to "current" series
+    if dp_created:
+        series, series_created = DataSeries.objects.get_or_create(ba=ba, series_type=DataSeries.CURRENT)
+        try:
+            if dp.timestamp > series.datapoints.latest().timestamp:
+                series.datapoints.delete()
+                series.datapoints.add(dp)
+        except DataPoint.DoesNotExist: # no datapoints in series
+            series.datapoints.add(dp)
+            
     # return
     return gen_created, dp_created
     
