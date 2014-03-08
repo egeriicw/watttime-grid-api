@@ -1,7 +1,7 @@
 watttime-grid-api
 =================
 
-An API for the power grid. See the code in action at http://watttime-grid-api.herokuapp.com/!
+What kind of electricity are you getting right now? The WattTime grid API collects real-time information on the current generation fuel mix from the major American electricity markets (MISO, PJM, CAISO, ERCOT, ISONE, SPP, and BPA) and displays it in a convenient standardized format. The API also calculates a real-time carbon footprint of electricity use in a given place and time based on this fuel mix. See the code in action at http://watttime-grid-api.herokuapp.com/!
 
 What's included
 ---------------
