@@ -57,7 +57,7 @@ class DataPoint(models.Model):
     ba = models.ForeignKey(BalancingAuthority)
 
     class Meta:
-        unique_together = ('timestamp', 'quality', 'freq', 'market', 'is_marginal', 'ba')
+        unique_together = ('timestamp', 'ba', 'quality', 'freq', 'market', 'is_marginal')
         ordering = ['-timestamp', 'ba', 'quality']
         get_latest_by = 'timestamp'
 
@@ -77,9 +77,11 @@ class DataSeries(models.Model):
     # data series type
     HISTORICAL = 'PAST'
     BEST = 'BEST'
+    CURRENT = 'NOW'
     SERIES_CHOICES = (
         (HISTORICAL, 'historical data'),
         (BEST, 'best-guess data (historical if available, best forecast if not)'),
+        (CURRENT, 'current data'),
     )
     series_type = models.CharField(max_length=4, choices=SERIES_CHOICES,
                                        default=HISTORICAL)
