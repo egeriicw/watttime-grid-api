@@ -9,7 +9,7 @@
 <div class="row" id="purpose">
     <h1>Why WattTime Impact API?</h1>
     <p>
-        The CO2 intensity of electricity varies in real time throughout the day. Ever wanted to know...
+        The CO<sub>2</sub> intensity of electricity varies in real time throughout the day. Ever wanted to know...
     </p>
     <ul>
         <li>What time of day has the cleanest energy in New England?</li>
@@ -83,8 +83,8 @@
         <dd>
             Because the generation mix is constantly changing,
             the carbon impact of electricity use is constantly changing too.
-            The API provides carbon emissions intensity in pounds of CO<sub>2</sub> per megawatt-hour
-            for each fuel typ. Combine with a user's <a href="//www.greenbuttondata.org/">Green Button data</a>
+            The API provides the total carbon emissions intensity in pounds of CO<sub>2</sub> per megawatt-hour.
+            Combine with a user's <a href="//www.greenbuttondata.org/">Green Button data</a>
             for a high-resolution localized carbon footprint analysis!
         </dd>
     </dl>
@@ -93,12 +93,19 @@
         <a href="{% url 'django.swagger.base.view' %}#!/datapoints">datapoints</a>
         endpoint.
     </div>
+
+    <p>
+        And last but not least, there is metadata about each
+        <a href="{% url 'django.swagger.base.view' %}#!/fuels">fuel type</a>
+        and its fuel-specific
+        <a href="{% url 'django.swagger.base.view' %}#!/fuel_carbon_intensities">carbon emissions intensity</a>.
+    </p>
 </div>
 
 <div class="row" id="sources">
     <h1>Where do the data come from?</h1>
     <p>  
-        Power generation data is pulled straight from the ISOs in real time,
+        Power generation data are pulled straight from the ISOs in real time,
         as frequently as they release it:
         every 5 minutes in ISONE, MISO, PJM, and BPA;
         every 10 minutes in CAISO;
@@ -107,7 +114,7 @@
         SPP releases yesterday's 5-minutely data,
         and CAISO releases yesterday's detailed hourly data.
         We combine all this with 
-        <a href="//www.eia.gov/tools/faqs/faq.cfm?id=74&t=11">CO2 emissions factors</a>
+        <a href="//www.eia.gov/tools/faqs/faq.cfm?id=74&t=11">CO<sub>2</sub> emissions factors</a>
         from the Energy Information Administration
         to calculate the carbon impact of energy use in each place at each time.
     </p>

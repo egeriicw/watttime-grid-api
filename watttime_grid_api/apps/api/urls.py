@@ -22,6 +22,6 @@ urlpatterns = patterns('',
         name='datapoint-detail'),
     url(r'^fuel_carbon_intensities/$', views.FuelToCarbonList.as_view(),
         name='fueltocarbon-list'),
-    url(r'^fuel_carbon_intensities/(?P<pk>[0-9]+)/$', views.FuelToCarbonList.as_view(),
+    url(r'^fuel_carbon_intensities/(?P<pk>[0-9]+)/$', views.FuelToCarbonDetail.as_view(),
         name='fueltocarbon-detail'),
 )
