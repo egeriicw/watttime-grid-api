@@ -15,16 +15,17 @@
         <li>What time of day has the cleanest energy in New England?</li>
         <li>What is the carbon footprint of my electricity,
             <a href="{% url 'map' %}">right here, right now</a>?</li>
+        <li>How variable is wind power production in the Midwest?</li></li>
         <li>Is California on track to meet its <a href="http://www.energy.ca.gov/portfolio/">33%-by-2020 renewable portfolio standard</a>?</li>
     </ul>
     <p>
         It turns out that for most parts of the US, the data to answer 
-        questions like these are freely and openly available. But these 
+        these kind of questions are freely and openly available. But these 
         data are scattered in wildly different formats across a wide 
-        variety of sources, not all of which are easy to find.
+        variety of sources, not all of which are exactly easy to find.
     </p>
     <p>
-        The goal of the WattTime Impact API is to make it easier for app developers
+        The WattTime Impact API standardizes this information to empower app developers
         to build cool tools that make real-time electricity data accessible, 
         exciting, and actionable. It's also useful for data analysts who want a single portal
         that provides energy cleanliness data in a simple, queryable, standardized format.
@@ -54,11 +55,11 @@
         <dt>PJM</dt><dd>Mid-Atlantic</dd>
     </dl>    
     <p>
-        The only ISO/RTO region not included in our API is New York ISO, which does not make its real-time
+        The only ISO/RTO region we are unable to support is New York ISO, which does not make its real-time
         fuel mix information public.
     </p>
     <div class="well well-sm">
-        Tip: You can find out what region a user is in by providing geospatial parameters to the
+        Tip: You can find out what ISO/RTO a user is in by providing geospatial parameters to the
         <a href="{% url 'django.swagger.base.view' %}#!/balancing_authorities">balancing_authorities</a>
         endpoint.
     </div>
@@ -74,7 +75,7 @@
         <dd>
             The power on the grid is generated from different fuel sources at different times;
             sometimes there's more coal, other times there's more wind.
-            (Wind and other renewables also count as fuels in this case.)
+            (We count wind and other renewables as types of fuels for ease of comparison.)
             The API provides the number of megawatts generated from each fuel.
             Pie charts or <a href="//bl.ocks.org/mbostock/4060954">streamgraphs</a>, anyone?
         </dd>
@@ -82,9 +83,9 @@
         <dd>
             Because the generation mix is constantly changing,
             the carbon impact of electricity use is constantly changing too.
-            The API provides carbon emissions intensity in pounds of CO<sub>2</sub> per megawatt-hour.
-            Combine with a user's <a href="//www.greenbuttondata.org/">Green Button data</a>
-            for a high-resolution carbon footprint analysis!
+            The API provides carbon emissions intensity in pounds of CO<sub>2</sub> per megawatt-hour
+            for each fuel typ. Combine with a user's <a href="//www.greenbuttondata.org/">Green Button data</a>
+            for a high-resolution localized carbon footprint analysis!
         </dd>
     </dl>
     <div class="well well-sm">
