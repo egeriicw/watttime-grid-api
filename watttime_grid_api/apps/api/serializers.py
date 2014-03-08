@@ -9,11 +9,13 @@ class BalancingAuthoritySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = BalancingAuthority
         fields = ('name', 'ba_type', 'url', 'abbrev', 'link', 'notes')
-
+        lookup_field = 'abbrev'
+        
 
 class FuelTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = FuelType
+        lookup_field = 'name'
 
 
 class GenerationSerializer(serializers.HyperlinkedModelSerializer):
@@ -25,7 +27,7 @@ class GenerationSerializer(serializers.HyperlinkedModelSerializer):
 
 class FuelCarbonIntensitySerializer(serializers.HyperlinkedModelSerializer):
     ba = BalancingAuthoritySerializer()
-    fuel = FuelTypeSerializer()
+    fuel = serializers.SlugRelatedField(slug_field='name')
 
     class Meta:
         model = FuelCarbonIntensity

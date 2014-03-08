@@ -6,6 +6,7 @@ from rest_framework.compat import parse_datetime
 import django_filters
 from apps.gridentities.models import BalancingAuthority
 from apps.griddata.models import DataPoint
+from apps.carbon.models import FuelCarbonIntensity
 
 
 class GeometryFilter(django_filters.Filter):
@@ -50,3 +51,14 @@ class DataPointFilter(filters.FilterSet):
     class Meta:
         model = DataPoint
         fields = ['start_at', 'end_at', 'ba', 'freq', 'market']
+
+
+class FuelCarbonFilter(filters.FilterSet):
+    # filters for balancing authority
+    ba = django_filters.CharFilter(name='ba__abbrev')
+
+    # filter for fuel
+    fuel = django_filters.CharFilter(name='fuel__name')
+    
+    class Meta:
+        model = FuelCarbonIntensity

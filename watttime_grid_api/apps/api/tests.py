@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
-from apps.api.views import DataPointViewSet
+from apps.api.views import DataPointList
 from apps.api.filters import DataPointFilter
 from datetime import datetime, timedelta
 from dateutil.parser import parse as dateutil_parse
@@ -21,7 +21,7 @@ class TestDocs(TestCase):
             
     def test_datapoint_param_docs(self):
         for filterstr in DataPointFilter._meta.fields:
-            self.assertIn(filterstr+' -- ', DataPointViewSet.__doc__)
+            self.assertIn(filterstr+' -- ', DataPointList.__doc__)
             
 
 class BAAPITest(APITestCase):
