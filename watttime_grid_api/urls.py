@@ -1,7 +1,6 @@
 from django.contrib.gis import admin
 from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
-from apps.griddata.views import CurrentMapView
 
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/admin/#hooking-adminsite-instances-into-your-urlconf
@@ -17,9 +16,9 @@ urlpatterns = patterns('',
     # home
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),
     url(r'^contact/', TemplateView.as_view(template_name="contact.html"), name='contact'),
-    url(r'^map/',
-        CurrentMapView.as_view(template_name="map.html"),
-        name='map'),
+    
+    # griddata dashboard views
+    url(r'', include('apps.griddata.urls')),
 
     # api
     url(r'^api/v1/', include('apps.api.urls')),
