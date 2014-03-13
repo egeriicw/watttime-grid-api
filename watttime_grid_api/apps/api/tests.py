@@ -103,8 +103,6 @@ class DataPointsAPITest(APITestCase):
     def _run_get(self, url, data, n_expected):
         """boilerplate for testing status and number of objects in get requests"""
         response = self.client.get(url, data=data)
-        if response.status_code is not status.HTTP_200_OK:
-            print response.data, url
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), n_expected)        
         return response

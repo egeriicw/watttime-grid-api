@@ -30,20 +30,17 @@ class CurrentMapView(TemplateView):
                               'carbon': carbon_val,
                               'lag': td,
                               }
-                start = datetime.now()
                 geojson["features"].append({'geometry': json.loads(ba.geom.geojson),
                                             'properties': properties,
                                             'type': "Feature",
                                             'id': ba.id,
                                             })
-                print ba, datetime.now() - start
             except AttributeError: # no geom
                 continue
             
         # strip non-json characters
-        start = datetime.now()
         context['geojson'] = json.dumps(geojson).replace('\\','')
-        print 'dump', datetime.now() - start
+
         # return
         return context
         
