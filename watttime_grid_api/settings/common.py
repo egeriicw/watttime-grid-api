@@ -180,6 +180,12 @@ ROOT_URLCONF = '%s.urls' % SITE_NAME
 
 ########## APP CONFIGURATION
 DJANGO_APPS = (
+    # Admin tools:
+    'admin_tools',
+   # 'admin_tools.theming',
+    'admin_tools.menu',
+    'admin_tools.dashboard',
+
     # Default Django apps:
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -214,7 +220,6 @@ THIRD_PARTY_APPS = (
     
     # mapping
     'leaflet',
-
 )
 
 LOCAL_APPS = (
