@@ -4,10 +4,68 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block head %}
+<script type="text/javascript" src='{% static "js/d3.v3_4_3.min.js" %}'></script>
+<script type="text/javascript" src='{% static "js/crossfilter.v1_3_7.min.js" %}'></script>
+<script type="text/javascript" src='{% static "js/dc.min.js" %}'></script>
+<link rel="stylesheet" type="text/css" href='{% static "css/dc.css" %}' media="screen" /> 
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    {{ data }}
+    <div id="chart-line-count-ts"></div>
+    <div id="chart-ring-ba"></div>
 </div>
+
+<script type="text/javascript">
+    function makeCharts(data) {
+        // parse dates
+        var parseDate = d3.time.format.iso.parse;
+        data.forEach(function(d) {d.date = parseDate(d.timestamp);});
+        
+        // initialize crossfilter
+        var ndx = crossfilter(data);
+    
+        // set up dimensions
+        var dateDim = ndx.dimension(function(d) { return d.date; }); 
+        var baDim = ndx.dimension(function(d) { return d.ba; }); 
+    
+        // set up groups
+        var n_obs = dateDim.group().reduceSum(function (d) {return 1;}); 
+        var n_ba = baDim.group().reduceSum(function (d) {return 1;}); 
+    
+        // set up date range
+        var minDate = dateDim.bottom(1)[0].date;
+        var maxDate = dateDim.top(1)[0].date;
+    
+        // set up time series count chart
+        var countLineChart = dc.lineChart("#chart-line-count-ts"); 
+        countLineChart
+        	.width(500).height(200)
+        	.dimension(dateDim)
+        	.group(n_obs)
+           .yAxisLabel("Number of data points")  
+        	.x(d3.time.scale().domain([minDate,maxDate])); 
+    
+        // set up BA ring chart
+        var baRingChart = dc.pieChart("#chart-ring-ba");
+        baRingChart
+            .width(150).height(150)
+            .dimension(baDim)
+            .group(n_ba)
+            .innerRadius(30); 
+    
+        // render
+        dc.renderAll(); 
+    }
+
+    function onSuccess(data) {
+        // only want 'results'
+        console.log(data);
+        makeCharts(data.results);
+    }
+
+    // get data and run
+    $.getJSON("/api/v1/datapoints/?page_size=1000", onSuccess);
+    
+</script>
 {% endblock %}

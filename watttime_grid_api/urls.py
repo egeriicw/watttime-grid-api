@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     # home
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),
     url(r'^contact/', TemplateView.as_view(template_name="contact.html"), name='contact'),
+    url(r'^dashboard/', TemplateView.as_view(template_name="dashboard.html"), name='dashboard'),
     
     # griddata dashboard views
     url(r'', include('apps.griddata.urls')),

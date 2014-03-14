@@ -38,13 +38,4 @@ class TestDashboard(TestCase):
         """page response has status 200"""
         response = Client().get(reverse('dashboard'))
         self.assertEqual(response.status_code, 200)        
-        
-    def test_context(self):
-        """response context has data"""
-        # get data
-        response = Client().get(reverse('dashboard'))
-        data = response.context['data']
-        
-        # test list length
-        self.assertGreater(len(data), 0)
-        
+              
