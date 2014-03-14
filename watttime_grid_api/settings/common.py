@@ -168,6 +168,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    
+    # CORS
+    'corsheaders.middleware.CorsMiddleware',
 )
 ########## END MIDDLEWARE CONFIGURATION
 
@@ -220,6 +223,9 @@ THIRD_PARTY_APPS = (
     
     # mapping
     'leaflet',
+    
+    # CORS
+    'corsheaders',
 )
 
 LOCAL_APPS = (
@@ -357,3 +363,8 @@ SWAGGER_SETTINGS = {
     "is_superuser": False,  # Set to True to enforce admin only access
 }
 ########## END SWAGGER API DOCS CONFIGURATION
+
+
+########## CORS CONFIGURATION
+CORS_ORIGIN_ALLOW_ALL = True
+########## END CORS CONFIGURATION
