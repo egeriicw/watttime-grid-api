@@ -69,10 +69,10 @@ app.conf.CELERYBEAT_SCHEDULE.update({
 
 # other tasks
 app.conf.CELERYBEAT_SCHEDULE.update({
-    # ERCOT on minute 33
+    # ERCOT on minute 34
     'update-ercot-genmix-latest': {
         'task': 'apps.genmix.tasks.update',
-        'schedule': crontab(minute='33'),
+        'schedule': crontab(minute='34'),
         'args': ['ERCOT'],
         'kwargs': {'latest': True, 'market': 'RTHR'},
     },
@@ -86,7 +86,7 @@ app.conf.CELERYBEAT_SCHEDULE.update({
     # yesterday in CAISO every hour (should be once, just after midnight Pacific time)
     'update-caiso-genmix-yesterday': {
         'task': 'apps.genmix.tasks.update',
-        'schedule': crontab(hour='7,8', minute='*/10'),
+        'schedule': crontab(hour='7', minute='20'),
         'args': ['CAISO'],
         'kwargs': {'yesterday': True, 'market': 'RTHR'},
     },
