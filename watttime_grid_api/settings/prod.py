@@ -90,6 +90,9 @@ BROKER_URL = environ.get('RABBITMQ_URL') or environ.get('CLOUDAMQP_URL')
 
 # See: http://docs.celeryproject.org/en/latest/configuration.html#celery-result-backend
 CELERY_RESULT_BACKEND = 'amqp'
+
+# See: http://celery.readthedocs.org/en/latest/configuration.html#error-e-mails
+CELERY_SEND_TASK_ERROR_EMAILS = True
 ########## END CELERY CONFIGURATION
 
 
