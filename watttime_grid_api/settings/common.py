@@ -217,6 +217,7 @@ THIRD_PARTY_APPS = (
 
     # API framework
     'rest_framework',
+    'rest_framework.authtoken',
     
     # API documentation
     'rest_framework_swagger',
@@ -226,6 +227,7 @@ THIRD_PARTY_APPS = (
     
     # CORS
     'corsheaders',
+
 )
 
 LOCAL_APPS = (
