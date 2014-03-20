@@ -1,6 +1,4 @@
 from rest_framework import generics, viewsets, response, status
-from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.views import ObtainAuthToken
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
 from apps.carbon.models import FuelCarbonIntensity
@@ -129,20 +127,3 @@ class FuelToCarbonDetail(generics.RetrieveAPIView):
     """
     queryset = FuelCarbonIntensity.objects.all()
     serializer_class = serializers.FuelCarbonIntensitySerializer
-
-
-class ResetAuthToken(ObtainAuthToken):
-    def post(self, request):
-        serializer = self.serializer_class(data=request.DATA)
-        if serializer.is_valid():
-            # delete existing token
-            Token.objects.filter(user=serializer.object['user']).delete()
-
-            # and create new one
-            token, created = Token.objects.get_or_create(user=serializer.object['user'])
-
-            # return
-            return response.Response({'token': token.key, 'success': created})
-
-        # invalid serializer
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

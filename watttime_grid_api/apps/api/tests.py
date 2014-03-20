@@ -1,8 +1,6 @@
 from django.test import TestCase, Client
 from django.contrib.gis.geos import Point
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.test import APITestCase
 from apps.gridentities.models import BalancingAuthority, FuelType
@@ -248,68 +246,3 @@ class DataPointsAPITest(APITestCase):
                                     n_expected)
             for dp in response.data['results']:
                 self.assertEqual(dp['market'], market)
-
-
-class TestAuth(TestCase):
-    def setUp(self):
-        self.username = 'test_user'
-        self.password = 'test_pw'
-        self.user = User.objects.create_user(self.username, 'test@example.com', self.password)
-        self.obtain_token_view_name = 'obtain-token-auth'
-        self.reset_token_view_name = 'reset-token-auth'
-
-    def test_token_autocreate(self):
-        """API tokens autocreate on user creation"""
-        self.assertEqual(Token.objects.filter(user__username='other_user').count(), 0)
-        u = User.objects.create_user('other_user', 'other@example.com', 'otherpw')
-        self.assertEqual(Token.objects.filter(user__username='other_user').count(), 1)
-
-    def test_obtain_token_success(self):
-        # set up payload for post
-        payload = {'username': self.username, 'password': self.password}
-
-        # make request
-        c = Client()
-        response = c.post(reverse(self.obtain_token_view_name), data=payload)
-
-        # test response
-        self.assertIn('token', response.data.keys())
-        self.assertEqual(response.data['token'], Token.objects.get(user=self.user).key)
-
-    def test_obtain_token_no_username(self):
-        c = Client()
-        response = c.post(reverse(self.obtain_token_view_name),
-                            {'password': 'string'})
-        self.assertEqual(response.data['username'], ["This field is required."])
-
-    def test_obtain_token_no_password(self):
-        c = Client()
-        response = c.post(reverse(self.obtain_token_view_name),
-                            {'username': 'string'})
-        self.assertEqual(response.data['password'], ["This field is required."])
- 
-    def test_obtain_token_bad_credentials(self):
-        c = Client()
-        response = c.post(reverse(self.obtain_token_view_name),
-                            {'username': 'no_user', 'password': 'no_pw'})
-        self.assertEqual(response.data['non_field_errors'],
-                        ["Unable to login with provided credentials."])
-
-    def test_reset_token_success(self):
-        # set up payload for post
-        payload = {'username': self.username, 'password': self.password}
-        old_token = Token.objects.get(user=self.user).key
-
-        # make request
-        c = Client()
-        response = c.post(reverse(self.reset_token_view_name), data=payload)
-
-        # test response
-        new_token = Token.objects.get(user=self.user).key
-        self.assertIn('token', response.data.keys())
-        self.assertEqual(response.data['token'], new_token)
-        self.assertIn('success', response.data.keys())
-        self.assertEqual(response.data['success'], True)
-
-        # test token is new
-        self.assertNotEqual(old_token, new_token)

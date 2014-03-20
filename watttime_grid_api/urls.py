@@ -1,7 +1,8 @@
 from django.contrib.gis import admin
 from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
-
+from django.contrib.auth.decorators import login_required
+from apps.api.api_auth.views import TokenView
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/admin/#hooking-adminsite-instances-into-your-urlconf
 admin.autodiscover()
@@ -32,6 +33,6 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('libs.registration_tweaks.urls')),
 
     # profile
-    url(r'^accounts/profile/', TemplateView.as_view(template_name="accounts/profile.html"), name='profile'),
-    url(r'^accounts/token/', TemplateView.as_view(template_name="accounts/token.html"), name='token'),
+    url(r'^accounts/profile/', login_required(TemplateView.as_view(template_name="accounts/profile.html")), name='profile'),
+    url(r'^accounts/token/', TokenView.as_view(template_name="accounts/token.html"), name='token-detail'),
 )

@@ -1,19 +1,19 @@
 from django.conf.urls import patterns, url, include
 from rest_framework import routers
 from apps.api import views
+from apps.api.api_auth import views as auth_views
 
-router = routers.DefaultRouter()
-
-# Wire up our API using automatic URL routing.
 urlpatterns = patterns('',
-    url(r'^', include(router.urls)),
-    
+    # docs
     url(r'^docs/', include('rest_framework_swagger.urls')),
-    url(r'^obtain-token-auth/', 'rest_framework.authtoken.views.obtain_auth_token',
+
+    # auth
+    url(r'^obtain-token-auth/', auth_views.ObtainAuthToken.as_view(),
         name='obtain-token-auth'),
-    url(r'^reset-token-auth/', views.ResetAuthToken.as_view(),
+    url(r'^reset-token-auth/', auth_views.ResetAuthToken.as_view(),
         name='reset-token-auth'),
 
+    # data
     url(r'^balancing_authorities/$', views.BalancingAuthorityList.as_view(),
         name='balancingauthority-list'),
     url(r'^balancing_authorities/(?P<abbrev>[A-Z]+)/$', views.BalancingAuthorityDetail.as_view(),
