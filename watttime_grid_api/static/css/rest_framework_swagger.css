@@ -1,5 +1,9 @@
-body { padding-top: 70px; }
+body { padding-top: 140px; }
 
+.navbar-sub {
+	margin-top: 50px;
+    background-color: #8DC63F; 
+}
 .navbar a#logo {
   background: transparent url(../images/wordlogo_sm.png) no-repeat left center;
   padding-right: 120px;

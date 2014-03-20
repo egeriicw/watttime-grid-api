@@ -30,4 +30,8 @@ urlpatterns = patterns('',
 
     # registration
     url(r'^accounts/', include('libs.registration_tweaks.urls')),
+
+    # profile
+    url(r'^accounts/profile/', TemplateView.as_view(template_name="accounts/profile.html"), name='profile'),
+    url(r'^accounts/token/', TemplateView.as_view(template_name="accounts/token.html"), name='token'),
 )
