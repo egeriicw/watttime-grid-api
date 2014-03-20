@@ -27,4 +27,7 @@ urlpatterns = patterns('',
 
     # api docs
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    # registration
+    url(r'^accounts/', include('libs.registration_tweaks.urls')),
 )

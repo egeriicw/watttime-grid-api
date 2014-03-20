@@ -228,6 +228,12 @@ THIRD_PARTY_APPS = (
     # CORS
     'corsheaders',
 
+    # registration
+    'registration',
+
+    # bootstrap
+    'bootstrap3',
+
 )
 
 LOCAL_APPS = (
@@ -370,3 +376,8 @@ SWAGGER_SETTINGS = {
 ########## CORS CONFIGURATION
 CORS_ORIGIN_ALLOW_ALL = True
 ########## END CORS CONFIGURATION
+
+
+########## REGISTRATION CONFIGURATION
+ACCOUNT_ACTIVATION_DAYS = 7
+########## END REGISTRATION CONFIGURATION
