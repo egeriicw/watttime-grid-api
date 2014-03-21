@@ -86,15 +86,18 @@
 				<li>the JSON object returned by {% url 'reset-token-auth' %} includes an additional <code>"reset_success"</code> attribute that is <code>true</code> if the token was reset and <code>false</code> otherwise</li>
 			</ul>
 		</p>
-		<p class="alert alert-warning">
-			<strong>Careful:</strong>
-			Clicking this button will invalidate your current API token,
-			generate a new token for you,
-			and display it on this page.
-			<span>
-				<button type="submit" class="btn btn-warning" id="reset">Reset</button>
-			</span>
-		</p>
+		<form id="reset" action="{% url 'token-reset' %}" method="post">
+			{% csrf_token %}
+			<p class="alert alert-warning">
+				<strong>Careful:</strong>
+				Clicking this button will invalidate your current API token,
+				generate a new token for you,
+				and display it on this page.
+				<span>
+					<input type="submit" class="btn btn-warning" value="Reset">
+				</span>
+			</p>
+		</form>
 	</div>
 </div> <!-- end body container -->
 
