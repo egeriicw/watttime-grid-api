@@ -1,8 +1,9 @@
 from django.contrib.gis import admin
 from django.conf.urls import patterns, include, url
 from django.core.urlresolvers import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/admin/#hooking-adminsite-instances-into-your-urlconf
 admin.autodiscover()
@@ -36,7 +37,5 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('libs.registration_tweaks.urls')),
 
     # profile
-    url(r'^accounts/profile[/]$',
-        login_required(TemplateView.as_view(template_name="accounts/profile.html")),
-        name='profile'),
+    url(r'^accounts/profile/', include('apps.accounts.urls')),
 )

@@ -6,7 +6,19 @@
 
 <div class="container" id="body" role="main">
 
-    test
+    <div class="row">
+    	<p class="lead">Welcome!</p>
+    	<dl class="dl-horizontal lead">
+	        <dt>Username</dt>
+	        <dd>{{ object.username }}</dd>
+	        <dt>Email</dt>
+	        <dd>{{ object.email }}</dd>
+	        <dt>API Token</dt>
+	        <dd><a href="{% url 'token-detail' %}" class="btn btn-sm btn-default">View</a></dd>
+	        <dt>Password</dt>
+	        <dd><a href="{% url 'password_change' %}" class="btn btn-sm btn-default">Change</a></dd>
+    	</dl>    
+    </div>
 </div> <!-- end body container -->
 
 {% endblock %}
