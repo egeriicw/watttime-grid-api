@@ -1,6 +1,3 @@
-/* navbar fixed to top */
-body { padding-top: 70px; }
-
 .navbar a#logo {
   background: transparent url(../images/wordlogo_sm.png) no-repeat left center;
   padding-right: 120px;
