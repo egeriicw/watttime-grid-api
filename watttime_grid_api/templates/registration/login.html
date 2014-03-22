@@ -10,17 +10,22 @@
 
 {% block content %}
     <div class="container" id="body" role="main">
+    	<p class="lead">Welcome back!</p>
+
 		<form action="{% url 'auth_login' %}" method="post" class="form">
 		    {% csrf_token %}
 		    {% bootstrap_form form %}
 		    {% buttons %}
 		        <button type="submit" class="btn btn-primary">
-		            {% bootstrap_icon "star" %} Submit
+		            {% bootstrap_icon "star" %} Sign in
 		        </button>
 		    {% endbuttons %}
 		</form>
-
-        <p><a href="{% url 'password_reset' %}">{% trans "Reset my password" %}</a></p>
+		<p>
+			Not what you're looking for?<br>
+        	<a href="{% url 'registration_register' %}">{% trans "Sign up for a new account" %}</a><br>
+        	<a href="{% url 'password_reset' %}">{% trans "Reset your password" %}</a>
+        </p>
 
     </div>
 

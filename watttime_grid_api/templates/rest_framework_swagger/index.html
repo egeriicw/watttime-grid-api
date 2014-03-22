@@ -64,7 +64,24 @@
 
 <div class="swagger-ui-wrap">
     <p class="lead">
-        Click on the links below to explore the API.
+      Click on the links below to explore the API.
+    </p>    
+    <p>
+      {% if user.is_authenticated %}
+        Ready to start developing?
+        Use your 
+        <a href="{% url 'token-detail' %}" class="btn btn-sm btn-default">API token</a>
+        for unlimited access!
+      {% else %}
+        This interactive documentation gives you full access to the complete API,
+        but is restricted to 100 views per day if you aren't signed in.
+        (If you get a "429 error" message, sorry, you've hit your limit for today.)
+        For unrestricted access, just
+        <a href="{% url 'auth_login' %}" class="btn btn-sm btn-default">sign in</a>
+        to your account or
+        <a href="{% url 'registration_register' %}" class="btn btn-sm btn-default">register</a>
+        for a new one!
+      {% endif %}
     </p>
 </div>
 <div id="swagger-ui-container" class="swagger-ui-wrap">
