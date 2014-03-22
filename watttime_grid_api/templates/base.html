@@ -8,13 +8,14 @@
 {% endblock %}
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
   <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
-  <link href='{% static "css/rest_framework_swagger.css" %}' media='screen' rel='stylesheet' type='text/css'/>
+  <link href='{% static "css/navbar_primary.css" %}' media='screen' rel='stylesheet' type='text/css'/>
+  <link href='{% static "css/navbar_accounts.css" %}' media='screen' rel='stylesheet' type='text/css'/>
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 </head>
 
 <body>
     <!-- Fixed navbar -->
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="navbar navbar-primary navbar-fixed-top" role="navigation">
       <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -59,7 +60,7 @@
 
     <!-- Fixed navbar -->
   {% if user.is_authenticated %}
-    <div class="navbar navbar-sub navbar-fixed-top" role="navigation">
+    <div class="navbar navbar-accounts navbar-fixed-top" role="navigation">
       <div class="container-fluid">
         <p class="navbar-text">Signed in as {{ user.username }}</p>
         <div class="navbar-collapse collapse navbar-right">
