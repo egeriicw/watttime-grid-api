@@ -41,7 +41,7 @@ class TestRequestHeaderToken(APITestCase):
 
     def test_token_auth_on_by_default(self):
         authenticators = self.view.get_authenticators()
-        self.assertEqual(len(authenticators), 1)
+        self.assertGreaterEqual(len(authenticators), 1)
         self.assertEqual(type(TokenAuthentication()), type(authenticators[0]))
 
     def test_header_enables_auth(self):

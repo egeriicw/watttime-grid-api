@@ -280,6 +280,7 @@ REST_FRAMEWORK = {
     # http://www.django-rest-framework.org/api-guide/authentication#setting-the-authentication-scheme
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
 
     # Throttling for anonymous users
