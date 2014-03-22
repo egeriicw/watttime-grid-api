@@ -254,6 +254,7 @@ LOCAL_APPS = (
     
     # api
     'apps.api',
+    'apps.api.api_auth',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -272,9 +273,24 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly'
     ],
     
+    # Authentication via API tokens
+    # http://www.django-rest-framework.org/api-guide/authentication#setting-the-authentication-scheme
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+
+    # Throttling for anonymous users
+    # http://www.django-rest-framework.org/api-guide/throttling
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/day',
+    },
+
     # Allow filtering
     # http://www.django-rest-framework.org/api-guide/filtering
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
