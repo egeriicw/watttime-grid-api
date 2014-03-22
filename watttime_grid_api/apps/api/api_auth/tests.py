@@ -1,12 +1,13 @@
-from django.test import TestCase, Client
-from django.test.client import RequestFactory
+from rest_framework.test import APITestCase, APIClient, APIRequestFactory
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication, get_authorization_header
+from rest_framework.views import APIView
 import views
 
 
-class TestToken(TestCase):
+class TestToken(APITestCase):
     def setUp(self):
         self.username = 'test_user'
         self.password = 'test_pw'
@@ -22,15 +23,50 @@ class TestToken(TestCase):
 
     def test_related_name(self):
         self.assertEqual(self.token, self.user.auth_token)
-        
 
-class TestAPIViews(TestCase):
+
+class MockView(APIView):
+    def get(self, request):
+        return Response('foo')
+
+
+class TestRequestHeaderToken(APITestCase):
+    def setUp(self):
+        self.username = 'test_user'
+        self.password = 'test_pw'
+        self.user = User.objects.create_user(self.username, 'test@example.com', self.password)
+        self.token = Token.objects.get()
+        self.factory = APIRequestFactory()
+        self.view = MockView()
+
+    def test_token_auth_on_by_default(self):
+        authenticators = self.view.get_authenticators()
+        self.assertEqual(len(authenticators), 1)
+        self.assertEqual(type(TokenAuthentication()), type(authenticators[0]))
+
+    def test_header_enables_auth(self):
+        # set up request
+        header = "Token %s" % self.token.key
+        request = self.factory.get('/', HTTP_AUTHORIZATION=header)
+        auth_request = self.view.initialize_request(request)
+
+        # user is correctly associated with request
+        self.assertEqual(auth_request.user, self.user)
+
+    def test_auth_header_name(self):
+        header = "Token %s" % self.token.key
+        request = self.factory.get('/', HTTP_AUTHORIZATION=header)
+        self.assertIn('HTTP_AUTHORIZATION', request.META)
+    
+
+class TestAPIViews(APITestCase):
     def setUp(self):
         self.username = 'test_user'
         self.password = 'test_pw'
         self.user = User.objects.create_user(self.username, 'test@example.com', self.password)
         self.obtain_token_view_name = 'obtain-token-auth'
         self.reset_token_view_name = 'reset-token-auth'
+        self.c = APIClient()
 
     def test_token_autocreate(self):
         """API tokens autocreate on user creation"""
@@ -43,30 +79,26 @@ class TestAPIViews(TestCase):
         payload = {'username': self.username, 'password': self.password}
 
         # make request
-        c = Client()
-        response = c.post(reverse(self.obtain_token_view_name), data=payload)
+        response = self.c.post(reverse(self.obtain_token_view_name), data=payload)
 
         # test response
         self.assertEqual(['token'], response.data.keys())
         self.assertEqual(response.data['token'], Token.objects.get(user=self.user).key)
 
     def test_obtain_token_no_username(self):
-        c = Client()
-        response = c.post(reverse(self.obtain_token_view_name),
+        response = self.c.post(reverse(self.obtain_token_view_name),
                             {'password': 'string'})
         self.assertEqual(response.data['username'], ["This field is required."])
         self.assertEqual(len(response.data.keys()), 1)
 
     def test_obtain_token_no_password(self):
-        c = Client()
-        response = c.post(reverse(self.obtain_token_view_name),
+        response = self.c.post(reverse(self.obtain_token_view_name),
                             {'username': 'string'})
         self.assertEqual(response.data['password'], ["This field is required."])
         self.assertEqual(len(response.data.keys()), 1)
  
     def test_obtain_token_bad_credentials(self):
-        c = Client()
-        response = c.post(reverse(self.obtain_token_view_name),
+        response = self.c.post(reverse(self.obtain_token_view_name),
                             {'username': 'no_user', 'password': 'no_pw'})
         self.assertEqual(response.data['non_field_errors'],
                         ["Unable to login with provided credentials."])
@@ -78,8 +110,7 @@ class TestAPIViews(TestCase):
         old_token = Token.objects.get(user=self.user).key
 
         # make request
-        c = Client()
-        response = c.post(reverse(self.reset_token_view_name), data=payload)
+        response = self.c.post(reverse(self.reset_token_view_name), data=payload)
 
         # test response
         new_token = Token.objects.get(user=self.user).key
@@ -93,12 +124,12 @@ class TestAPIViews(TestCase):
         self.assertNotEqual(old_token, new_token)
 
 
-class TestDetailView(TestCase):
+class TestDetailView(APITestCase):
     def setUp(self):
         self.username = 'test_user'
         self.password = 'test_pw'
         self.user = User.objects.create_user(self.username, 'test@example.com', self.password)
-        self.c = Client()
+        self.c = APIClient()
 
     def test_view_requires_login(self):
         response = self.c.get(reverse('token-detail'))
@@ -116,13 +147,13 @@ class TestDetailView(TestCase):
         self.assertIn(reverse('token-reset'), response.content)
 
 
-class TestResetView(TestCase):
+class TestResetView(APITestCase):
     def setUp(self):
         self.username = 'test_user'
         self.password = 'test_pw'
         self.user = User.objects.create_user(self.username, 'test@example.com', self.password)
-        self.c = Client()
-        self.factory = RequestFactory()
+        self.c = APIClient()
+        self.factory = APIRequestFactory()
 
     def test_view_requires_login(self):
         response = self.c.post(reverse('token-reset'))

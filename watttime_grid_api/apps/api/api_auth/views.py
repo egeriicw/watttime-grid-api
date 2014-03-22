@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from rest_framework import response, status
+from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken import views as authtoken_views
 from .models import reset_auth_token
@@ -16,7 +17,8 @@ class ObtainAuthToken(authtoken_views.ObtainAuthToken):
     username -- Username for an existing user account.
     password -- Password for an existing user account.
     """
-    pass
+    # override other permissions
+    permission_classes = (AllowAny,)
 
 
 class ResetAuthToken(authtoken_views.ObtainAuthToken):
@@ -25,6 +27,9 @@ class ResetAuthToken(authtoken_views.ObtainAuthToken):
     username -- Username for an existing user account.
     password -- Password for an existing user account.
     """
+    # override other permissions
+    permission_classes = (AllowAny,)
+
     def post(self, request):
         serializer = self.serializer_class(data=request.DATA)
         if serializer.is_valid():
