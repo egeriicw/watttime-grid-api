@@ -1,7 +1,7 @@
 Congratulations, you are now a WattTime Impact API developer! We're so excited to give you full access to our real-time energy impact data.
 
 To get your API token, please follow the link below within {{expiration_days}} days:
-{{ site.protocol}}://{{ site.domain }}{% url 'registration_activate' activation_key=activation_key %}
+{{ site.domain }}{% url 'registration_activate' activation_key=activation_key %}
 
 Then, sign up for the user list (http://groups.google.com/forum/#!forum/watttime-api-users) and follow along on Twitter (http://twitter.com/watttime/) and GitHub (http://github.com/WattTime/watttime-grid-api/). Don't hesitate to ping our tech team (dev@watttime.org) if anything comes up. And please let us know when your project is ready for prime time—we're looking forward to seeing what you come up with!
 
@@ -10,5 +10,5 @@ Thanks again for your support.
 cheers,
 Anna and the WattTime Impact API team
 
-{{ site.protocol}}://{{ site.domain }}
+{{ site.domain }}
 anna@watttime.org
