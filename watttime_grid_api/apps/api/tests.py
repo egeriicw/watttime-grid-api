@@ -3,6 +3,7 @@ from django.contrib.gis.geos import Point
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.contrib.auth.models import User
+from django.conf import settings
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.test import APITestCase, APIRequestFactory
@@ -105,6 +106,12 @@ class DataPointsAPITest(APITestCase):
 
         # set up routes
         self.base_url = '/api/v1/datapoints/'
+
+        # authenticate client
+        username = 'api_user'
+        password = 'apipw'
+        user = User.objects.create_user(username, 'api_user@example.com', password)
+        authenticated = self.client.login(username=username, password=password)
         
     def _run_get(self, url, data, n_expected):
         """boilerplate for testing status and number of objects in get requests"""
@@ -265,8 +272,8 @@ class TestThrottle(APITestCase):
         """
         cache.clear()
         self.factory = APIRequestFactory()
-        self.n_anon_throttle_requests = 100
-        self.n_anon_throttle_rate = 3600*24 # 1 day
+        self.n_anon_throttle_requests = 25
+        self.n_anon_throttle_rate = 3600 # 1 hour
 
     def get_throttle_classes(self):
         return MockView().throttle_classes
@@ -330,3 +337,19 @@ class TestThrottle(APITestCase):
         for dummy in range(self.n_anon_throttle_requests+1):
             response = MockView.as_view()(request)
         self.assertEqual(200, response.status_code)
+
+    def test_throttle_rate_documented(self):
+        throttler = self.get_throttler()
+        n_requests, n_sec = throttler.parse_rate(throttler.get_rate())
+        if n_sec == 3600*24:
+            intervalstr = 'day'
+        elif n_sec == 3600:
+            intervalstr = 'hour'
+        elif n_sec == 60:
+            intervalstr == 'minute'
+        else:
+            intervalstr == 'second'
+        docstr = '%d views per %s' % (n_requests, intervalstr)
+
+        response = self.client.get('/api/v1/docs/')
+        self.assertIn(docstr, response.content)

@@ -3,6 +3,7 @@
 
 from datetime import timedelta
 from os.path import abspath, basename, dirname, join, normpath, realpath
+from os import environ
 from sys import path
 
 
@@ -263,6 +264,10 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
 ########## DJANGO REST FRAMEWORK CONFIGURATION
+# Throttle rate for unauthenticated users
+# See: http://www.django-rest-framework.org/api-guide/throttling#setting-the-throttling-policy
+ANONYMOUS_THROTTLE_RATE = environ.get('ANONYMOUS_THROTTLE_RATE', '25/hour')
+
 # See: http://www.django-rest-framework.org/#example
 REST_FRAMEWORK = {
     # Use hyperlinked styles by default.
@@ -289,7 +294,7 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.AnonRateThrottle',
     ),
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',
+        'anon': ANONYMOUS_THROTTLE_RATE,
     },
 
     # Allow filtering
