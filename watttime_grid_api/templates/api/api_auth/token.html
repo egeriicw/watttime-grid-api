@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Token{% endblock%}
+
+{% block content %}
+
+<div class="container" id="body" role="main">
+	<div class="row alert alert-info">
+		<p class="lead">Your API token is</p>
+		<h3 id="token" >{{ object.key }}</h3>
+		<p>created on {{ object.created | date }}</p>
+	</div>
+
+	<div class="row">
+		<h1>Usage</h1>
+		<p>
+			Authenticated API requests have unlimited access to all API endpoints,
+			while unauthenticated API requests are throttled.
+			To authenticate your API requests,
+			include your 40-digit hexadecimal token in the Authorization HTTP Header.
+		</p>
+
+		<h3>Examples</h3>
+		<p>
+			Using <code>curl</code>:
+<pre class="pre-scrollable">
+curl -X GET {% url 'home' %}api/v1/datapoints/ -H 'Authorization: Token {{ object.key }}'
+</pre>
+
+			Using <a href="http://docs.python-requests.org/">Python Requests</a>:
+<pre class="pre-scrollable">
+>>> import requests
+>>> requests.get('{% url 'home' %}api/v1/datapoints/', headers={'Authorization': 'Token {{ object.key }}'})
+</pre>
+		</p>
+		
+		<h3>Possible errors</h3>
+		<table class="table table-hover">
+			<tr>
+				<th>header</th>
+				<th>problem</th>
+				<th>response code</th>
+				<th>response content</th>
+			</tr>
+			<tr>
+				<td>[blank]</td>
+				<td>too many unauthenticated requests</td>
+				<td>429</td>
+				<td>{'detail': 'Request was throttled.Expected available in 85999 seconds.'}</td>
+			</tr>
+			<tr>
+				<td>Authorization: Token badtoken</td>
+				<td>invalid token</td>
+				<td>401</td>
+				<td>{'detail': 'Invalid token'}</td>
+			</tr>
+			<tr>
+				<td>Authorization: Token</td>
+				<td>missing token</td>
+				<td>401</td>
+				<td>{'detail': 'Invalid token header. No credentials provided.'}</td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="row">
+		<h1>Getting a token</h1>
+		<p>
+			An API token is automatically generated for you when you create your user account.
+			You can access your token in two ways:
+			by viewing it on this page,
+			or via the <a href="{% url 'obtain-token-auth' %}">{% url 'obtain-token-auth' %}</a> API endpoint.
+			To use the endpoint, POST a valid username and password, e.g.,
+			<code>{'username': 'myname', 'password': 'secret'}</code>.
+			This will return a JSON response like
+			<code>{'token': '9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b'}</code>.
+			You do not need to include any Authorization Header in this request.
+			POSTing to this endpoint does not modify the state of your token.
+		</p>
+
+		<h3>Possible errors</h3>
+		<table class="table table-hover">
+			<tr>
+				<th>POST request</th>
+				<th>problem</th>
+				<th>response code</th>
+				<th>response content</th>
+			</tr>
+			<tr>
+				<td>{% url 'obtain-token-auth' %}</td>
+				<td>missing username and password</td>
+				<td>400</td>
+				<td>{'username': ['This field is required.'], 'password': ['This field is required.']}</td>
+			</tr>
+			<tr>
+				<td>{% url 'obtain-token-auth' %}?username=myname</td>
+				<td>missing password</td>
+				<td>400</td>
+				<td>{'password': ['This field is required.']}</td>
+			</tr>
+			<tr>
+				<td>{% url 'obtain-token-auth' %}?password=secret</td>
+				<td>missing username</td>
+				<td>400</td>
+				<td>{'username': ['This field is required.']}</td>
+			</tr>
+			<tr>
+				<td>{% url 'obtain-token-auth' %}?username=myname&password=wrongpw</td>
+				<td>invalid username and password</td>
+				<td>400</td>
+				<td>{'non_field_errors': ['Unable to login with provided credentials.']}</td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="row">
+		<h1>Resetting your token</h1>
+		<p>
+			Please keep your API token secure.
+			If the security of your API token becomes compromised,
+			there are two ways to reset it:
+			by clicking the "Reset" button below,
+			or via the <a href="{% url 'reset-token-auth' %}">{% url 'reset-token-auth' %}</a> API endpoint.
+			Usage of the {% url 'reset-token-auth' %} endpoint
+			is the same as for the {% url 'obtain-token-auth' %} endpoint,
+			except for two differences:
+			<ul>
+				<li><strong>{% url 'reset-token-auth' %} invalidates your current token</strong>
+				and returns a newly-generated, newly-valid API token</li>
+				<li>the JSON object returned by {% url 'reset-token-auth' %} includes an additional <code>"reset_success"</code> attribute that is <code>true</code> if the token was reset and <code>false</code> otherwise</li>
+			</ul>
+		</p>
+		<form id="reset" action="{% url 'token-reset' %}" method="post">
+			{% csrf_token %}
+			<p class="alert alert-warning">
+				<strong>
+				Careful:
+				Clicking this button will invalidate your current API token,
+				</strong>
+				generate a new token for you,
+				and display it on this page.
+				<span>
+					<input type="submit" class="btn btn-warning" value="Reset">
+				</span>
+			</p>
+		</form>
+	</div>
+</div> <!-- end body container -->
+
+{% endblock %}

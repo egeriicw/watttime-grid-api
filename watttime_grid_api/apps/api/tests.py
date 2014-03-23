@@ -1,7 +1,14 @@
 from django.test import TestCase, Client
 from django.contrib.gis.geos import Point
+from django.core.urlresolvers import reverse
+from django.core.cache import cache
+from django.contrib.auth.models import User
+from django.conf import settings
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.views import APIView
+from rest_framework.test import APITestCase, APIRequestFactory
+from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
 from apps.api.views import DataPointList
@@ -99,6 +106,12 @@ class DataPointsAPITest(APITestCase):
 
         # set up routes
         self.base_url = '/api/v1/datapoints/'
+
+        # authenticate client
+        username = 'api_user'
+        password = 'apipw'
+        user = User.objects.create_user(username, 'api_user@example.com', password)
+        authenticated = self.client.login(username=username, password=password)
         
     def _run_get(self, url, data, n_expected):
         """boilerplate for testing status and number of objects in get requests"""
@@ -245,4 +258,98 @@ class DataPointsAPITest(APITestCase):
                                     n_expected)
             for dp in response.data['results']:
                 self.assertEqual(dp['market'], market)
-                
+
+
+class MockView(APIView):
+    def get(self, request):
+        return Response('foo')
+
+
+class TestThrottle(APITestCase):
+    def setUp(self):
+        """
+        Reset the cache so that no throttles will be active
+        """
+        cache.clear()
+        self.factory = APIRequestFactory()
+        self.n_anon_throttle_requests = 25
+        self.n_anon_throttle_rate = 3600 # 1 hour
+
+    def get_throttle_classes(self):
+        return MockView().throttle_classes
+
+    def get_throttler(self):
+        classes = self.get_throttle_classes()
+        first_class = classes[0]
+        return first_class()
+
+    def test_anon_throttle_on_by_default(self):
+        """Only default throttler should be AnonRateThrottle"""
+        throttle_classes = self.get_throttle_classes()
+        self.assertEqual(len(throttle_classes), 1)
+        self.assertIn(AnonRateThrottle, throttle_classes)
+
+    def test_number_anon_allowed_requests_is_expected(self):
+        throttler = self.get_throttler()
+        n_requests, n_sec = throttler.parse_rate(throttler.get_rate())
+        self.assertEqual(n_requests, self.n_anon_throttle_requests)
+
+    def test_anon_requests_are_throttled(self):
+        """
+        Ensure request rate is limited for anonymous
+        """
+        # surpass limit
+        request = self.factory.get('/')
+        for dummy in range(self.n_anon_throttle_requests+1):
+            response = MockView.as_view()(request)
+
+        # response code is 429
+        self.assertEqual(429, response.status_code)
+
+    def test_throttle_response(self):
+        """
+        Error message and header are correct
+        """
+        # surpass limit
+        request = self.factory.get('/')
+        for dummy in range(self.n_anon_throttle_requests+1):
+            response = MockView.as_view()(request)
+
+        # error message
+        msg = "Request was throttled.Expected available in %d seconds." % (self.n_anon_throttle_rate-1)
+        self.assertEqual(response.render().data,
+                    {"detail": msg})
+
+        # header
+        self.assertEqual(response['X-Throttle-Wait-Seconds'], '%d' % self.n_anon_throttle_rate)
+
+    def test_auth_requests_are_not_throttled(self):
+        """
+        Ensure allowed request rate for user is higher than anonymous rate
+        """
+        # set up request with token
+        User.objects.create_user(username='myname', password='secret')
+        user = User.objects.get(username='myname')
+        header = "Token %s" % user.auth_token.key
+        request = self.factory.get('/', HTTP_AUTHORIZATION=header)
+
+        # test rate
+        for dummy in range(self.n_anon_throttle_requests+1):
+            response = MockView.as_view()(request)
+        self.assertEqual(200, response.status_code)
+
+    def test_throttle_rate_documented(self):
+        throttler = self.get_throttler()
+        n_requests, n_sec = throttler.parse_rate(throttler.get_rate())
+        if n_sec == 3600*24:
+            intervalstr = 'day'
+        elif n_sec == 3600:
+            intervalstr = 'hour'
+        elif n_sec == 60:
+            intervalstr == 'minute'
+        else:
+            intervalstr == 'second'
+        docstr = '%d views per %s' % (n_requests, intervalstr)
+
+        response = self.client.get('/api/v1/docs/')
+        self.assertIn(docstr, response.content)

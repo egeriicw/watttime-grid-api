@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Activation complete{% endblock%}
+
+{% block content %}
+    <div class="container" id="body" role="main">
+		<p class="lead">
+			Woohoo, your account is active.
+			<a href="{% url 'auth_login' %}">{% trans "Sign in" %}</a>
+			to get started!
+		</p>
+    </div>
+
+{% endblock %}

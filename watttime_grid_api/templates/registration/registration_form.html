@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load bootstrap3 %}
+{% load i18n %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+
+{% block title %}Sign up{% endblock%}
+
+{% block content %}
+    <div class="container" id="body" role="main">
+    	<p class="lead">Let's get started!</p>
+    	<p>
+    		We care about making it as easy as possible to access
+    		information about energy impact timing,
+    		so we've made the WattTime Impact API open to anyone.
+    		But we encourage you to create an account anyway!
+    		It's free, quick, and easy, and it will help us do more awesome together.
+    		Plus, creating an account is how you get an API token,
+    		which gives you unlimited access to the API.
+
+    	</p>
+
+		<form action="{% url 'registration_register' %}" method="post" class="form">
+		    {% csrf_token %}
+		    {% bootstrap_form form %}
+		    {% buttons %}
+		        <button type="submit" class="btn btn-primary">
+		            {% bootstrap_icon "star" %} Send registration email
+		        </button>
+		    {% endbuttons %}
+		</form>
+
+		<p>
+			Not what you're looking for?<br>
+        	<a href="{% url 'auth_login' %}">{% trans "Sign in to your existing account" %}</a><br>
+        	<a href="{% url 'password_reset' %}">{% trans "Reset your password" %}</a>
+        </p>
+    </div>
+
+{% endblock %}

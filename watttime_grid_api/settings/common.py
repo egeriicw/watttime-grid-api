@@ -3,6 +3,7 @@
 
 from datetime import timedelta
 from os.path import abspath, basename, dirname, join, normpath, realpath
+from os import environ
 from sys import path
 
 
@@ -217,6 +218,7 @@ THIRD_PARTY_APPS = (
 
     # API framework
     'rest_framework',
+    'rest_framework.authtoken',
     
     # API documentation
     'rest_framework_swagger',
@@ -226,6 +228,13 @@ THIRD_PARTY_APPS = (
     
     # CORS
     'corsheaders',
+
+    # registration
+    'registration',
+
+    # bootstrap
+    'bootstrap3',
+
 )
 
 LOCAL_APPS = (
@@ -246,6 +255,7 @@ LOCAL_APPS = (
     
     # api
     'apps.api',
+    'apps.api.api_auth',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -254,6 +264,10 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
 ########## DJANGO REST FRAMEWORK CONFIGURATION
+# Throttle rate for unauthenticated users
+# See: http://www.django-rest-framework.org/api-guide/throttling#setting-the-throttling-policy
+ANONYMOUS_THROTTLE_RATE = environ.get('ANONYMOUS_THROTTLE_RATE', '25/hour')
+
 # See: http://www.django-rest-framework.org/#example
 REST_FRAMEWORK = {
     # Use hyperlinked styles by default.
@@ -264,9 +278,25 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly'
     ],
     
+    # Authentication via API tokens
+    # http://www.django-rest-framework.org/api-guide/authentication#setting-the-authentication-scheme
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+
+    # Throttling for anonymous users
+    # http://www.django-rest-framework.org/api-guide/throttling
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': ANONYMOUS_THROTTLE_RATE,
+    },
+
     # Allow filtering
     # http://www.django-rest-framework.org/api-guide/filtering
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
@@ -368,3 +398,8 @@ SWAGGER_SETTINGS = {
 ########## CORS CONFIGURATION
 CORS_ORIGIN_ALLOW_ALL = True
 ########## END CORS CONFIGURATION
+
+
+########## REGISTRATION CONFIGURATION
+ACCOUNT_ACTIVATION_DAYS = 7
+########## END REGISTRATION CONFIGURATION

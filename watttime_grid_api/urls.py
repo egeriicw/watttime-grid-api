@@ -1,7 +1,9 @@
 from django.contrib.gis import admin
 from django.conf.urls import patterns, include, url
-from django.views.generic import TemplateView
-
+from django.core.urlresolvers import reverse_lazy
+from django.views.generic import TemplateView, DetailView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/admin/#hooking-adminsite-instances-into-your-urlconf
 admin.autodiscover()
@@ -16,8 +18,8 @@ urlpatterns = patterns('',
 
     # home
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),
-    url(r'^contact/', TemplateView.as_view(template_name="contact.html"), name='contact'),
-    url(r'^dashboard/', TemplateView.as_view(template_name="dashboard.html"), name='dashboard'),
+    url(r'^contact[/]$', TemplateView.as_view(template_name="contact.html"), name='contact'),
+    url(r'^dashboard[/]$', TemplateView.as_view(template_name="dashboard.html"), name='dashboard'),
     
     # griddata dashboard views
     url(r'', include('apps.griddata.urls')),
@@ -27,4 +29,13 @@ urlpatterns = patterns('',
 
     # api docs
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    # api tokens
+    url(r'^accounts/token/', include('apps.api.api_auth.urls')),
+
+    # registration
+    url(r'^accounts/', include('libs.registration_tweaks.urls')),
+
+    # profile
+    url(r'^accounts/profile/', include('apps.accounts.urls')),
 )
