@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.auth import views as auth_views
 from django.core.urlresolvers import reverse_lazy
+from registration.backends.default import views as reg_views
+from registration import forms as reg_forms
 
 # See https://bitbucket.org/ubernostrum/django-registration/pull-request/63/django-16-compatibility-fix-auth-views/diff
 # and http://stackoverflow.com/questions/19985103/django-1-6-and-django-registration-built-in-authentication-views-not-picked-up
@@ -33,6 +35,9 @@ urlpatterns = patterns('',
         auth_views.password_reset_confirm,
         {'post_reset_redirect': reverse_lazy('auth_password_reset_complete')},
         name='password_reset_confirm'),
+    url(r'^register/$',
+        reg_views.RegistrationView.as_view(form_class=reg_forms.RegistrationFormUniqueEmail),
+        name='registration_register'),
 
     # and now add the registration urls
     url(r'', include('registration.backends.default.urls')),

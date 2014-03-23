@@ -30,6 +30,20 @@ class TestRegistration(TestCase):
 		response = self.c.post(reverse('registration_register'), payload)
 		self.assertIn("The two password fields didn't match", response.content)
 
+	def test_repeat_email_fails(self):
+		# create user with different username and same email
+		old_user = User.objects.create_user('othername', email, 'otherpw')
+
+		# try to register
+		response = self.c.post(reverse('registration_register'), self.good_payload)
+
+		# new user not created
+		self.assertEqual(User.objects.filter(email=email).count(), 1)
+		self.assertEqual(User.objects.get(email=email).username, 'othername')
+
+		# error in response
+		self.assertIn("This email address is already in use", response.content)
+
 	def test_success_redirects_to_complete(self):
 		response = self.c.post(reverse('registration_register'), self.good_payload)
 		self.assertRedirects(response, reverse('registration_complete'))

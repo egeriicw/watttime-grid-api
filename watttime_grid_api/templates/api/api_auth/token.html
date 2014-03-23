@@ -22,16 +22,15 @@
 
 		<h3>Examples</h3>
 		<p>
-			When using these examples, remember to replace the dummy token with your real token!<br>
 			Using <code>curl</code>:
 <pre class="pre-scrollable">
-curl -X GET http://api.watttime.org/api/v1/datapoints/ -H 'Authorization: Token 1234abcdef1234abcdef1234abcdef1234abcdef'
+curl -X GET {% url 'home' %}api/v1/datapoints/ -H 'Authorization: Token {{ object.key }}'
 </pre>
 
 			Using <a href="http://docs.python-requests.org/">Python Requests</a>:
 <pre class="pre-scrollable">
 >>> import requests
->>> requests.get('http://api.watttime.org/api/v1/datapoints/', headers={'Authorization': 'Token 1234abcdef1234abcdef1234abcdef1234abcdef'})
+>>> requests.get('{% url 'home' %}api/v1/datapoints/', headers={'Authorization': 'Token {{ object.key }}'})
 </pre>
 		</p>
 		
