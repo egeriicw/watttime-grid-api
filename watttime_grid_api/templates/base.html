@@ -11,6 +11,11 @@
   <link href='{% static "css/navbar_primary.css" %}' media='screen' rel='stylesheet' type='text/css'/>
   <link href='{% static "css/navbar_accounts.css" %}' media='screen' rel='stylesheet' type='text/css'/>
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+{% if GOOGLE_ANALYTICS_PROPERTY_ID %}
+  {% include "snippets/ga.html" %}
+{% endif %}
+
 </head>
 
 {% if user.is_authenticated %}

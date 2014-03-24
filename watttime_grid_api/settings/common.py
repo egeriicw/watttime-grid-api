@@ -142,6 +142,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
+
+    # google analytics
+    'libs.analytics.context_processors.google_analytics',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
@@ -403,3 +406,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 ########## REGISTRATION CONFIGURATION
 ACCOUNT_ACTIVATION_DAYS = 7
 ########## END REGISTRATION CONFIGURATION
+
+########## GOOGLE ANALYTICS CONFIGURATION
+GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-42171038-2'
+GOOGLE_ANALYTICS_DOMAIN = 'watttime.org'
+########## END GOOGLE ANALYTICS CONFIGURATION
