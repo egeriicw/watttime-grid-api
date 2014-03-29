@@ -1,15 +1,14 @@
 watttime-grid-api
 =================
 
-What kind of electricity are you getting right now? The WattTime grid API collects real-time information on the current generation fuel mix from the major American electricity markets (MISO, PJM, CAISO, ERCOT, ISONE, SPP, and BPA) and displays it in a convenient standardized format. The API also calculates a real-time carbon footprint of electricity use in a given place and time based on this fuel mix. See the code in action at http://api.watttime.org/!
+What kind of electricity are you getting right now? The WattTime grid API collects real-time information on the current generation fuel mix from the major American electricity markets (MISO, PJM, CAISO, ERCOT, ISONE, SPP, and BPA) using the [pyiso](https://github.com/WattTime/pyiso) library and displays it in a convenient standardized format. The API also calculates a real-time carbon footprint of electricity use in a given place and time based on this fuel mix. See the code in action at http://api.watttime.org/!
 
 What's included
 ---------------
 All the Django apps are in `watttime_grid_api/apps`. These are
 * `gridentities`: provides models for metadata and descriptions of geographic entities (`BalancingAuthority` and `PowerPlant`) and data types (`FuelType`); standalone
 * `griddata`: provides models for time series data (`DataPoint`); depends on `gridentities`
-* `clients`: provides clients that scrape and parse external data sources, celery tasks for running clients, and a client factory function; depends on `griddata`
-* `genmix`: provides a `Generation` model that associates generation mix observations to `DataPoint`s, and management commands and celery tasks for pulling the data; depends on `gridentities`, `griddata`, and `clients`
+* `genmix`: provides a `Generation` model that associates generation mix observations to `DataPoint`s, and management commands and celery tasks for pulling the data; depends on `gridentities` and `griddata`
 * `carbon`: provides `Carbon` and `FuelCarbonIntensity` models that associate carbon intensity observations to `DataPoint`s, and hooks for calculating the data; depends on `gridentities`, `griddata`, and `genmix`
 * `api`: implements a Django REST Framework API to all other apps; depends on `gridentities`, `griddata`, `genmix`, and `carbon`
 
