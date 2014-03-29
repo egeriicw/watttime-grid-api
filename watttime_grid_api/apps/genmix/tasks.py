@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from celery import shared_task, subtask, group
 from django.db import IntegrityError
-from apps.clients.tasks import get_generation
+from pyiso.tasks import get_generation
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.genmix.models import Generation
 from apps.griddata.models import DataPoint, DataSeries
