@@ -244,9 +244,6 @@ LOCAL_APPS = (
     # grid entities like ISOs
     'apps.gridentities',
     
-    # clients for external data sets
-    'apps.clients',
-    
     # base classes for grid data
     'apps.griddata',
     
