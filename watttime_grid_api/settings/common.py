@@ -256,6 +256,9 @@ LOCAL_APPS = (
     # api
     'apps.api',
     'apps.api.api_auth',
+
+    # marginal emissions
+    'apps.marginal',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
