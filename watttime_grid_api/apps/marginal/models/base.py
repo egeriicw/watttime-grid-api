@@ -1,9 +1,9 @@
 from django.db import models
-from django.db.models import Sum
 from apps.gridentities.models import BalancingAuthority
+from apps.griddata.models import BaseObservation
+import logging
 from datetime import datetime
 import pytz
-import logging
 
 
 logger = logging.getLogger(__name__)
@@ -16,13 +16,14 @@ class BaseStructuralModel(models.Model):
     the associated data sources
     """
     # the beta parameter from a linear regression
-    beta = models.FloatField()
+    beta1 = models.FloatField()
+    std_dev1 = models.FloatField(null=True, blank=True)
 
     # balancing authority
     ba = models.ForeignKey(BalancingAuthority, null=True, blank=True)
     
-   # timestamp data validity begins (in UTC) (can be present, past, or future)
- #   valid_after = models.DateTimeField(default=pytz.utc.localize(datetime.utcnow()))
+    # timestamp data validity begins (in UTC) (can be present, past, or future)
+    valid_after = models.DateTimeField(default=pytz.utc.localize(datetime.utcnow()))
 
     # minimum value in range (greater-equal)
     min_value = models.FloatField()
@@ -31,23 +32,29 @@ class BaseStructuralModel(models.Model):
     max_value = models.FloatField()
     
     class Meta:
- #       get_latest_by = 'valid_after'
+        get_latest_by = 'valid_after'
         abstract = True
+        app_label = 'marginal'
   #      unique_together = ('ba', 'min_value', 'max_value')
 
     def __str__(self):
-        return "%s (%.1f,%.1f) beta=%.2f" % (self.ba.abbrev, self.min_value, self.max_value, self.beta)
+        return "%s (%.1f,%.1f) beta=%.2f" % (self.ba.abbrev, self.min_value, self.max_value, self.beta1)
 
     @classmethod
     def predict(self, dp, **kwargs):
         """
-        Compute a prediction for a DataPoint using the best available model
+        Compute a prediction for a DataPoint using the best available model,
+        or return None if no model is found.
         """
         # compute inputs
         inputs = self.inputs(dp, **kwargs)
 
         # get model
-        model = self.best_model(dp, inputs)
+        try:
+            model = self.best_model(dp, inputs)
+        except ValueError as e:
+            logger.warn(e)
+            return None
 
         # compute output
         output = model.output(**kwargs)
@@ -71,12 +78,16 @@ class BaseStructuralModel(models.Model):
         if not qset.exists():
             raise ValueError("No model found for dp %s, nothing matches for ba %s" % (dp, dp.ba.abbrev))
 
+        # filter for valid_after
+        qset = qset.filter(valid_after__lte=dp.timestamp)
+        if not qset.exists():
+            raise ValueError("No model found for dp %s valid after timestamp" % (dp))
+
         # get best for min value (supremum by min_value)
         qset = qset.filter(min_value__lte=input_value)
         row = qset.order_by('min_value').last()
         if row is None:
             raise ValueError("No model found for dp %s with value %s, all bins too high" % (dp, input_value))
-
 
         # test for max val
         if row.max_value <= input_value:
@@ -99,18 +110,13 @@ class SimpleStructuralModel(BaseStructuralModel):
     """
     def output(self, **kwargs):
         """Output value is beta"""
-        return self.beta
+        return self.beta1
 
 
-class SilerEvansModel(SimpleStructuralModel):
-    """
-    Replicating Siler-Evans et al, Environ Sci Technol 2012.
-    http://pubs.acs.org/doi/abs/10.1021/es300145v
-    """
+class BaseCarbon(BaseObservation):
+    DEFAULT_UNITS = 'lb/MW'
+
     class Meta:
-        proxy = True
+        app_label = 'marginal'
+        abstract = False
 
-    @classmethod
-    def inputs(self, dp, **kwargs):
-        """Input value is total generation"""
-        return dp.genmix.all().aggregate(bin_value=Sum('gen_MW'))

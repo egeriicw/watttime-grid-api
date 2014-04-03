@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.db import IntegrityError
-from apps.gridentities.models import FuelType, BalancingAuthority
+from apps.gridentities.models import BalancingAuthority
 from apps.griddata.models import DataPoint
-from apps.marginal.models import SimpleStructuralModel, SilerEvansModel
-from datetime import datetime
+from apps.marginal.models import SimpleStructuralModel
+from datetime import datetime, timedelta
 import pytz
 
 
@@ -13,11 +13,13 @@ class TestSimpleStructuralModel(TestCase):
     def setUp(self):
         self.ba = BalancingAuthority.objects.get(pk=1)
         self.ba_other = BalancingAuthority.objects.get(pk=2)
-        self.good_params = {'beta': 1.0, 'min_value': 0, 'max_value': 700, 'ba': self.ba}
-        self.good_params_no_ba = {'beta': 1.0, 'min_value': 0, 'max_value': 700}
-        self.bad_params_high_vals = {'beta': 1.0, 'min_value': 700, 'max_value': 1000, 'ba': self.ba}
-        self.bad_params_low_vals = {'beta': 1.0, 'min_value': 0, 'max_value': 100, 'ba': self.ba}
-        self.bad_params_other_ba = {'beta': 1.0, 'min_value': 0, 'max_value': 700, 'ba': self.ba_other}
+        self.good_params = {'beta1': 1.0, 'min_value': 0, 'max_value': 700, 'ba': self.ba}
+        self.good_params_no_ba = {'beta1': 1.0, 'min_value': 0, 'max_value': 700}
+        self.bad_params_high_vals = {'beta1': 1.0, 'min_value': 700, 'max_value': 1000, 'ba': self.ba}
+        self.bad_params_low_vals = {'beta1': 1.0, 'min_value': 0, 'max_value': 100, 'ba': self.ba}
+        self.bad_params_other_ba = {'beta1': 1.0, 'min_value': 0, 'max_value': 700, 'ba': self.ba_other}
+        self.bad_params_validafter = {'beta1': 1.0, 'min_value': 0, 'max_value': 700, 'ba': self.ba,
+                                      'valid_after': pytz.utc.localize(datetime.utcnow())+timedelta(hours=1)}
         self.good_inputs = {'bin_value': 600}
 
     def create_dp(self):
@@ -69,6 +71,15 @@ class TestSimpleStructuralModel(TestCase):
         SimpleStructuralModel.objects.create(**self.bad_params_other_ba)
         self.assertRaises(ValueError, SimpleStructuralModel.best_model, dp, self.good_inputs)
 
+    def test_cannot_match_dp_to_row_with_late_validafter(self):
+        # set up dp
+        self.create_dp()
+        dp = DataPoint.objects.get()
+
+        # test can't find row for wrong BA
+        SimpleStructuralModel.objects.create(**self.bad_params_validafter)
+        self.assertRaises(ValueError, SimpleStructuralModel.best_model, dp, self.good_inputs)
+
     def test_cannot_match_dp_to_row_with_high_vals(self):
         # set up dp
         self.create_dp()
@@ -101,28 +112,9 @@ class TestSimpleStructuralModel(TestCase):
     def test_output(self):
         """Output is beta"""
         row = SimpleStructuralModel.objects.create(**self.good_params)
-        self.assertEqual(row.output(), row.beta)
+        self.assertEqual(row.output(), row.beta1)
 
-
-class TestSilerEvansModel(TestSimpleStructuralModel):
-    def create_genmix(self):
-        # add generation to data point
-        self.dp.genmix.create(fuel=FuelType.objects.get(name='coal'), gen_MW=100)
-        self.dp.genmix.create(fuel=FuelType.objects.get(name='natgas'), gen_MW=300)
-        self.dp.genmix.create(fuel=FuelType.objects.get(name='wind'), gen_MW=200)
-
-        self.total_gen = 100 + 300 + 200
-
-    def test_input(self):
-        """Input value is total generation"""
-        # set up dp
-        self.create_dp()
-        self.create_genmix()
-        dp = DataPoint.objects.get()
-
-        # get inputs
-        inputs = SilerEvansModel.inputs(dp)
-
-        # should have value = total generation
-        self.assertEqual(inputs['bin_value'], self.total_gen)
-
+    def test_valid_after(self):
+        """Default is now"""
+        row = SimpleStructuralModel.objects.create(**self.good_params)
+        self.assertLess(row.valid_after, pytz.utc.localize(datetime.utcnow()))        

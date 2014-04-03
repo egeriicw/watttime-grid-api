@@ -89,4 +89,37 @@ class DataSeries(models.Model):
     datapoints = models.ManyToManyField(DataPoint)
 
     def __str__(self):
-        return '%s %s' % (self.ba, self.series_type)        
+        return '%s %s' % (self.ba, self.series_type)
+
+
+class BaseObservation(models.Model):
+    """Base class for measured or predicted value with a one-to-one relationship to DataPoint"""
+    # measured or predicted value
+    value = models.FloatField(null=True, blank=True)
+
+    # units
+    DEFAULT_UNITS = ''
+    units = models.CharField(max_length=100)
+
+    # data point
+    dp = models.OneToOneField(DataPoint)
+
+    # auto timestamps for creating and updating
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+    def __init__(self, *args, **kwargs):
+        """Set class-based defaults"""
+        # http://stackoverflow.com/questions/3786987/class-based-default-value-for-field-in-django-model-inheritance-hierarchy
+        super(BaseObservation, self).__init__(*args, **kwargs)
+        if not self.pk and not self.units:
+            self.units = self.DEFAULT_UNITS
+
+    def __str__(self):
+        try:
+            return '%d %s' % (self.value, self.units)
+        except TypeError: # if none
+            return 'null'
