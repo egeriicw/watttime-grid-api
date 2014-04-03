@@ -45,7 +45,7 @@ class TestSimpleStructuralModel(TestCase):
         row = SimpleStructuralModel.objects.create(**self.good_params)
 
         # different BA, should pass
-        different = SimpleStructuralModel.objects.create(**self.good_params)
+        different = SimpleStructuralModel.objects.create(**self.bad_params_other_ba)
         self.assertNotEqual(row, different)
 
         # same BA, should fail

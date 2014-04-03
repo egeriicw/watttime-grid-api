@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from apps.gridentities.models import BalancingAuthority
 from apps.griddata.models import BaseObservation
 import logging
@@ -35,10 +36,16 @@ class BaseStructuralModel(models.Model):
         get_latest_by = 'valid_after'
         abstract = True
         app_label = 'marginal'
-  #      unique_together = ('ba', 'min_value', 'max_value')
 
     def __str__(self):
         return "%s (%.1f,%.1f) beta=%.2f" % (self.ba.abbrev, self.min_value, self.max_value, self.beta1)
+
+    def clean(self):
+        """
+        Validate max value greater than min value
+        """
+        if self.max_value <= self.min_value:
+            raise ValidationError("Max value must be less than min value")
 
     @classmethod
     def predict(self, dp, **kwargs):
@@ -111,6 +118,9 @@ class SimpleStructuralModel(BaseStructuralModel):
     def output(self, **kwargs):
         """Output value is beta"""
         return self.beta1
+
+    class Meta(BaseStructuralModel.Meta):
+        unique_together = ('ba', 'min_value', 'max_value', 'valid_after')
 
 
 class BaseCarbon(BaseObservation):
