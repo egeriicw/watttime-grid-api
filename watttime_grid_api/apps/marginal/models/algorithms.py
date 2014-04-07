@@ -25,8 +25,8 @@ class MOERAlgorithm(models.Model):
     """
     # Replicating Siler-Evans et al, Environ Sci Technol 2012.
     # http://pubs.acs.org/doi/abs/10.1021/es300145v
-    SILEREVANS = 0
-    SILEREVANS_GEN = 1
+    SILEREVANS = '0'
+    SILEREVANS_GEN = '1'
 
     NAME_CHOICES = (
         (SILEREVANS, 'Siler-Evans'),
@@ -41,8 +41,8 @@ class MOERAlgorithm(models.Model):
     description = models.TextField(default='')
 
     # binning method
-    TOTAL_LOAD = 0
-    TOTAL_GEN = 1
+    TOTAL_LOAD = '0'
+    TOTAL_GEN = '1'
     BINNER_CHOICES = (
         (TOTAL_LOAD, 'total load'),
         (TOTAL_GEN, 'total generation'),
@@ -51,7 +51,7 @@ class MOERAlgorithm(models.Model):
                               choices=BINNER_CHOICES)
 
     # predictor method
-    BETA = 0
+    BETA = '0'
     PREDICTOR_CHOICES = (
         (BETA, 'simple'),
     )

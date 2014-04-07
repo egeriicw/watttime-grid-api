@@ -39,6 +39,9 @@ class StructuralModelSet(models.Model):
         app_label = 'marginal'
         unique_together = ('ba', 'valid_after', 'algorithm')
 
+    def __str__(self):
+        return '%s, %s, after %s' % (self.ba.abbrev, self.algorithm, self.valid_after)
+
     # @classmethod
     # def predict(self, dp, **kwargs):
     #     """
