@@ -47,7 +47,7 @@ class MOERAlgorithm(models.Model):
         (TOTAL_LOAD, 'total load'),
         (TOTAL_GEN, 'total generation'),
     )
-    binner = models.CharField(max_length=50, unique=True,
+    binner = models.CharField(max_length=50,
                               choices=BINNER_CHOICES)
 
     # predictor method
@@ -55,11 +55,12 @@ class MOERAlgorithm(models.Model):
     PREDICTOR_CHOICES = (
         (BETA, 'simple'),
     )
-    predictor = models.CharField(max_length=50, unique=True,
+    predictor = models.CharField(max_length=50,
                                  choices=PREDICTOR_CHOICES)
 
     class Meta:
         unique_together = ('binner', 'predictor')
+        app_label = 'marginal'
 
     def __str__(self):
         """Descriptive name"""

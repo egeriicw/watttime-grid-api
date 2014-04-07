@@ -30,8 +30,11 @@ class TestBaseAlgorithm(TestCase):
         # set up mocks
         self.mock_model = MockModel(beta1=1000)
 
-    def test_unique(self):
+    def test_unique_together(self):
         """binner and predictor should be unique together"""
+        # clear
+        MOERAlgorithm.objects.all().delete()
+
         # first alg
         MOERAlgorithm.objects.create(name='test1', binner='testbin1', predictor='testpred1')
 
@@ -41,8 +44,18 @@ class TestBaseAlgorithm(TestCase):
         # ok to add with different binner
         MOERAlgorithm.objects.create(name='test3', binner='testbin2', predictor='testpred1')
 
-        # not ok to add with same
+        # not ok to add with same bin+pred
         self.assertRaises(IntegrityError, MOERAlgorithm.objects.create, name='test4', binner='testbin1', predictor='testpred1')
+
+    def test_unique_name(self):
+        # clear
+        MOERAlgorithm.objects.all().delete()
+
+        # first alg
+        MOERAlgorithm.objects.create(name='test1', binner='testbin1', predictor='testpred1')
+
+        # not ok to add with same name
+        self.assertRaises(IntegrityError, MOERAlgorithm.objects.create, name='test1', binner='testbin2', predictor='testpred2')
 
     def test_predict(self):
         """Integration test"""
@@ -57,16 +70,15 @@ class TestBaseAlgorithm(TestCase):
         self.assertEqual(prediction, algorithm.prediction_result(model=self.mock_model))
 
 
-class TestSilerEvans(TestBaseAlgorithm):
+class TestSilerEvansGen(TestBaseAlgorithm):
     def create_algorithm(self):
-        return MOERAlgorithm(name=MOERAlgorithm.SILEREVANS,
+        return MOERAlgorithm.objects.create(name=MOERAlgorithm.SILEREVANS_GEN,
                              binner=MOERAlgorithm.TOTAL_GEN,
                              predictor=MOERAlgorithm.BETA)
 
     def test_bin_value(self):
         """
         Bin value is total generation
-        TODO: should be total load
         """
         algorithm = self.create_algorithm()
         
@@ -84,3 +96,30 @@ class TestSilerEvans(TestBaseAlgorithm):
         # get prediction
         prediction = algorithm.prediction_result(model=self.mock_model)
         self.assertEqual(prediction, self.mock_model.beta1)
+
+
+class TestSilerEvans(TestBaseAlgorithm):
+    def create_algorithm(self):
+        return MOERAlgorithm.objects.create(name=MOERAlgorithm.SILEREVANS,
+                             binner=MOERAlgorithm.TOTAL_LOAD,
+                             predictor=MOERAlgorithm.BETA)
+
+    def test_bin_value(self):
+        """
+        Bin value is total load
+        TODO: failing because load not implemented
+        """
+        algorithm = self.create_algorithm()
+        
+        # get inputs
+        self.assertRaises(NotImplementedError, algorithm.bin_value, dp=self.dp)
+
+    def test_prediction_result(self):
+        """Prediction is beta"""
+        # set up row
+        algorithm = self.create_algorithm()
+
+        # get prediction
+        prediction = algorithm.prediction_result(model=self.mock_model)
+        self.assertEqual(prediction, self.mock_model.beta1)
+
