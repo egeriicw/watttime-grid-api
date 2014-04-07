@@ -1,7 +1,7 @@
-from .base import SimpleStructuralModel, StructuralModelSet
+from .structural_models import SimpleStructuralModel, StructuralModelSet
 from .algorithms import MOERAlgorithm
-from .siler_evans import SilerEvansModel, SilerEvansMOER
+from .moer import MOER
 
-__all__ = ['SimpleStructuralModel', 'StructuralModelSet'
-		   'SilerEvansModel', 'SilerEvansMOER',
-		   'MOERAlgorithm']
+__all__ = ['SimpleStructuralModel', 'StructuralModelSet',
+		   'MOERAlgorithm',
+		   'MOER']
