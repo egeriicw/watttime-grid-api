@@ -12,7 +12,9 @@ class TestStructuralModelSet(TestCase):
     def setUp(self):
         self.ba = BalancingAuthority.objects.get(pk=1)
         self.ba_other = BalancingAuthority.objects.get(pk=2)
-        self.algorithm = MOERAlgorithm.objects.create(name='test', binner=MOERAlgorithm.TOTAL_GEN, predictor=MOERAlgorithm.BETA)
+        self.algorithm = MOERAlgorithm.objects.create(name=MOERAlgorithm.SILEREVANS_GEN,
+                                                      binner=MOERAlgorithm.TOTAL_GEN,
+                                                      predictor=MOERAlgorithm.BETA)
         self.good_inputs = {'bin_value': 600}
 
     def create_dp(self):
@@ -43,7 +45,16 @@ class TestStructuralModelSet(TestCase):
 
         # test can't find set for wrong set
         StructuralModelSet.objects.create(ba=self.ba_other, algorithm=self.algorithm)
-        self.assertRaises(ValueError, StructuralModelSet.objects.all().best, dp)
+        self.assertRaises(ValueError, StructuralModelSet.objects.all().best, dp, self.algorithm.name)
+
+    def test_cannot_match_dp_to_set_with_wrong_alg(self):
+        # set up dp
+        self.create_dp()
+        dp = DataPoint.objects.get()
+
+        # test can't find set for wrong set
+        StructuralModelSet.objects.create(ba=self.ba_other, algorithm=self.algorithm)
+        self.assertRaises(ValueError, StructuralModelSet.objects.all().best, dp, 'test')
 
     def test_cannot_match_dp_to_set_with_late_validafter(self):
         # set up dp
@@ -53,7 +64,7 @@ class TestStructuralModelSet(TestCase):
         # test can't find set for wrong dates
         StructuralModelSet.objects.create(ba=dp.ba, algorithm=self.algorithm,
             valid_after=pytz.utc.localize(datetime.utcnow())+timedelta(hours=1))
-        self.assertRaises(ValueError, StructuralModelSet.objects.all().best, dp)
+        self.assertRaises(ValueError, StructuralModelSet.objects.all().best, dp, self.algorithm.name)
 
     def test_can_match_dp_to_set(self):
         """Given a DataPoint, can identify the matching set of structural models"""
@@ -63,8 +74,9 @@ class TestStructuralModelSet(TestCase):
 
         # test correct set can be found
         matching_row = StructuralModelSet.objects.create(ba=dp.ba, algorithm=self.algorithm)
-        found_row = StructuralModelSet.objects.all().best(dp)
+        found_row = StructuralModelSet.objects.all().best(dp, self.algorithm.name)
         self.assertEqual(matching_row, found_row)
+        self.assertIsNotNone(found_row)
 
     #####################
     #### models
@@ -116,6 +128,18 @@ class TestStructuralModelSet(TestCase):
 
         # test can't find row for missing input
         self.assertRaises(ValueError, sset.best, {'wrong_key': 10})
+
+    def test_cannot_match_dp_to_row_with_no_models(self):
+        # set up dp
+        self.create_dp()
+        dp = DataPoint.objects.get()
+
+        # set up set
+        sset = StructuralModelSet.objects.create(ba=dp.ba, algorithm=self.algorithm)
+        self.assertEqual(sset.models().count(), 0)
+
+        # test can't find row for no models
+        self.assertRaises(ValueError, sset.best, self.good_inputs)
 
     def test_can_match_dp_to_row_with_good_vals(self):
         # set up dp

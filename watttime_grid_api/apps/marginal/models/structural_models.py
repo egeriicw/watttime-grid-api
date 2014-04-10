@@ -86,6 +86,10 @@ class StructuralModelSet(models.Model):
         # get related qset of models
         qset = self.models()
 
+        # if no models, error
+        if not qset.exists():
+            raise ValueError("No models associated with set %s" % self)
+
         # get supremum of min value
         qset = qset.filter(min_value__lte=input_value)
         supremum = qset.aggregate(val=Max('min_value'))['val']

@@ -22,17 +22,16 @@ class MOER(BaseCarbon):
     class Meta:
         app_label = 'marginal'
 
+    def compute(self):
+        """Compute value based on DataPoint and model"""
+        inputs = self.structural_model.algorithm.bin_value(dp=self.dp)
+        model = self.structural_model.best(inputs)
+        return self.structural_model.algorithm.predict(dp=self.dp, model=model)
 
-# every time a Generation model is saved, update its related MOER value
-def reset_moer_on_gen(sender, instance, **kwargs):
-    # add carbon to data point
-    dp = instance.mix
-    c, created = MOER.objects.get_or_create(dp=dp)
-    # set value for carbon
-    c.value = SilerEvansModel.predict(dp)
-    # save
-    c.save()
-#post_save.connect(reset_moer_on_gen, Generation)
+    def set(self):
+        """Compute and save value"""
+        self.value = self.compute()
+        self.save()
 
 
 # every time a structural model is saved, update its related MOER value
