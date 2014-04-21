@@ -77,12 +77,12 @@ app.conf.CELERYBEAT_SCHEDULE.update({
         'kwargs': {'latest': True, 'market': 'RTHR'},
     },
     # yesterday in SPP every hour (should be once, just after midnight UTC)
-    'update-spp-genmix-yesterday': {
-        'task': 'apps.genmix.tasks.update',
-        'schedule': crontab(hour='14,15', minute='*/10'),
-        'args': ['SPP'],
-        'kwargs': {'yesterday': True, 'market': 'RT5M'},
-    },
+#    'update-spp-genmix-yesterday': {
+#        'task': 'apps.genmix.tasks.update',
+#        'schedule': crontab(hour='14,15', minute='*/10'),
+#        'args': ['SPP'],
+#        'kwargs': {'yesterday': True, 'market': 'RT5M'},
+#    },
     # yesterday in CAISO every hour (should be once, just after midnight Pacific time)
     'update-caiso-genmix-yesterday': {
         'task': 'apps.genmix.tasks.update',
