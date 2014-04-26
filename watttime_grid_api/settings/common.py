@@ -238,6 +238,9 @@ THIRD_PARTY_APPS = (
     # bootstrap
     'bootstrap3',
 
+    # celery crontab tables
+    'djcelery',
+
 )
 
 LOCAL_APPS = (
@@ -259,6 +262,9 @@ LOCAL_APPS = (
 
     # marginal emissions
     'apps.marginal',
+
+    # ETL
+    'apps.etl',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
