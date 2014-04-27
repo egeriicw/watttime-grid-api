@@ -2,7 +2,10 @@ from __future__ import absolute_import
 from celery import shared_task
 from pyiso.tasks import get_generation
 from apps.genmix.tasks import insert_generation
+from apps.etl.models import ETLJob
 import logging
+import json
+
 
 # set up logger
 logger = logging.getLogger(__name__)
@@ -15,16 +18,33 @@ def cmap(it, callback):
     return [callback(x) for x in it]
     
 @shared_task(ignore_result=True)
-def log_update(res_list, ba_name):
-    n_new_gen = sum([x[0] for x in res_list])
-    n_new_dp = sum([x[1] for x in res_list])
-    logger.info('%s: Created %d new generations at %d new datapoints' % (ba_name, n_new_gen, n_new_dp))
+def log_update(res_list, job):
+    # get unique datapoint ids
+    dps = set(res_list)
+
+    # save to job
+    job.datapoints = dps
+    job.success = True
+    job.save()
     
 @shared_task(ignore_result=True)
 def update_generation(ba_name, **kwargs):    
-    # pre-log
-    logger.info('%s: Getting data with args %s' % (ba_name, kwargs))
+    # set up job
+    job = ETLJob.objects.create(task='update_generation',
+                                args=json.dumps([ba_name]),
+                                kwargs=json.dumps(kwargs),
+                                )
     
+    # set up chain
+    # get and set generation
+    chain = (get_generation.s(ba_name, **kwargs) | cmap.s(insert_generation) | log_update.s(job))
+
     # run chain
-    chain = (get_generation.s(ba_name, **kwargs) | cmap.s(insert_generation) | log_update.s(ba_name))
-    chain()
+    try:
+        chain()
+    except Exception as e:
+        logger.error('%s: %s' % (ba_name, e))
+        job.errors = e
+
+    # save the job
+    job.save()

@@ -38,4 +38,4 @@ def insert_generation(gen_obs):
             series.datapoints.add(dp)
             
     # return
-    return gen_created, dp_created
+    return dp.id

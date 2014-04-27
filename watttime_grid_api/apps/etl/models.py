@@ -22,3 +22,6 @@ class ETLJob(models.Model):
 
     # finished successfully
     success = models.BooleanField(default=False)
+
+    class Meta:
+    	get_latest_by = 'updated_at'

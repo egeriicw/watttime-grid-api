@@ -15,12 +15,13 @@ class TestInsert(TestCase):
               'timestamp': pytz.utc.localize(datetime.utcnow())}
 
     def test_insert_one(self):
-        gen_created, dp_created = tasks.insert_generation(self.dp_dict)
-        self.assertTrue(gen_created)
-        self.assertTrue(dp_created)
+        dp_id = tasks.insert_generation(self.dp_dict)
+        gen = Generation.objects.get(fuel__name=self.dp_dict['fuel_name'],
+                                     mix__ba__abbrev=self.dp_dict['ba_name'])
+        self.assertEqual(dp_id, gen.mix.id)
         
     def test_insertion_creates_carbon(self):
-        gen_created, dp_created = tasks.insert_generation(self.dp_dict)        
+        dp_id = tasks.insert_generation(self.dp_dict)        
         gen = Generation.objects.get(fuel__name=self.dp_dict['fuel_name'],
                                      mix__ba__abbrev=self.dp_dict['ba_name'])
         self.assertGreater(gen.mix.carbon.emissions_intensity, 0)
