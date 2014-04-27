@@ -1,3 +1,5 @@
 from django.contrib import admin
+from apps.etl.models import ETLJob
 
-# Register your models here.
+
+admin.site.register(ETLJob)
