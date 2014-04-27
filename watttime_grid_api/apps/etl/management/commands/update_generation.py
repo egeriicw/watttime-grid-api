@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from apps.griddata.models import DataPoint
-from apps.genmix.tasks import update
+from apps.etl.tasks import update_generation
 from dateutil.parser import parse as dateutil_parse
 import pytz
 from optparse import make_option
@@ -35,7 +35,7 @@ class Command(BaseCommand):
             self.stdout.write('Getting the latest data...')
             
         # run task
-        update.apply_async(args=[ba_name],
+        update_generation.apply_async(args=[ba_name],
                            kwargs={'latest': latest, 'start_at': start_at, 'end_at': end_at, 'market': options['market']},
 #                           queue='management'
                            )

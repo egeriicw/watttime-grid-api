@@ -357,6 +357,8 @@ CELERY_TASK_RESULT_EXPIRES = timedelta(minutes=30)
 # See: http://docs.celeryproject.org/en/master/configuration.html#std:setting-CELERY_CHORD_PROPAGATES
 CELERY_CHORD_PROPAGATES = True
 
+# See http://celery.readthedocs.org/en/latest/userguide/periodic-tasks.html
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 ########## END CELERY CONFIGURATION
 
 

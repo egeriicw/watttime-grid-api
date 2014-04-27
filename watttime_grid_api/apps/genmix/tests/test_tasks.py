@@ -6,15 +6,6 @@ from datetime import datetime
 import pytz
 
 
-class TestUpdate(TestCase):
-    fixtures = ['isos', 'gentypes']
-
-    def test_update(self):
-        self.assertEqual(Generation.objects.filter(mix__ba__abbrev='CAISO').count(), 0)
-        tasks.update('CAISO', latest=True)
-        self.assertGreater(Generation.objects.filter(mix__ba__abbrev='CAISO').count(), 0)
-        
-
 class TestInsert(TestCase):
     fixtures = ['isos', 'gentypes', 'fuelcarbonintensities']
 
