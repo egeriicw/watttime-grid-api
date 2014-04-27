@@ -1,5 +1,6 @@
 from django.db import models
 from apps.griddata.models import DataPoint
+from django.core.mail import mail_admins
 
 
 class ETLJob(models.Model):
@@ -24,4 +25,16 @@ class ETLJob(models.Model):
     success = models.BooleanField(default=False)
 
     class Meta:
-    	get_latest_by = 'updated_at'
+        get_latest_by = 'updated_at'
+
+    def __str__(self):
+        return ' '.join([self.task, self.args, self.kwargs, str(self.created_at)])
+
+    def set_error(self, msg):
+        """Register error message and send email"""
+        # set error
+        self.errors = msg
+        self.save()
+
+        # send email
+        mail_admins('Error on job %d (%s)' % (self.id, str(self)), msg)

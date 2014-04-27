@@ -1,5 +1,6 @@
 from django.test import TestCase
 from apps.etl.models import ETLJob
+from django.core import mail
 
 
 class TestJob(TestCase):
@@ -25,3 +26,16 @@ class TestJob(TestCase):
         # default success is False
         job = ETLJob.objects.create()
         self.assertFalse(job.success)
+
+    def test_error(self):
+        # set error
+        job = ETLJob.objects.create()
+        msg = 'test'
+        job.set_error(msg)
+
+        # error is set
+        self.assertEqual(job.error, msg)
+
+        # error sends email
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(msg, mail.outbox[0].body)

@@ -5,6 +5,7 @@ from apps.genmix.tasks import insert_generation
 from apps.etl.models import ETLJob
 import logging
 import json
+import traceback
 
 
 # set up logger
@@ -43,8 +44,10 @@ def update_generation(ba_name, **kwargs):
     try:
         chain()
     except Exception as e:
-        logger.error('%s: %s' % (ba_name, e))
-        job.errors = e
+        # log stack trace
+        msg = traceback.format_exc(e)
+        logger.error('Error on job %d (%s)' % (job.id, str(job)))
+        job.set_error(msg)
 
     # save the job
     job.save()
