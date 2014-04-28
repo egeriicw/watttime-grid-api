@@ -1,8 +1,9 @@
 from __future__ import absolute_import
-from celery import shared_task
+from celery import shared_task, group
 from pyiso.tasks import get_generation
 from apps.genmix.tasks import insert_generation
 from apps.carbon.tasks import set_average_carbons
+from apps.marginal.tasks import set_moers
 from apps.etl.models import ETLJob
 import logging
 import json
@@ -39,11 +40,22 @@ def update_generation(ba_name, **kwargs):
                                 kwargs=json.dumps(kwargs),
                                 )
     
+    # set up transformations
+    # these tasks will run in parallel, so make sure they're independent!
+    transformations = []
+    if kwargs.get('set_average_carbon', True):
+        # set average carbon by default
+        transformations.append(set_average_carbons.s())
+    moer_alg_name = kwargs.get('moer_alg_name', None)
+    if moer_alg_name:
+        # set MOER only if alg name given
+        transformations.append(set_moers.s(moer_alg_name))
+
     # set up ETL chain
     extract = get_generation.s(ba_name, **kwargs)
     load = cmap.s(insert_generation) | log_load.s(job)
-    transform = set_average_carbons.s()
-    chain =  (extract | load | transform)
+    transform = group(transformations)
+    chain = (extract | load | transform)
 
     # run chain
     try:

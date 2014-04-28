@@ -52,7 +52,7 @@ def reset_moer_on_model(sender, instance, **kwargs):
 
     # reset carbon on each point
     for dp in dps:
-        c, created = SilerEvansMOER.objects.get_or_create(dp=dp)
+        c, created = MOER.objects.get_or_create(dp=dp)
         c.value = sender.predict(dp)
         c.save()
 #post_save.connect(reset_moer_on_model, SilerEvansModel)
