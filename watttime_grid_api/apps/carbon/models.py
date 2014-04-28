@@ -98,17 +98,6 @@ class Carbon(models.Model):
             self.emissions_intensity = None
 
 
-# every time a Generation model is saved, update its related carbon value
-def reset_carbon_on_gen(sender, instance, **kwargs):
-    # add carbon to data point
-    c, created = Carbon.objects.get_or_create(dp=instance.mix)
-    # set value for carbon
-    c.set_carbon()
-    # save
-    c.save()
-post_save.connect(reset_carbon_on_gen, Generation)
-
-
 # every time a FuelCarbonIntensity model is saved, update its related carbon value
 def reset_carbon_on_fuelcarbon(sender, instance, **kwargs):
     # get affected data points

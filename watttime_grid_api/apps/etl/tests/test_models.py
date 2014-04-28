@@ -34,7 +34,7 @@ class TestJob(TestCase):
         job.set_error(msg)
 
         # error is set
-        self.assertEqual(job.error, msg)
+        self.assertEqual(job.errors, msg)
 
         # error sends email
         self.assertEqual(len(mail.outbox), 1)

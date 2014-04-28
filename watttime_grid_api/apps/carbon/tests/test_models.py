@@ -52,10 +52,10 @@ class TestCarbon(TestCase):
         c.set_carbon()
         self.assertIsNone(c.emissions_intensity)
 
-    def test_autocreate_carbon_w_gens(self):
+    def test_no_autocreate_carbon_w_gens(self):
         self.add_gens()
         c, created = Carbon.objects.get_or_create(dp=self.dp)
-        self.assertFalse(created)
+        self.assertTrue(created)
 
     def test_autocreate_carbon_w_conversions(self):
         self.add_conversions()
@@ -65,38 +65,44 @@ class TestCarbon(TestCase):
     def test_null_carbon_wo_intensities(self):
         FuelCarbonIntensity.objects.all().delete()
         self.add_gens()
-        c = Carbon.objects.get(dp=self.dp)
+        c = Carbon.objects.create(dp=self.dp)
         c.set_carbon()
         self.assertIsNone(c.emissions_intensity)
         
-    def test_autocalc_carbon(self):
+    def test_calc_carbon(self):
         self.add_conversions()
+        c = Carbon.objects.get(dp=self.dp)
 
-        # autocalc on first new gen
+        # calc after first new gen
         self.dp.genmix.create(fuel=FuelType.objects.get(name='coal'), gen_MW=100)
-        self.assertAlmostEqual(Carbon.objects.get(dp=self.dp).emissions_intensity,
-                         (100 * 1000) / 100.0)
+        c.set_carbon(); c.save()
+        self.assertAlmostEqual(c.emissions_intensity, (100 * 1000) / 100.0)
         self.assertEqual(self.dp.carbon.fuel_carbons.count(), 1)
     
-        # update on second new gen
+        # update after second new gen
         self.dp.genmix.create(fuel=FuelType.objects.get(name='natgas'), gen_MW=200)
+        c.set_carbon(); c.save()
         self.assertAlmostEqual(Carbon.objects.get(dp=self.dp).emissions_intensity,
                          (100 * 1000 + 200 * 500) / 300.0)
         self.assertEqual(self.dp.carbon.fuel_carbons.count(), 2)
+
+    def test_not_set_wo_save(self):
+        self.add_conversions()
+        c = Carbon.objects.get(dp=self.dp)
+        self.dp.genmix.create(fuel=FuelType.objects.get(name='coal'), gen_MW=100)
+
+        # emissions intensity is None even after setting
+        c.set_carbon()
+        self.assertIsNone(Carbon.objects.get(dp=self.dp).emissions_intensity)
+
+        # emissions intensity not None after saving
+        c.save()
+        self.assertIsNotNone(Carbon.objects.get(dp=self.dp).emissions_intensity)
     
     def test_populated_carbon_intensities(self):
         self.add_conversions()
         self.add_gens()
-        self.assertEqual(Carbon.objects.get(dp=self.dp).fuel_carbons.count(),
-                         self.dp.genmix.count())
-        
-    def test_passing_on_dup_gen(self):
-        self.add_conversions()
-        self.add_gens()
-        coal = FuelType.objects.get(name='coal')
-        gens = Generation.objects.filter(mix=self.dp, fuel=coal)
-        self.assertEqual(gens.count(), 1)
-        gen = gens.get()
-        gen.gen_MW = 200
-        gen.save()
-            
+
+        c = Carbon.objects.get(dp=self.dp)
+        c.set_carbon(); c.save()
+        self.assertEqual(c.fuel_carbons.count(), self.dp.genmix.count())

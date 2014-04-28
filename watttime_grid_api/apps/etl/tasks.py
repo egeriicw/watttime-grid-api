@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from celery import shared_task
 from pyiso.tasks import get_generation
 from apps.genmix.tasks import insert_generation
+from apps.carbon.tasks import set_average_carbons
 from apps.etl.models import ETLJob
 import logging
 import json
@@ -18,15 +19,17 @@ def cmap(it, callback):
     # NOT this solution http://stackoverflow.com/questions/13271056/how-to-chain-a-celery-task-that-returns-a-list-into-a-group
     return [callback(x) for x in it]
     
-@shared_task(ignore_result=True)
-def log_update(res_list, job):
+@shared_task
+def log_load(res_list, job):
     # get unique datapoint ids
     dps = set(res_list)
 
     # save to job
     job.datapoints = dps
-    job.success = True
     job.save()
+
+    # return job
+    return dps
     
 @shared_task(ignore_result=True)
 def update_generation(ba_name, **kwargs):    
@@ -36,13 +39,16 @@ def update_generation(ba_name, **kwargs):
                                 kwargs=json.dumps(kwargs),
                                 )
     
-    # set up chain
-    # get and set generation
-    chain = (get_generation.s(ba_name, **kwargs) | cmap.s(insert_generation) | log_update.s(job))
+    # set up ETL chain
+    extract = get_generation.s(ba_name, **kwargs)
+    load = cmap.s(insert_generation) | log_load.s(job)
+    transform = set_average_carbons.s()
+    chain =  (extract | load | transform)
 
     # run chain
     try:
         chain()
+        job.success = True
     except Exception as e:
         # log stack trace
         msg = traceback.format_exc(e)
