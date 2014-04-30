@@ -3,6 +3,7 @@ from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
 from apps.genmix.models import Generation
 from apps.carbon.models import FuelCarbonIntensity
+from apps.marginal.models import MOER
 
 
 class BalancingAuthoritySerializer(serializers.HyperlinkedModelSerializer):
@@ -34,9 +35,17 @@ class FuelCarbonIntensitySerializer(serializers.HyperlinkedModelSerializer):
         fields = ('valid_after', 'lb_CO2_per_MW', 'fuel', 'ba')
 
 
+class MOERSerializer(serializers.ModelSerializer):
+    structural_model = serializers.RelatedField(source='structural_model.algorithm.description')
+
+    class Meta:
+        model = MOER
+        fields = ('value', 'units', 'structural_model')
+
+
 class DataPointSerializer(serializers.HyperlinkedModelSerializer):
     carbon = serializers.SlugRelatedField(slug_field='emissions_intensity',
-                                          help_text='carbon emissions intensity, in lb/MW')
+                                          help_text='average carbon emissions intensity, in lb/MW')
     genmix = GenerationSerializer(many=True)
     ba = serializers.SlugRelatedField(slug_field='abbrev',
                                       help_text='abbreviated name of the balancing authority')
@@ -45,3 +54,12 @@ class DataPointSerializer(serializers.HyperlinkedModelSerializer):
         model = DataPoint
         fields = ('timestamp', 'created_at', 'carbon', 'genmix', 'url',
                   'market', 'freq', 'ba')
+
+class DataPointMOERSerializer(DataPointSerializer):
+    moer_set = MOERSerializer()
+
+    class Meta:
+        model = DataPoint
+        fields = ('timestamp', 'created_at', 'genmix', 'url',
+                  'market', 'freq', 'ba', 'moer_set')
+   
