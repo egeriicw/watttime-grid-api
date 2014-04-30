@@ -13,7 +13,7 @@ class BaseCarbon(BaseObservation):
 
     class Meta:
         app_label = 'marginal'
-        abstract = False
+        abstract = True
 
 
 class MOER(BaseCarbon):

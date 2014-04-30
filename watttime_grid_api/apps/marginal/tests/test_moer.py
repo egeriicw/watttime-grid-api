@@ -36,7 +36,7 @@ class TestMOER(TestCase):
     def test_related_name(self):
         moer = MOER.objects.create(dp=self.dp)
         dp = DataPoint.objects.get(id=self.dp.id)
-#        self.assertEqual(dp.moer, moer)
+        self.assertEqual(dp.moer_set.first(), moer)
         self.assertEqual(dp, moer.dp)
 
     def test_units(self):
