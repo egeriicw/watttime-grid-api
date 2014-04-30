@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, url, include
-from rest_framework import routers
 from apps.api import views
 from apps.api.api_auth import views as auth_views
 
@@ -30,4 +29,10 @@ urlpatterns = patterns('',
         name='fueltocarbon-list'),
     url(r'^fuel_carbon_intensities/(?P<pk>[0-9]+)/$', views.FuelToCarbonDetail.as_view(),
         name='fueltocarbon-detail'),
+
+    # restricted views
+    url(r'^marginal/$', views.DataPointMOERList.as_view(),
+        name='datapoint-moer-list'),
+    url(r'^marginal/(?P<pk>[0-9]+)/$', views.DataPointMOERDetail.as_view(),
+        name='datapoint-moer-detail'),
 )

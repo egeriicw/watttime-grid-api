@@ -1,4 +1,4 @@
-from rest_framework import generics, viewsets, response, status
+from rest_framework import generics, viewsets, response, status, permissions
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
 from apps.carbon.models import FuelCarbonIntensity
@@ -100,7 +100,57 @@ class DataPointDetail(generics.RetrieveAPIView):
     'pk' is a unique numeric identifier for a data point.
     """
     queryset = DataPoint.objects.all()
-    serializer_class = serializers.DataPointSerializer    
+    serializer_class = serializers.DataPointSerializer
+
+
+class DataPointMOERList(generics.ListAPIView):
+    """
+    API endpoint that allows a list of grid data points to be viewed, including marginal emissions.
+    All times are in UTC.
+    Access is restricted to this data.
+    
+    ba -- An abbreviation for a balancing authority.\
+        Options can be found at the 'balancing_authorities' endpoint.\
+        e.g., ba=ISONE
+    start_at -- Minimum timestamp (inclusive).\
+        e.g., start_at=2014-02-20 \
+        or start_at=2014-02-20T16:45:30-0800 \
+        or start_at=2014-02-20T16:45:30-08:00
+    end_at -- Maximum timestamp (inclusive).\
+        e.g., end_at=2014-02-20 \
+        or end_at=2014-02-20T16:45:30-0800 \
+        or end_at=2014-02-20T16:45:30-08:00
+    page_size -- Number of data points to return on each page.\
+        default is page_size=12
+    freq -- Time series frequency.\
+        Options are '5m', '10m', '1hr', 'n/a'.\
+        e.g., freq=1hr
+    market -- Market from which the data were gathered.\
+        Options are 'RT5M' for real-time 5 minute,\
+        'RTHR' for real-time hourly,\
+        or 'DAHR' for day-ahead hourly.
+        e.g., market=RT5M
+    """
+    queryset = DataPoint.objects.all()
+    serializer_class = serializers.DataPointMOERSerializer
+    filter_class = filters.DataPointFilter
+    permission_classes = (permissions.IsAdminUser,)
+    
+    # turn on pagination
+    paginate_by = 12
+    paginate_by_param = 'page_size'
+    
+    
+class DataPointMOERDetail(generics.RetrieveAPIView):
+    """
+    API endpoint that allows a single grid data point to be viewed, including marginal emissions.
+    All times are in UTC.
+    Access is restricted to this data.
+    'pk' is a unique numeric identifier for a data point.
+    """
+    queryset = DataPoint.objects.all()
+    serializer_class = serializers.DataPointMOERSerializer
+    permission_classes = (permissions.IsAdminUser,)
 
 
 class FuelToCarbonList(generics.ListAPIView):

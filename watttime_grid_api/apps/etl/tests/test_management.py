@@ -2,6 +2,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from apps.genmix.models import Generation
 from apps.gridentities.models import BalancingAuthority
+from apps.etl.models import ETLJob
 from datetime import datetime
 
 
@@ -22,13 +23,22 @@ class TestCommand(TestCase):
             self._run_test(ba_name)
         
     def test_failing_BPA_wo_kwargs(self):
-        self.assertRaises(ValueError, self._run_test, 'BPA')
+        call_command('update_generation', 'BPA')
+        job = ETLJob.objects.filter(args__contains='BPA').latest()
+        self.assertIn('Market must be RT5M', job.errors)
+        self.assertFalse(job.success)
         
     def test_BPA_requires_kwargs(self):
         self._run_test('BPA', market='RT5M')
+        job = ETLJob.objects.filter(args__contains='BPA').latest()
+        self.assertEqual(len(job.errors), 0)
+        self.assertTrue(job.success)
 
     def test_NYISO_fails(self):
-        self.assertRaises(ValueError, self._run_test, 'NYISO')
+        call_command('update_generation', 'NYISO')
+        job = ETLJob.objects.filter(args__contains='NYISO').latest()
+        self.assertIn('No client found for name NYISO', job.errors)
+        self.assertFalse(job.success)
 
     def test_ERCOT_fails_before_min33(self):
         if datetime.now().minute > 33:
