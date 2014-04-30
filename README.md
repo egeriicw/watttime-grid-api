@@ -9,8 +9,10 @@ All the Django apps are in `watttime_grid_api/apps`. These are
 * `gridentities`: provides models for metadata and descriptions of geographic entities (`BalancingAuthority` and `PowerPlant`) and data types (`FuelType`); standalone
 * `griddata`: provides models for time series data (`DataPoint`); depends on `gridentities`
 * `genmix`: provides a `Generation` model that associates generation mix observations to `DataPoint`s, and management commands and celery tasks for pulling the data; depends on `gridentities` and `griddata`
-* `carbon`: provides `Carbon` and `FuelCarbonIntensity` models that associate carbon intensity observations to `DataPoint`s, and hooks for calculating the data; depends on `gridentities`, `griddata`, and `genmix`
-* `api`: implements a Django REST Framework API to all other apps; depends on `gridentities`, `griddata`, `genmix`, and `carbon`
+* `carbon`: provides `Carbon` and `FuelCarbonIntensity` models that associate carbon intensity observations to `DataPoint`s, and tasks for calculating the data; depends on `gridentities`, `griddata`, and `genmix`
+* `marginal`: provides `MOER`, `MOERAlgorithm`, and `StructuralModelSet` models that associate marginal carbon intensity observations (MOER) to `DataPoint`s, and tasks for calculating the data; depends on `gridentities`, `griddata`, and `genmix`
+* `api`: implements a Django REST Framework API to all other apps; depends on `gridentities`, `griddata`, `genmix`, `carbon`, and `marginal`
+* `etl`: implements a extract-transform-load job flow to supply data to all other apps; depends on `gridentities`, `griddata`, `genmix`, `carbon`, and `marginal`
 
 
 Quickstart dev environment
