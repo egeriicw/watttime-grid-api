@@ -93,7 +93,7 @@ class DataSeries(models.Model):
 
 
 class BaseObservation(models.Model):
-    """Base class for measured or predicted value with a one-to-one relationship to DataPoint"""
+    """Base class for measured or predicted value with a many-to-one relationship to DataPoint"""
     # measured or predicted value
     value = models.FloatField(null=True, blank=True)
 
@@ -102,7 +102,7 @@ class BaseObservation(models.Model):
     units = models.CharField(max_length=100)
 
     # data point
-    dp = models.OneToOneField(DataPoint)
+    dp = models.ForeignKey(DataPoint)
 
     # auto timestamps for creating and updating
     created_at = models.DateTimeField(auto_now_add=True)
