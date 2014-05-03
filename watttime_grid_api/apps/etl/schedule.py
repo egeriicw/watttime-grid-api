@@ -29,7 +29,7 @@ schedule.update({
         'task': 'apps.etl.tasks.update_generation',
         'schedule': crontab(minute=EVERY_FIVE_PLUS_THREE),
         'args': [ba_name.upper()],
-        'kwargs': {'latest': True, 'market': 'RT5M'},
+        'kwargs': {'latest': True, 'market': 'RT5M', 'moer_alg_name': '1'},
     } for ba_name in ['PJM']
 })
 
@@ -53,13 +53,13 @@ schedule.update({
         'args': ['ERCOT'],
         'kwargs': {'latest': True, 'market': 'RTHR'},
     },
-    # yesterday in SPP every hour (should be once, just after midnight UTC)
-    'update-spp-genmix-yesterday': {
-        'task': 'apps.etl.tasks.update_generation',
-        'schedule': crontab(hour='14,15', minute='*/10'),
-        'args': ['SPP'],
-        'kwargs': {'yesterday': True, 'market': 'RT5M'},
-    },
+    # yesterday in SPP (should change to every 5 minutes once new scraper is working)
+    # 'update-spp-genmix-yesterday': {
+    #     'task': 'apps.etl.tasks.update_generation',
+    #     'schedule': crontab(hour='14,15', minute='*/10'),
+    #     'args': ['SPP'],
+    #     'kwargs': {'yesterday': True, 'market': 'RT5M'},
+    # },
     # yesterday in CAISO every hour (should be once, just after midnight Pacific time)
     'update-caiso-genmix-yesterday': {
         'task': 'apps.etl.tasks.update_generation',
