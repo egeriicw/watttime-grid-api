@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, TransactionTestCase
 from django.contrib.gis.geos import Point
 from django.core.cache import cache
 from django.contrib.auth.models import User
@@ -257,6 +257,52 @@ class DataPointsAPITest(APITestCase):
                                     n_expected)
             for dp in response.data['results']:
                 self.assertEqual(dp['market'], market)
+
+class PerformanceTest(TransactionTestCase):
+    fixtures = ['bageom', 'gentypes', 'fuelcarbonintensities']
+
+    def setUp(self):
+        # set up times
+        self.now = pytz.utc.localize(datetime.utcnow())
+        self.tomorrow = self.now + timedelta(days=1)
+        self.yesterday = self.now - timedelta(days=1)
+        
+        # create sample data points
+        for ba in [BalancingAuthority.objects.get(abbrev='ISONE'),
+                   BalancingAuthority.objects.get(abbrev='CAISO')]:
+            for ts in [self.now, self.yesterday, self.tomorrow]:
+                DataPoint.objects.create(timestamp=ts, ba=ba,
+                                         market=DataPoint.RT5M, freq=DataPoint.FIVEMIN)
+                DataPoint.objects.create(timestamp=ts, ba=ba,
+                                         market=DataPoint.RT5M, freq=DataPoint.IRREGULAR)
+                DataPoint.objects.create(timestamp=ts, ba=ba,
+                                         market=DataPoint.RT5M, freq=DataPoint.TENMIN)
+                DataPoint.objects.create(timestamp=ts, ba=ba,
+                                         market=DataPoint.RTHR, freq=DataPoint.HOURLY)
+                                         
+        # add sample gens to data points
+        for dp in DataPoint.objects.all():
+            dp.genmix.create(fuel=FuelType.objects.get(name='wind'), gen_MW=100)
+            dp.genmix.create(fuel=FuelType.objects.get(name='natgas'), gen_MW=200)
+
+        # number of expected objects of different types
+        self.n_isos = 2
+        self.n_times = 3
+        self.n_at_time = 4
+        self.n_gen = 2
+
+        # set up routes
+        self.base_url = '/api/v1/datapoints/'
+
+        # authenticate client
+        username = 'api_user'
+        password = 'apipw'
+        User.objects.create_user(username, 'api_user@example.com', password)
+        self.client.login(username=username, password=password)
+
+    def test_n_db_calls(self):
+        with self.assertNumQueries(7):
+            self.client.get(self.base_url)
 
 
 class DataPointsMOERAPITest(DataPointsAPITest):

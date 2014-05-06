@@ -84,7 +84,7 @@ class DataPointList(generics.ListAPIView):
         or 'DAHR' for day-ahead hourly.
         e.g., market=RT5M
     """
-    queryset = DataPoint.objects.all()
+    queryset = DataPoint.objects.all().prefetch_related('carbon', 'genmix', 'genmix__fuel').select_related('ba').defer('ba__geom')
     serializer_class = serializers.DataPointSerializer
     filter_class = filters.DataPointFilter
     
@@ -131,7 +131,7 @@ class DataPointMOERList(generics.ListAPIView):
         or 'DAHR' for day-ahead hourly.
         e.g., market=RT5M
     """
-    queryset = DataPoint.objects.all()
+    queryset = DataPoint.objects.all().prefetch_related('moer_set', 'genmix', 'genmix__fuel').select_related('ba').defer('ba__geom')
     serializer_class = serializers.DataPointMOERSerializer
     filter_class = filters.DataPointFilter
     permission_classes = (permissions.IsAdminUser,)
