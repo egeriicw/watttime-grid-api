@@ -265,6 +265,9 @@ LOCAL_APPS = (
 
     # ETL
     'apps.etl',
+
+    # supply and demand
+    'apps.supply_demand',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
