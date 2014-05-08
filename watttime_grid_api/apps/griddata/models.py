@@ -92,17 +92,14 @@ class DataSeries(models.Model):
         return '%s %s' % (self.ba, self.series_type)
 
 
-class BaseObservation(models.Model):
-    """Base class for measured or predicted value with a many-to-one relationship to DataPoint"""
+class BaseUnboundObservation(models.Model):
+    """Base class for measured or predicted value, not bound to DataPoint"""
     # measured or predicted value
     value = models.FloatField(null=True, blank=True)
 
     # units
     DEFAULT_UNITS = ''
     units = models.CharField(max_length=100)
-
-    # data point
-    dp = models.ForeignKey(DataPoint)
 
     # auto timestamps for creating and updating
     created_at = models.DateTimeField(auto_now_add=True)
@@ -114,7 +111,7 @@ class BaseObservation(models.Model):
     def __init__(self, *args, **kwargs):
         """Set class-based defaults"""
         # http://stackoverflow.com/questions/3786987/class-based-default-value-for-field-in-django-model-inheritance-hierarchy
-        super(BaseObservation, self).__init__(*args, **kwargs)
+        super(BaseUnboundObservation, self).__init__(*args, **kwargs)
         if not self.pk and not self.units:
             self.units = self.DEFAULT_UNITS
 
@@ -123,3 +120,12 @@ class BaseObservation(models.Model):
             return '%d %s' % (self.value, self.units)
         except TypeError: # if none
             return 'null'
+
+
+class BaseObservation(BaseUnboundObservation):
+    """Base class for measured or predicted value with a many-to-one relationship to DataPoint"""
+    # data point
+    dp = models.ForeignKey(DataPoint)
+
+    class Meta:
+        abstract = True
