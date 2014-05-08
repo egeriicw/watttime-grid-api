@@ -46,7 +46,8 @@ class TestUpdate(TestCase):
 	        self.assertEqual(gen.mix.id, job.datapoints.first().id)
         self.assertEqual(MOER.objects.filter(dp__ba__abbrev='CAISO').count(), 0)
 
-    def test_update_generation_moer(self):
+    def test_update_generation_moer_gen(self):
+        """Updating generation with SILEREVANS_GEN should create MOER"""
         # test for blank slate
         self.assertEqual(Generation.objects.filter(mix__ba__abbrev='CAISO').count(), 0)
         self.assertEqual(ETLJob.objects.filter(args__contains='CAISO').count(), 0)
@@ -68,3 +69,24 @@ class TestUpdate(TestCase):
         for moer in moers:
             self.assertEqual(moer.dp.id, job.datapoints.first().id)
             self.assertEqual(moer.value, 1)
+
+    def test_update_generation_moer_load(self):
+        """Updating generation with SILEREVANS_GEN should not create MOER"""
+        # test for blank slate
+        self.assertEqual(Generation.objects.filter(mix__ba__abbrev='CAISO').count(), 0)
+        self.assertEqual(ETLJob.objects.filter(args__contains='CAISO').count(), 0)
+        self.assertEqual(Carbon.objects.filter(dp__ba__abbrev='CAISO').count(), 0)
+
+        # set up model
+        self.set_up_moer()
+
+        # run task
+        tasks.update_generation('CAISO', moer_alg_name=MOERAlgorithm.SILEREVANS, latest=True)
+
+        # test for side effects
+        job = ETLJob.objects.filter(args__contains='CAISO').latest()
+        if not job.success:
+            print job.errors
+
+        moers = MOER.objects.filter(dp__ba__abbrev='CAISO')
+        self.assertEqual(moers.count(), 0)

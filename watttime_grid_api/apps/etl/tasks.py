@@ -31,6 +31,21 @@ def log_load(res_list, job):
 
     # return job
     return dps
+
+def run_chain(chain, job):
+    """Run a chain of tasks and log the result to job"""
+    # run chain
+    try:
+        chain()
+        job.success = True
+    except Exception as e:
+        # log stack trace
+        msg = traceback.format_exc(e)
+        logger.error('Error on job %d (%s)' % (job.id, str(job)))
+        job.set_error(msg)
+
+    # return
+    return job
     
 @shared_task(ignore_result=True)
 def update_generation(ba_name, **kwargs):    
@@ -47,7 +62,7 @@ def update_generation(ba_name, **kwargs):
         # set average carbon by default
         transformations.append(set_average_carbons.s())
     moer_alg_name = kwargs.get('moer_alg_name', None)
-    if moer_alg_name:
+    if moer_alg_name == '1':
         # set MOER only if alg name given
         transformations.append(set_moers.s(moer_alg_name))
 
