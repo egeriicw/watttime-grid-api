@@ -174,7 +174,7 @@ LOGGING['loggers'] = {
             'level': 'ERROR',
             'propagate': True,
         },
-    'apps.genmix.tasks' : {
+    'apps.supply_demand.tasks' : {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,
