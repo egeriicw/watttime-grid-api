@@ -249,13 +249,10 @@ LOCAL_APPS = (
     
     # base classes for grid data
     'apps.griddata',
-    
-    # generation mix
-    'apps.genmix',
-    
-    # carbon intensity
+
+     # carbon intensity
     'apps.carbon',
-    
+
     # api
     'apps.api',
     'apps.api.api_auth',
@@ -265,6 +262,9 @@ LOCAL_APPS = (
 
     # ETL
     'apps.etl',
+
+    # supply and demand
+    'apps.supply_demand',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -419,3 +419,8 @@ ACCOUNT_ACTIVATION_DAYS = 7
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-42171038-2'
 GOOGLE_ANALYTICS_DOMAIN = 'watttime.org'
 ########## END GOOGLE ANALYTICS CONFIGURATION
+
+
+########## SOUTH CONFIGURATION
+SOUTH_TESTS_MIGRATE = False
+########## END SOUTH CONFIGURATION

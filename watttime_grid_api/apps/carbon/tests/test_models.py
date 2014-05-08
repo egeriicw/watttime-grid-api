@@ -3,7 +3,6 @@ from django.db import IntegrityError
 from apps.griddata.models import DataPoint
 from apps.gridentities.models import FuelType, BalancingAuthority
 from apps.carbon.models import Carbon, FuelCarbonIntensity
-from apps.genmix.models import Generation
 from datetime import datetime
 import pytz
 
