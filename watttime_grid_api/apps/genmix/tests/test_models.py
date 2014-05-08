@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.db import IntegrityError
 from apps.gridentities.models import FuelType, BalancingAuthority
 from apps.griddata.models import DataPoint
-from apps.genmix.models import Generation
+from apps.supply_demand.models import Generation
 from datetime import datetime
 import pytz
 

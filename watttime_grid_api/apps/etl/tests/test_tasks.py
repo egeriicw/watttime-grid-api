@@ -1,6 +1,6 @@
 from django.test import TestCase
 from apps.gridentities.models import BalancingAuthority
-from apps.genmix.models import Generation
+from apps.supply_demand.models import Generation
 from apps.carbon.models import Carbon
 from apps.marginal.models import MOER, MOERAlgorithm, StructuralModelSet
 from apps.etl.models import ETLJob

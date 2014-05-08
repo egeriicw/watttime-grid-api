@@ -1,7 +1,7 @@
 from django.test import TestCase
 from apps.griddata.models import DataSeries
 from apps.genmix import tasks
-from apps.genmix.models import Generation
+from apps.supply_demand.models import Generation
 from datetime import datetime
 import pytz
 

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
-from apps.genmix.models import Generation
+from apps.supply_demand.models import Generation
 from apps.carbon.models import FuelCarbonIntensity
 from apps.marginal.models import MOER
 

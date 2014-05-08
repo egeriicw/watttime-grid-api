@@ -43,7 +43,7 @@ class TestAdmin(TestCase):
         links = self.job.gen_admin_links()
         self.assertEqual(len(links), 2)
         for link in links:
-            self.assertIn('/admin/genmix/generation/', link)
+            self.assertIn('/admin/supply_demand/generation/', link)
             self.assertIn('<a href=', link)
             self.assertIn('</a>', link)
 

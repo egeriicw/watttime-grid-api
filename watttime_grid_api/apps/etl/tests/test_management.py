@@ -1,6 +1,6 @@
 from django.core.management import call_command
 from django.test import TestCase
-from apps.genmix.models import Generation
+from apps.supply_demand.models import Generation
 from apps.etl.models import ETLJob
 from datetime import datetime
 

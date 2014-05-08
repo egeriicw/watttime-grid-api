@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from celery import shared_task
 from apps.gridentities.models import BalancingAuthority, FuelType
-from apps.genmix.models import Generation
+from apps.supply_demand.models import Generation
 from apps.griddata.models import DataPoint, DataSeries
 import logging
 

@@ -1,9 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
-from django.db import IntegrityError
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
-from apps.genmix.models import Generation
 from datetime import datetime
 import pytz
 import logging
