@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from celery import shared_task, group
 from pyiso.tasks import get_generation
-from apps.genmix.tasks import insert_generation
+from apps.supply_demand.tasks import insert_generation
 from apps.carbon.tasks import set_average_carbons
 from apps.marginal.tasks import set_moers
 from apps.etl.models import ETLJob

@@ -249,13 +249,10 @@ LOCAL_APPS = (
     
     # base classes for grid data
     'apps.griddata',
-    
-    # generation mix
-    'apps.genmix',
-    
-    # carbon intensity
+
+     # carbon intensity
     'apps.carbon',
-    
+
     # api
     'apps.api',
     'apps.api.api_auth',
