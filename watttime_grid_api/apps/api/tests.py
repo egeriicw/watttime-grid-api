@@ -83,8 +83,8 @@ class DataPointsAPITest(APITestCase):
         for ba in [BalancingAuthority.objects.get(abbrev='ISONE'),
                    BalancingAuthority.objects.get(abbrev='CAISO')]:
             for ts in [self.now, self.yesterday, self.tomorrow]:
-                DataPoint.objects.create(timestamp=ts, ba=ba,
-                                         market=DataPoint.RT5M, freq=DataPoint.FIVEMIN)
+             #   DataPoint.objects.create(timestamp=ts, ba=ba,
+             #                            market=DataPoint.RT5M, freq=DataPoint.FIVEMIN)
                 DataPoint.objects.create(timestamp=ts, ba=ba,
                                          market=DataPoint.RT5M, freq=DataPoint.IRREGULAR)
                 DataPoint.objects.create(timestamp=ts, ba=ba,
@@ -100,7 +100,7 @@ class DataPointsAPITest(APITestCase):
         # number of expected objects of different types
         self.n_isos = 2
         self.n_times = 3
-        self.n_at_time = 4
+        self.n_at_time = 3
         self.n_gen = 2
 
         # set up routes
@@ -238,7 +238,7 @@ class DataPointsAPITest(APITestCase):
                                     n)
 
     def test_filter_freq(self):
-        for freq in ['5m', '1hr', 'n/a', '10m']:
+        for freq in ['1hr', 'n/a', '10m']:
             n_expected = DataPoint.objects.filter(freq=freq, ba__abbrev='CAISO').count()
             self.assertGreater(n_expected, 1)
             self.assertIn(freq, dict(DataPoint.FREQ_CHOICES).keys())
@@ -332,6 +332,8 @@ class DataPointsMOERAPITest(DataPointsAPITest):
             dp.genmix.create(fuel=FuelType.objects.get(name='wind'), gen_MW=30000)
             dp.genmix.create(fuel=FuelType.objects.get(name='natgas'), gen_MW=60000)
 
+            dp.load_set.create(value=91234)
+
         # add MOER
         sset = StructuralModelSet.objects.first()
         sset.ba = BalancingAuthority.objects.get(abbrev='PJM')
@@ -364,13 +366,17 @@ class DataPointsMOERAPITest(DataPointsAPITest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)       
         
         # correct field names
-        expected_keys = set(['ba', 'timestamp', 'genmix', 'moer_set', 'created_at',
+        expected_keys = set(['ba', 'timestamp', 'genmix', 'moer_set', 'load_set', 'created_at',
                              'url', 'freq', 'market'])
         self.assertEqual(expected_keys, set(response.data.keys()))
 
         # moer has data
         self.assertEqual(len(response.data['moer_set']), 1)
         self.assertEqual(response.data['moer_set'][0].keys(), ['value', 'units', 'structural_model'])
+
+       # load has data
+        self.assertEqual(len(response.data['load_set']), 1)
+        self.assertEqual(response.data['load_set'][0].keys(), ['value', 'units'])
 
     def test_must_be_authenticated(self):
         self.client.logout()

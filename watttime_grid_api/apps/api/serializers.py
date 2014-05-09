@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
-from apps.supply_demand.models import Generation
+from apps.supply_demand.models import Generation, Load
 from apps.carbon.models import FuelCarbonIntensity
 from apps.marginal.models import MOER
 
@@ -24,6 +24,12 @@ class GenerationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Generation
         fields = ('fuel', 'gen_MW')
+
+
+class LoadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Load
+        fields = ('value', 'units',)
 
 
 class FuelCarbonIntensitySerializer(serializers.HyperlinkedModelSerializer):
@@ -57,9 +63,10 @@ class DataPointSerializer(serializers.HyperlinkedModelSerializer):
 
 class DataPointMOERSerializer(DataPointSerializer):
     moer_set = MOERSerializer()
+    load_set = LoadSerializer()
 
     class Meta:
         model = DataPoint
         fields = ('timestamp', 'created_at', 'genmix', 'url',
-                  'market', 'freq', 'ba', 'moer_set')
+                  'market', 'freq', 'ba', 'moer_set', 'load_set')
    

@@ -84,7 +84,7 @@ class DataPointList(generics.ListAPIView):
         or 'DAHR' for day-ahead hourly.
         e.g., market=RT5M
     """
-    queryset = DataPoint.objects.all().prefetch_related('carbon', 'genmix', 'genmix__fuel').select_related('ba').defer('ba__geom')
+    queryset = DataPoint.objects.all().prefetch_related('carbon', 'genmix', 'genmix__fuel').select_related('ba').defer('ba__geom').exclude(ba__abbrev='CAISO', freq='5m')
     serializer_class = serializers.DataPointSerializer
     filter_class = filters.DataPointFilter
     
