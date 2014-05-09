@@ -127,13 +127,13 @@ class TestUpdateLoad(TestCase):
         self.assertEqual(loads.first().dp.id, job.datapoints.first().id)
         self.assertEqual(MOER.objects.filter(dp__ba__abbrev='CAISO').count(), 0)
 
-    def test_update_load_moer_gen(self):
+    def test_update_load_moer_load(self):
         """Updating load with SILEREVANS should create MOER"""
          # set up model
         self.set_up_moer()
 
         # run task
-        tasks.update_load('CAISO', moer_alg_name=MOERAlgorithm.SILEREVANS_GEN, latest=True)
+        tasks.update_load('CAISO', moer_alg_name=MOERAlgorithm.SILEREVANS, latest=True)
 
         # test for side effects
         job = ETLJob.objects.filter(args__contains='CAISO').latest()

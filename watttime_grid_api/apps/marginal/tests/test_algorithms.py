@@ -27,6 +27,10 @@ class TestBaseAlgorithm(TestCase):
         self.dp.genmix.create(fuel=FuelType.objects.get(name='wind'), gen_MW=200)
         self.total_gen = 100 + 300 + 200
 
+        # add load to data point
+        self.dp.load_set.create(value=123)
+        self.total_load = 123
+
         # set up mocks
         self.mock_model = MockModel(beta1=1000)
 
@@ -111,8 +115,11 @@ class TestSilerEvans(TestBaseAlgorithm):
         """
         algorithm = self.create_algorithm()
         
-        # get inputs
-        self.assertRaises(NotImplementedError, algorithm.bin_value, dp=self.dp)
+       # get inputs
+        inputs = algorithm.bin_value(dp=self.dp)
+
+        # should have value = total generation
+        self.assertEqual(inputs['bin_value'], self.total_load)
 
     def test_prediction_result(self):
         """Prediction is beta"""
