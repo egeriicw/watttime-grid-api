@@ -23,6 +23,15 @@ schedule.update({
         'kwargs': {'latest': True, 'market': 'RT5M'},
     } for ba_name in ['BPA']
 })
+EVERY_FIVE_PLUS_THREE = ','.join([str(i*5+3) for i in range(12)])
+schedule.update({
+    'update-%s-load-latest' % ba_name.lower(): {
+        'task': 'apps.etl.tasks.update_load',
+        'schedule': crontab(minute=EVERY_FIVE_PLUS_THREE),
+        'args': [ba_name.upper()],
+        'kwargs': {'latest': True, 'market': 'RT5M'},
+    } for ba_name in ['BPA']
+})
 EVERY_FIVE_PLUS_ZERO = ','.join([str(i*5) for i in range(12)])
 schedule.update({
     'update-%s-genmix-latest' % ba_name.lower(): {
@@ -33,7 +42,7 @@ schedule.update({
     } for ba_name in ['PJM']
 })
 schedule.update({
-    'update-%s-genmix-latest' % ba_name.lower(): {
+    'update-%s-load-latest' % ba_name.lower(): {
         'task': 'apps.etl.tasks.update_load',
         'schedule': crontab(minute=EVERY_FIVE_PLUS_THREE),
         'args': [ba_name.upper()],
@@ -47,6 +56,14 @@ schedule.update({
     'update-%s-genmix-latest' % ba_name.lower(): {
         'task': 'apps.etl.tasks.update_generation',
         'schedule': crontab(minute=EVERY_TEN_PLUS_TWO),
+        'args': [ba_name.upper()],
+        'kwargs': {'latest': True, 'market': 'RT5M'},
+    } for ba_name in ['CAISO']
+})
+schedule.update({
+    'update-%s-load-latest' % ba_name.lower(): {
+        'task': 'apps.etl.tasks.update_load',
+        'schedule': crontab(minute=EVERY_FIVE_PLUS_ONE),
         'args': [ba_name.upper()],
         'kwargs': {'latest': True, 'market': 'RT5M'},
     } for ba_name in ['CAISO']
