@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from celery import shared_task, group
-from pyiso.tasks import get_generation
-from apps.supply_demand.tasks import insert_generation
+from pyiso.tasks import get_generation, get_load
+from apps.supply_demand.tasks import insert_generation, insert_load
 from apps.carbon.tasks import set_average_carbons
 from apps.marginal.tasks import set_moers
 from apps.etl.models import ETLJob
@@ -21,7 +21,7 @@ def cmap(it, callback):
     return [callback(x) for x in it]
     
 @shared_task
-def log_load(res_list, job):
+def log_etl_load(res_list, job):
     # get unique datapoint ids
     dps = set(res_list)
 
@@ -68,7 +68,42 @@ def update_generation(ba_name, **kwargs):
 
     # set up ETL chain
     extract = get_generation.s(ba_name, **kwargs)
-    load = cmap.s(insert_generation) | log_load.s(job)
+    load = cmap.s(insert_generation) | log_etl_load.s(job)
+    transform = group(transformations)
+    chain = (extract | load | transform)
+
+    # run chain
+    try:
+        chain()
+        job.success = True
+    except Exception as e:
+        # log stack trace
+        msg = traceback.format_exc(e)
+        logger.error('Error on job %d (%s)' % (job.id, str(job)))
+        job.set_error(msg)
+
+    # save the job
+    job.save()
+
+@shared_task(ignore_result=True)
+def update_load(ba_name, **kwargs):    
+    # set up job
+    job = ETLJob.objects.create(task='update_load',
+                                args=json.dumps([ba_name]),
+                                kwargs=json.dumps(kwargs),
+                                )
+    
+    # set up transformations
+    # these tasks will run in parallel, so make sure they're independent!
+    transformations = []
+    moer_alg_name = kwargs.get('moer_alg_name', None)
+    if moer_alg_name == '0':
+        # set MOER only if alg name given
+        transformations.append(set_moers.s(moer_alg_name))
+
+    # set up ETL chain
+    extract = get_load.s(ba_name, **kwargs)
+    load = cmap.s(insert_load) | log_etl_load.s(job)
     transform = group(transformations)
     chain = (extract | load | transform)
 

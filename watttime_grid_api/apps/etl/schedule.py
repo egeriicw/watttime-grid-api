@@ -29,7 +29,15 @@ schedule.update({
         'task': 'apps.etl.tasks.update_generation',
         'schedule': crontab(minute=EVERY_FIVE_PLUS_THREE),
         'args': [ba_name.upper()],
-        'kwargs': {'latest': True, 'market': 'RT5M', 'moer_alg_name': '1'},
+        'kwargs': {'latest': True, 'market': 'RT5M'},
+    } for ba_name in ['PJM']
+})
+schedule.update({
+    'update-%s-genmix-latest' % ba_name.lower(): {
+        'task': 'apps.etl.tasks.update_load',
+        'schedule': crontab(minute=EVERY_FIVE_PLUS_THREE),
+        'args': [ba_name.upper()],
+        'kwargs': {'latest': True, 'market': 'RT5M', 'moer_alg_name': '0'},
     } for ba_name in ['PJM']
 })
 

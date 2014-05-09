@@ -2,12 +2,16 @@ from django.db import models
 from django.db.models import Sum
 
 ##################
-# biner utils
+# binner utils
 ##################
 
 def total_gen(dp):
     """total generation"""
     return dp.genmix.all().aggregate(bin_value=Sum('gen_MW'))
+
+def total_load(dp):
+    """total load"""
+    return {'bin_value': dp.load_set.latest('updated_at').value}
 
 
 ##################
@@ -76,8 +80,17 @@ class MOERAlgorithm(models.Model):
                 raise ValueError('%s bin_value requires a dp kwarg' % self.binner)
 
             # return
-            # TODO: should be load not gen
             return total_gen(dp)
+
+        elif self.binner == self.TOTAL_LOAD:
+            # check args
+            try:
+                dp = kwargs['dp']
+            except KeyError:
+                raise ValueError('%s bin_value requires a dp kwarg' % self.binner)
+
+            # return
+            return total_load(dp)
 
         else:
             raise NotImplementedError("bin_value not implemented for %s" % self.binner)
