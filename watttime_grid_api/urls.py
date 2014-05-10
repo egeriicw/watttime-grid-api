@@ -1,9 +1,6 @@
 from django.contrib.gis import admin
 from django.conf.urls import patterns, include, url
-from django.core.urlresolvers import reverse_lazy
-from django.views.generic import TemplateView, DetailView
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
+from django.views.generic import TemplateView
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/admin/#hooking-adminsite-instances-into-your-urlconf
 admin.autodiscover()
@@ -18,6 +15,7 @@ urlpatterns = patterns('',
 
     # home
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),
+    url(r'^faq[/]$', TemplateView.as_view(template_name="faq.html"), name='faq'),
     url(r'^contact[/]$', TemplateView.as_view(template_name="contact.html"), name='contact'),
     url(r'^dashboard[/]$', TemplateView.as_view(template_name="dashboard.html"), name='dashboard'),
     
