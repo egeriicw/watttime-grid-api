@@ -17,26 +17,42 @@ class CurrentMapView(TemplateView):
         
         
         for ds in DataSeries.objects.filter(series_type=DataSeries.CURRENT):
-            # get vals
+            # set up defaults
+            carbon_val = 0
+            td = None
+            lag_units = 'minutes'
+
             try:
+                # get most recent data
                 dp = ds.datapoints.latest()
                 carbon_val = round(dp.carbon.emissions_intensity, 0)
-                td = (pytz.utc.localize(datetime.utcnow()) - dp.timestamp).seconds / 60
+                td = round((pytz.utc.localize(datetime.utcnow()) - dp.timestamp).total_seconds() / 60, 0)
+
+                if td > 60 * 24:
+                    # stale data greater than 1 day old
+                    carbon_val = 0
+                    td /= 60*24
+                    lag_units = 'days'
+
             except:
-                carbon_val = 0
-                td = None
+                # use defaults
+                pass
+
             try:
+                # set up for content
                 ba = ds.ba
                 properties = {'name': str(ba),
                               'carbon': carbon_val,
                               'lag': td,
+                              'lag_units': lag_units,
                               }
                 geojson["features"].append({'geometry': json.loads(ba.geom.geojson),
                                             'properties': properties,
                                             'type': "Feature",
                                             'id': ba.id,
                                             })
-            except AttributeError: # no geom
+            except AttributeError:
+                # no geom
                 continue
             
         # strip non-json characters

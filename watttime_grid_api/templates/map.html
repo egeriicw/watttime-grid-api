@@ -51,6 +51,24 @@
     </div>
 
     <div class="row">
+      <div class="col-md-4">
+        <div class="alert text-center" style="background-color: rgb(215,48,39)">
+          Coal is about 2100 lb CO<sub>2</sub>/MWh
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="alert text-center" style="background-color: rgb(254,224,139)">
+          Natural gas is about 1200 lb CO<sub>2</sub>/MWh
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="alert text-center" style="background-color: rgb(26,152,80)">
+          Renewables are essentially carbon-free!
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
        {% leaflet_map "map" callback="main_map_init" creatediv=False %}
        <div id="map" style="height: 500px;"></div>
     </div>
@@ -87,9 +105,9 @@
 
         function onEachFeature (feature, layer) {
             var msg = feature.properties.name+"<br>";
-            if (feature.properties.carbon > 0) {
-                msg += "carbon impact = "+feature.properties.carbon+" lb/MW<br>";
-                msg += feature.properties.lag+" minutes ago";
+            if (feature.properties.lag > 0) {
+                msg += "carbon impact = "+feature.properties.carbon+" lb/MWh<br>";
+                msg += feature.properties.lag+" "+feature.properties.lag_units+" ago";
             } else {
                 msg += "no data available";
             }
@@ -115,19 +133,19 @@
                         labels = [],
 				from, to;
                   labels.push('<i style="background:' + getColor(-1) + '"></i> ' +
-					'no data');
+					'no recent data');
                   labels.push('<i style="background:' + getColor(1) + '"></i> ' +
-					'0-400 lb CO<sub>2</sub>/MW');
+					'0-400 lb CO<sub>2</sub>/MWh');
                   labels.push('<i style="background:' + getColor(401) + '"></i> ' +
-					'400-800 lb CO<sub>2</sub>/MW');
+					'400-800 lb CO<sub>2</sub>/MWh');
                   labels.push('<i style="background:' + getColor(801) + '"></i> ' +
-					'800-1200 lb CO<sub>2</sub>/MW');
+					'800-1200 lb CO<sub>2</sub>/MWh');
                   labels.push('<i style="background:' + getColor(1201) + '"></i> ' +
-					'1200-1600 lb CO<sub>2</sub>/MW');
+					'1200-1600 lb CO<sub>2</sub>/MWh');
                   labels.push('<i style="background:' + getColor(1601) + '"></i> ' +
-					'1600-2000 lb CO<sub>2</sub>/MW');
+					'1600-2000 lb CO<sub>2</sub>/MWh');
                   labels.push('<i style="background:' + getColor(2001) + '"></i> ' +
-					'2000+ lb CO<sub>2</sub>/MW');
+					'2000+ lb CO<sub>2</sub>/MWh');
 			div.innerHTML = labels.join('<br>');
 			return div;
 		};
