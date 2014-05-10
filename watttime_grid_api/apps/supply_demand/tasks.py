@@ -29,14 +29,13 @@ def insert_generation(gen_obs):
         logger.debug('Generation for %s with %s inserted with %s MW' % (dp, fuel, gen.gen_MW))
 
     # add to "current" series
-    if dp_created:
-        series, series_created = DataSeries.objects.get_or_create(ba=ba, series_type=DataSeries.CURRENT)
-        try:
-            if dp.timestamp > series.datapoints.latest().timestamp:
-                series.datapoints.clear()
-                series.datapoints.add(dp)
-        except DataPoint.DoesNotExist: # no datapoints in series
+    series, series_created = DataSeries.objects.get_or_create(ba=ba, series_type=DataSeries.CURRENT)
+    try:
+        if dp.timestamp > series.datapoints.latest().timestamp:
+            series.datapoints.clear()
             series.datapoints.add(dp)
+    except DataPoint.DoesNotExist: # no datapoints in series
+        series.datapoints.add(dp)
             
     # return
     return dp.id
