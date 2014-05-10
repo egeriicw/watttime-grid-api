@@ -24,15 +24,11 @@ class TestInsertLoad(TestCase):
         tasks.insert_load(self.dp_dict)
 
     def test_insert_series(self):
+        """Load points should not be added to series for now"""
         self.assertEqual(DataSeries.objects.count(), 0)
         tasks.insert_load(self.dp_dict)
         
-        self.assertEqual(DataSeries.objects.count(), 1)
-        self.assertEqual(DataSeries.objects.get(series_type=DataSeries.CURRENT).datapoints.count(), 1)
-
-        tasks.insert_load(self.dp_dict)
-        self.assertEqual(DataSeries.objects.count(), 1)
-        self.assertEqual(DataSeries.objects.get(series_type=DataSeries.CURRENT).datapoints.count(), 1)
+        self.assertEqual(DataSeries.objects.count(), 0)
 
 
 class TestInsertGeneration(TestCase):

@@ -60,15 +60,5 @@ def insert_load(obs):
     if obj_created:
         logger.debug('Load for %s inserted with %s %s' % (dp, obj.value, obj.units))
 
-    # add to "current" series
-    if dp_created:
-        series, series_created = DataSeries.objects.get_or_create(ba=ba, series_type=DataSeries.CURRENT)
-        try:
-            if dp.timestamp > series.datapoints.latest().timestamp:
-                series.datapoints.clear()
-                series.datapoints.add(dp)
-        except DataPoint.DoesNotExist: # no datapoints in series
-            series.datapoints.add(dp)
-            
     # return
     return dp.id
