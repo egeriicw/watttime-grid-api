@@ -105,11 +105,13 @@
 
         function onEachFeature (feature, layer) {
             var msg = feature.properties.name+"<br>";
-            if (feature.properties.lag > 0) {
+            if (feature.properties.carbon > 0) {
                 msg += "carbon impact = "+feature.properties.carbon+" lb/MWh<br>";
-                msg += feature.properties.lag+" "+feature.properties.lag_units+" ago";
             } else {
-                msg += "no data available";
+                msg += "no recent data available<br>";
+            }
+            if (feature.properties.lag > 0) {
+                msg += "updated "+feature.properties.lag+" "+feature.properties.lag_units+" ago";
             }
             layer.bindPopup(msg);
         }        

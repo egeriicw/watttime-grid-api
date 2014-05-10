@@ -31,7 +31,7 @@ class CurrentMapView(TemplateView):
                 if td > 60 * 24:
                     # stale data greater than 1 day old
                     carbon_val = 0
-                    td /= 60*24
+                    td = round(td/(60*24), 0)
                     lag_units = 'days'
 
             except:
