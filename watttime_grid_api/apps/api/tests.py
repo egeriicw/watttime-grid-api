@@ -28,6 +28,13 @@ class TestDocs(TestCase):
     def test_datapoint_param_docs(self):
         for filterstr in DataPointFilter._meta.fields:
             self.assertIn(filterstr+' -- ', DataPointList.__doc__)
+
+    def test_redirects(self):
+        c = Client()
+        response1 = c.get('/api/')
+        self.assertEqual(response1.status_code, 301)
+        response2 = c.get('/api/v1/')
+        self.assertEqual(response2.status_code, 301)
             
 
 class BAAPITest(APITestCase):

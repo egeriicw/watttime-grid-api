@@ -1,10 +1,13 @@
 from django.conf.urls import patterns, url, include
+from django.core.urlresolvers import reverse_lazy
+from django.views.generic.base import RedirectView
 from apps.api import views
 from apps.api.api_auth import views as auth_views
 
 urlpatterns = patterns('',
     # docs
     url(r'^docs/', include('rest_framework_swagger.urls')),
+    url(r'^$', RedirectView.as_view(url=reverse_lazy('django.swagger.base.view'))),
 
     # auth
     url(r'^obtain-token-auth/', auth_views.ObtainAuthToken.as_view(),
