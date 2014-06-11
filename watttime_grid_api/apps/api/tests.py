@@ -8,7 +8,7 @@ from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from apps.gridentities.models import BalancingAuthority, FuelType
-from apps.griddata.models import DataPoint
+from apps.griddata.models import DataPoint, DataSeries
 from apps.marginal.tasks import set_moers
 from apps.marginal.models import StructuralModelSet
 from apps.api.views import DataPointList
@@ -389,6 +389,86 @@ class DataPointsMOERAPITest(DataPointsAPITest):
         self.client.logout()
         response = self.client.get(self.base_url)
         self.assertEqual(response.data['detail'], 'Authentication credentials were not provided.')
+
+
+class CurrentAPITest(APITestCase):
+    fixtures = ['bageom', 'gentypes', 'groups']
+
+    def setUp(self):
+        # set up times
+        self.now = pytz.utc.localize(datetime.utcnow())
+        self.tomorrow = self.now + timedelta(days=1)
+        self.yesterday = self.now - timedelta(days=1)
+        
+        # create sample data series
+        for ba in [BalancingAuthority.objects.get(abbrev='PJM'),
+                   BalancingAuthority.objects.get(abbrev='CAISO')]:
+            ds = DataSeries.objects.create(ba=ba, series_type=DataSeries.BEST)
+            ds.datapoints.create(timestamp=self.yesterday, ba=ba,
+                                     market=DataPoint.RT5M, freq=DataPoint.FIVEMIN)
+            ds.datapoints.create(timestamp=self.now, ba=ba,
+                                     market=DataPoint.RT5M, freq=DataPoint.IRREGULAR)
+            ds.datapoints.create(timestamp=self.tomorrow, ba=ba,
+                                     market=DataPoint.DAHR, freq=DataPoint.HOURLY)
+                                         
+        # add sample gens to data points
+        for dp in DataPoint.objects.all():
+            dp.genmix.create(fuel=FuelType.objects.get(name='wind'), gen_MW=30000)
+            dp.genmix.create(fuel=FuelType.objects.get(name='natgas'), gen_MW=60000)
+
+            dp.load_set.create(value=91234)
+
+        # add MOER
+    #    sset = StructuralModelSet.objects.first()
+    #    sset.ba = BalancingAuthority.objects.get(abbrev='PJM')
+    #    sset.save()
+    #    set_moers(DataPoint.objects.filter(ba__abbrev='PJM').values_list('pk', flat=True),
+    #              sset.algorithm.name)
+
+        # number of expected objects of different types
+        self.n_isos = 2
+        self.n_times = 3
+        self.n_at_time = 1
+        self.n_gen = 2
+
+        # set up routes
+        self.base_url = '/api/v1/current/'
+
+        # authenticate client
+        username = 'api_user'
+        password = 'apipw'
+        user = User.objects.create_user(username, 'api_user@example.com', password)
+        user.groups.add(Group.objects.get(name='team'))
+        user.save()
+        authenticated = self.client.login(username=username, password=password)
+
+    def test_must_be_authenticated(self):
+        self.client.logout()
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.data['detail'], 'Authentication credentials were not provided.')
+
+    def test_get(self):
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # correct number of series
+        self.assertEqual(len(response.data), 2)
+
+        # correct field names
+        expected_keys_ds = set(['ba', 'datapoints'])
+        expected_keys_dp = set(['timestamp', 'url', 'market', 'load_set', 'genmix'])
+        for series in response.data:
+            self.assertEqual(expected_keys_ds, set(series.keys()))
+            for dp in series['datapoints']:
+                self.assertEqual(expected_keys_dp, set(dp.keys()))
+
+    def test_filter_ba(self):
+        response = self.client.get(self.base_url, {'ba': 'CAISO'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # only CAISO data
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['ba'], 'CAISO')
 
 
 class MockView(APIView):

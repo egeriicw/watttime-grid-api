@@ -1,6 +1,6 @@
 from rest_framework import generics
 from apps.gridentities.models import BalancingAuthority, FuelType
-from apps.griddata.models import DataPoint
+from apps.griddata.models import DataPoint, DataSeries
 from apps.carbon.models import FuelCarbonIntensity
 from apps.api import serializers, filters, permissions
 
@@ -151,6 +151,27 @@ class DataPointMOERDetail(generics.RetrieveAPIView):
     queryset = DataPoint.objects.all()
     serializer_class = serializers.DataPointMOERSerializer
     permission_classes = (permissions.IsInGroup,)
+
+
+class DataSeriesList(generics.ListAPIView):
+    """
+    API endpoint that allows sets of recent grid data points to be viewed.
+    These sets are preselected to contain the best-quality data available:
+    real historical (market=RT5M or market=RTHR) when available,
+    best available forecast (market=DAHR) otherwise.
+    Data sets contain data from midnight yesterday to midnight tomorrow
+        in the balancing authority's local time.
+    All timestamps are in UTC.
+    Access is restricted to this data.
+    
+    ba -- An abbreviation for a balancing authority.\
+        Options can be found at the 'balancing_authorities' endpoint.\
+        e.g., ba=ISONE
+    """
+    queryset = DataSeries.objects.all().filter(series_type=DataSeries.BEST)
+    serializer_class = serializers.DataSeriesSerializer
+    permission_classes = (permissions.IsInGroup,)
+    filter_class = filters.DataSeriesFilter
 
 
 class FuelToCarbonList(generics.ListAPIView):
