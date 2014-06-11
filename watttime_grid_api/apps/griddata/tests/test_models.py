@@ -116,7 +116,7 @@ class TestPoint(TestCase):
     def test_is_forecast(self):
         """is_forecast based on market, not timestamp"""
         past = pytz.utc.localize(datetime.utcnow())-timedelta(hours=1)
-        future = pytz.utc.localize(datetime.utcnow())-timedelta(hours=1)
+        future = pytz.utc.localize(datetime.utcnow())+timedelta(hours=1)
 
         # real-time markets in past are not forecast
         dp_5m_past = DataPoint.objects.create(timestamp=past, freq=DataPoint.HOURLY,
