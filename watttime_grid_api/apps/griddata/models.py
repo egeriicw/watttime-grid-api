@@ -69,6 +69,10 @@ class DataPoint(models.Model):
             return ' '.join([self.ba.abbrev, str(self.timestamp), self.quality,
                              self.freq, self.market])
 
+    def is_forecast(self):
+        """True if the data was obtained from a forecast, False if not"""
+        return self.market == self.DAHR
+
 
 class DataSeries(models.Model):
     # balancing authority
