@@ -161,3 +161,40 @@ class TestUpdateLoad(TestCase):
 
         moers = MOER.objects.filter(dp__ba__abbrev='CAISO')
         self.assertEqual(moers.count(), 0)
+
+    def test_update_load_forecast(self):
+        """Updating load with forecast should work"""
+        # run task
+        tasks.update_load('CAISO', start_at='2014-01-01 12:00', end_at='2014-01-02 12:00',
+                            market='DAM', freq='RTHR')
+
+        # test for side effects
+        job = ETLJob.objects.filter(args__contains='CAISO').latest()
+        if not job.success:
+            print job.errors
+
+        loads = Load.objects.filter(dp__ba__abbrev='CAISO')
+        self.assertEqual(len(job.errors), 0)
+        self.assertTrue(job.success)
+        self.assertEqual(job.datapoints.count(), 24)
+        self.assertEqual(loads.count(), 24)
+        self.assertEqual(loads.earliest('dp__timestamp').dp.id, job.datapoints.earliest('timestamp').id)
+        self.assertEqual(MOER.objects.filter(dp__ba__abbrev='CAISO').count(), 0)
+
+    def test_update_load_moer_load_forecast(self):
+        """Updating load forecast with SILEREVANS should create MOER"""
+         # set up model
+        self.set_up_moer()
+
+        # run task
+        tasks.update_load('CAISO', moer_alg_name=MOERAlgorithm.SILEREVANS,
+                            start_at='2014-01-01 12:00', end_at='2014-01-02 12:00',
+                            market='DAM', freq='RTHR')
+
+        # test for side effects
+        job = ETLJob.objects.filter(args__contains='CAISO').latest()
+        if not job.success:
+            print job.errors
+
+        moers = MOER.objects.filter(dp__ba__abbrev='CAISO')
+        self.assertEqual(moers.count(), 24)
