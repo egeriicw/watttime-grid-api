@@ -265,6 +265,9 @@ LOCAL_APPS = (
 
     # supply and demand
     'apps.supply_demand',
+
+    # account helpers
+    'apps.accounts',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

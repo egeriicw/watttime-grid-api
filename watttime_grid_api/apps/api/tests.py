@@ -1,7 +1,7 @@
 from django.test import TestCase, Client, TransactionTestCase
 from django.contrib.gis.geos import Point
 from django.core.cache import cache
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.test import APITestCase, APIRequestFactory
@@ -313,7 +313,7 @@ class PerformanceTest(TransactionTestCase):
 
 
 class DataPointsMOERAPITest(DataPointsAPITest):
-    fixtures = ['bageom', 'gentypes', 'silerevans_gen_pjm']
+    fixtures = ['bageom', 'gentypes', 'silerevans_gen_pjm', 'groups']
 
     def setUp(self):
         # set up times
@@ -361,7 +361,7 @@ class DataPointsMOERAPITest(DataPointsAPITest):
         username = 'api_user'
         password = 'apipw'
         user = User.objects.create_user(username, 'api_user@example.com', password)
-        user.is_staff = True
+        user.groups.add(Group.objects.get(name='team'))
         user.save()
         authenticated = self.client.login(username=username, password=password)
 

@@ -1,8 +1,8 @@
-from rest_framework import generics, viewsets, response, status, permissions
+from rest_framework import generics
 from apps.gridentities.models import BalancingAuthority, FuelType
 from apps.griddata.models import DataPoint
 from apps.carbon.models import FuelCarbonIntensity
-from apps.api import serializers, filters
+from apps.api import serializers, filters, permissions
 
 
 class BalancingAuthorityList(generics.ListAPIView):
@@ -134,7 +134,7 @@ class DataPointMOERList(generics.ListAPIView):
     queryset = DataPoint.objects.all().prefetch_related('moer_set', 'genmix', 'genmix__fuel').select_related('ba').defer('ba__geom')
     serializer_class = serializers.DataPointMOERSerializer
     filter_class = filters.DataPointFilter
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (permissions.IsInGroup,)
     
     # turn on pagination
     paginate_by = 12
@@ -150,7 +150,7 @@ class DataPointMOERDetail(generics.RetrieveAPIView):
     """
     queryset = DataPoint.objects.all()
     serializer_class = serializers.DataPointMOERSerializer
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (permissions.IsInGroup,)
 
 
 class FuelToCarbonList(generics.ListAPIView):
