@@ -73,6 +73,9 @@ class DataSeries(models.Model):
     def __str__(self):
         return '%s %s' % (self.ba, self.series_type)
 
+    def clean(self):
+        pass
+
 
 class BaseUnboundObservation(models.Model):
     """Base class for measured or predicted value, not bound to DataPoint"""
