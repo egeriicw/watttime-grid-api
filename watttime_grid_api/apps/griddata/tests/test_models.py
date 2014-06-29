@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.db import IntegrityError
 from django.db.transaction import TransactionManagementError
-from apps.griddata.models import DataPoint, DataSeries
+from apps.griddata.models import DataPoint, DataSeries, CurrentDataSet
 from apps.gridentities.models import BalancingAuthority
 from datetime import datetime, timedelta
 import pytz
@@ -49,6 +49,109 @@ class TestSeries(TestCase):
         qs = DataSeries.objects.filter(datapoints__timestamp__gte=now)
         self.assertEqual(qs.count(), 1)
         
+
+class TestCurrentSet(TestCase):
+    fixtures = ['bageom.json']
+    def setUp(self):
+        self.ba = BalancingAuthority.objects.get(pk=1)
+        self.now = pytz.utc.localize(datetime.utcnow())
+        self.dp_5m_past = DataPoint.objects.create(timestamp=self.now-timedelta(hours=1), freq=DataPoint.FIVEMIN,
+                                      ba=self.ba, market=DataPoint.RT5M)
+        self.dp_hr_past = DataPoint.objects.create(timestamp=self.now-timedelta(hours=1), freq=DataPoint.HOURLY,
+                                      ba=self.ba, market=DataPoint.RTHR)
+        self.dp_da_past = DataPoint.objects.create(timestamp=self.now-timedelta(hours=1), freq=DataPoint.HOURLY,
+                                      ba=self.ba, market=DataPoint.DAHR)
+        self.dp_5m_now = DataPoint.objects.create(timestamp=self.now, freq=DataPoint.FIVEMIN,
+                                      ba=self.ba, market=DataPoint.RT5M)
+        self.dp_hr_now = DataPoint.objects.create(timestamp=self.now, freq=DataPoint.HOURLY,
+                                      ba=self.ba, market=DataPoint.RTHR)
+        self.dp_da_now = DataPoint.objects.create(timestamp=self.now, freq=DataPoint.HOURLY,
+                                      ba=self.ba, market=DataPoint.DAHR)
+        self.dp_da_future = DataPoint.objects.create(timestamp=self.now+timedelta(hours=1), freq=DataPoint.HOURLY,
+                                      ba=self.ba, market=DataPoint.DAHR)
+
+    def test_failing_create(self):
+        self.assertRaises(IntegrityError, CurrentDataSet.objects.create)
+        self.assertRaises(TransactionManagementError, CurrentDataSet.objects.create,
+                          ba=self.ba)
+        
+    def test_default_create(self):
+        ds = CurrentDataSet.objects.create(ba=self.ba)
+        self.assertEqual(ds.current, None)
+        self.assertEqual(ds.past.count(), 0)
+        self.assertEqual(ds.forecast.count(), 0)
+
+    def test_insert_without_now(self):
+        """If no current data point, anything is the past"""
+        ds = CurrentDataSet.objects.create(ba=self.ba)
+        ds.insert(self.dp_da_future)
+        self.assertEqual(ds.forecast.count(), 0)
+        self.assertEqual(ds.past.count(), 1)
+        self.assertIsNone(ds.current)
+
+    def test_insert_past(self):
+        """If current data point, put past in the past"""
+        ds = CurrentDataSet.objects.create(ba=self.ba)
+        ds.current = self.dp_5m_now
+        ds.insert(self.dp_5m_past)
+        self.assertEqual(ds.forecast.count(), 0)
+        self.assertEqual(ds.past.count(), 1)
+        self.assertIsNotNone(ds.current)
+
+    def test_insert_future(self):
+        """If current data point, put future in the future"""
+        ds = CurrentDataSet.objects.create(ba=self.ba)
+        ds.current = self.dp_5m_now
+        ds.insert(self.dp_da_future)
+        self.assertEqual(ds.forecast.count(), 1)
+        self.assertEqual(ds.past.count(), 0)
+        self.assertIsNotNone(ds.current)
+
+    def test_clean_rearranges_times(self):
+        """clean method puts the right times in the right sets"""
+        ds = CurrentDataSet.objects.create(ba=self.ba)
+
+        # past in forecast, forecast in current, now in past
+        ds.forecast.add(self.dp_5m_past)
+        ds.current = self.dp_da_future
+        ds.past.add(self.dp_5m_now)
+
+        # clean
+        ds.clean()
+
+        # past is past
+        expected_past = DataPoint.objects.filter(pk__in=[self.dp_5m_past.pk, self.dp_5m_now.pk])
+        for dp in expected_past:
+            self.assertIn(dp, ds.past.all())
+        self.assertEqual(expected_past.count(), ds.past.count())
+
+        # forecast is forecast
+        expected_forecast = DataPoint.objects.filter(pk=self.dp_da_future.pk)
+        for dp in expected_forecast:
+            self.assertIn(dp, ds.forecast.all())
+        self.assertEqual(expected_forecast.count(), ds.forecast.count())
+
+        # now is now
+        self.assertEqual(ds.current, self.dp_5m_now)
+
+    # TODO: implement code to make this pass
+    # def test_clean_chooses_best_quality_data(self):
+    #     """clean method puts the right times in the right sets"""
+    #     ds = CurrentDataSet.objects.create(ba=self.ba)
+
+    #     # add duplicate timestamps
+    #     for dp in [self.dp_hr_now, self.dp_hr_past, self.dp_5m_past, self.dp_da_past]:
+    #         ds.insert(dp)
+
+    #     # clean
+    #     ds.clean()
+
+    #     # only highest resolution data is kept
+    #     expected_past = DataPoint.objects.filter(pk__in=[self.dp_5m_past.pk, self.dp_hr_now.pk])
+    #     for dp in expected_past:
+    #         self.assertIn(dp, ds.past.all())
+    #     self.assertEqual(expected_past.count(), ds.past.count())
+
 
 class TestPoint(TestCase):
     fixtures = ['isos.json']
