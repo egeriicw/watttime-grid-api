@@ -8,7 +8,7 @@ from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from apps.gridentities.models import BalancingAuthority, FuelType
-from apps.griddata.models import DataPoint, DataSeries
+from apps.griddata.models import DataPoint, CurrentDataSet
 from apps.marginal.tasks import set_moers
 from apps.marginal.models import StructuralModelSet
 from apps.api.views import DataPointList
@@ -373,7 +373,7 @@ class DataPointsMOERAPITest(DataPointsAPITest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)       
         
         # correct field names
-        expected_keys = set(['ba', 'timestamp', 'genmix', 'moer_set', 'load_set', 'created_at',
+        expected_keys = set(['ba', 'timestamp', 'genmix', 'moer_set', 'load_set',
                              'url', 'freq', 'market'])
         self.assertEqual(expected_keys, set(response.data.keys()))
 
@@ -392,7 +392,7 @@ class DataPointsMOERAPITest(DataPointsAPITest):
 
 
 class CurrentAPITest(APITestCase):
-    fixtures = ['bageom', 'gentypes', 'groups']
+    fixtures = ['bageom', 'gentypes', 'silerevans_gen_pjm', 'groups']
 
     def setUp(self):
         # set up times
@@ -403,13 +403,15 @@ class CurrentAPITest(APITestCase):
         # create sample data series
         for ba in [BalancingAuthority.objects.get(abbrev='PJM'),
                    BalancingAuthority.objects.get(abbrev='CAISO')]:
-            ds = DataSeries.objects.create(ba=ba, series_type=DataSeries.BEST)
-            ds.datapoints.create(timestamp=self.yesterday, ba=ba,
+            ds = CurrentDataSet.objects.create(ba=ba)
+            ds.past.create(timestamp=self.yesterday, ba=ba,
                                      market=DataPoint.RT5M, freq=DataPoint.FIVEMIN)
-            ds.datapoints.create(timestamp=self.now, ba=ba,
+            ds.past.create(timestamp=self.now, ba=ba,
                                      market=DataPoint.RT5M, freq=DataPoint.IRREGULAR)
-            ds.datapoints.create(timestamp=self.tomorrow, ba=ba,
+            ds.forecast.create(timestamp=self.tomorrow, ba=ba,
                                      market=DataPoint.DAHR, freq=DataPoint.HOURLY)
+            ds.clean()
+            ds.save()
                                          
         # add sample gens to data points
         for dp in DataPoint.objects.all():
@@ -419,11 +421,11 @@ class CurrentAPITest(APITestCase):
             dp.load_set.create(value=91234)
 
         # add MOER
-    #    sset = StructuralModelSet.objects.first()
-    #    sset.ba = BalancingAuthority.objects.get(abbrev='PJM')
-    #    sset.save()
-    #    set_moers(DataPoint.objects.filter(ba__abbrev='PJM').values_list('pk', flat=True),
-    #              sset.algorithm.name)
+        sset = StructuralModelSet.objects.first()
+        sset.ba = BalancingAuthority.objects.get(abbrev='PJM')
+        sset.save()
+        set_moers(DataPoint.objects.filter(ba__abbrev='PJM').values_list('pk', flat=True),
+                  sset.algorithm.name)
 
         # number of expected objects of different types
         self.n_isos = 2
@@ -437,15 +439,20 @@ class CurrentAPITest(APITestCase):
         # authenticate client
         username = 'api_user'
         password = 'apipw'
-        user = User.objects.create_user(username, 'api_user@example.com', password)
-        user.groups.add(Group.objects.get(name='team'))
-        user.save()
+        self.user = User.objects.create_user(username, 'api_user@example.com', password)
+        self.user.groups.add(Group.objects.get(name='team'))
+        self.user.save()
         authenticated = self.client.login(username=username, password=password)
 
     def test_must_be_authenticated(self):
         self.client.logout()
         response = self.client.get(self.base_url)
         self.assertEqual(response.data['detail'], 'Authentication credentials were not provided.')
+
+    def test_must_be_in_group(self):
+        self.user.groups.clear()
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.data['detail'], 'You do not have permission to perform this action.')
 
     def test_get(self):
         response = self.client.get(self.base_url)
@@ -455,11 +462,11 @@ class CurrentAPITest(APITestCase):
         self.assertEqual(len(response.data), 2)
 
         # correct field names
-        expected_keys_ds = set(['ba', 'datapoints'])
-        expected_keys_dp = set(['timestamp', 'url', 'market', 'load_set', 'genmix'])
-        for series in response.data:
-            self.assertEqual(expected_keys_ds, set(series.keys()))
-            for dp in series['datapoints']:
+        expected_keys_ds = set(['ba', 'past', 'forecast', 'current'])
+        expected_keys_dp = set(['timestamp', 'url', 'market', 'moer_set', 'genmix'])
+        for ds in response.data:
+            self.assertEqual(expected_keys_ds, set(ds.keys()))
+            for dp in ds['past'] + ds['forecast'] + [ds['current']]:
                 self.assertEqual(expected_keys_dp, set(dp.keys()))
 
     def test_filter_ba(self):

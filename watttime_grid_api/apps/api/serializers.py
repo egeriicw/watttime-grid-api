@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from apps.gridentities.models import BalancingAuthority, FuelType
-from apps.griddata.models import DataPoint, DataSeries
+from apps.griddata.models import DataPoint, CurrentDataSet
 from apps.supply_demand.models import Generation, Load
 from apps.carbon.models import FuelCarbonIntensity
 from apps.marginal.models import MOER
@@ -76,14 +76,16 @@ class DataPointInSeriesSerializer(DataPointMOERSerializer):
     class Meta:
         model = DataPoint
         fields = ('timestamp', 'genmix', 'url',
-                  'market', 'load_set')
+                  'market', 'moer_set')
 
 
-class DataSeriesSerializer(serializers.ModelSerializer):
-    datapoints = DataPointInSeriesSerializer(many=True)
+class CurrentDataSetSerializer(serializers.ModelSerializer):
+    past = DataPointInSeriesSerializer(many=True)
+    forecast = DataPointInSeriesSerializer(many=True)
+    current = DataPointInSeriesSerializer()
     ba = serializers.SlugRelatedField(slug_field='abbrev',
                                       help_text='abbreviated name of the balancing authority')
 
     class Meta:
-        model = DataSeries
-        fields = ('datapoints', 'ba')
+        model = CurrentDataSet
+        fields = ('past', 'forecast', 'current', 'ba')

@@ -38,6 +38,6 @@ urlpatterns = patterns('',
         name='datapoint-moer-list'),
     url(r'^marginal/(?P<pk>[0-9]+)/$', views.DataPointMOERDetail.as_view(),
         name='datapoint-moer-detail'),
-    url(r'^current/$', views.DataSeriesList.as_view(),
-        name='dataseries-list'),
+    url(r'^current/$', views.CurrentDataSetList.as_view(),
+        name='currentdataset-list'),
 )
