@@ -13,7 +13,7 @@ class ProvenanceQuerySet(QuerySet):
             raise ValueError("No model found for dp %s, nothing matches for ba %s" % (dp, dp.ba.abbrev))
 
         # filter for algorithm
-        qset = self.filter(algorithm__name=alg_name)
+        qset = qset.filter(algorithm__name=alg_name)
         if not qset.exists():
             raise ValueError("No model found for dp %s, nothing matches for algorithm %s" % (dp, alg_name))
 
