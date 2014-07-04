@@ -125,9 +125,13 @@ class CurrentDataSet(models.Model):
 
         # past is also forecast data that's more recent than the latest real-time
         #    while still being before the present
-        self.past.add(*dps.filter(timestamp__lte=self.current.timestamp,
-                                    timestamp__gt=self.past.latest().timestamp,
-                                    market__in=[DataPoint.DAHR]))
+        try:
+            self.past.add(*dps.filter(timestamp__lte=self.current.timestamp,
+                                        timestamp__gt=self.past.latest().timestamp,
+                                        market__in=[DataPoint.DAHR]))
+        except DataPoint.DoesNotExist: # no past data
+            self.past.add(*dps.filter(timestamp__lte=self.current.timestamp,
+                                        market__in=[DataPoint.DAHR]))
 
         # forecast is forecast data in the future
         self.forecast.add(*dps.filter(timestamp__gt=self.current.timestamp,

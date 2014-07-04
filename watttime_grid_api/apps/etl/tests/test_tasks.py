@@ -1,5 +1,6 @@
 from django.test import TestCase
 from apps.gridentities.models import BalancingAuthority
+from apps.griddata.models import CurrentDataSet
 from apps.supply_demand.models import Generation, Load
 from apps.carbon.models import Carbon
 from apps.marginal.models import MOER, MOERAlgorithm, StructuralModelSet
@@ -45,6 +46,8 @@ class TestUpdateGeneration(TestCase):
         for gen in gens:
 	        self.assertEqual(gen.mix.id, job.datapoints.first().id)
         self.assertEqual(MOER.objects.filter(dp__ba__abbrev='CAISO').count(), 0)
+        self.assertEqual(CurrentDataSet.objects.get(ba__abbrev='CAISO').past.all().count(), 1)
+        self.assertIsNotNone(CurrentDataSet.objects.get(ba__abbrev='CAISO').current)
 
     def test_update_generation_moer_gen(self):
         """Updating generation with SILEREVANS_GEN should create MOER"""
@@ -126,6 +129,8 @@ class TestUpdateLoad(TestCase):
         self.assertEqual(loads.count(), 1)
         self.assertEqual(loads.first().dp.id, job.datapoints.first().id)
         self.assertEqual(MOER.objects.filter(dp__ba__abbrev='CAISO').count(), 0)
+        self.assertEqual(CurrentDataSet.objects.get(ba__abbrev='CAISO').past.all().count(), 1)
+        self.assertIsNotNone(CurrentDataSet.objects.get(ba__abbrev='CAISO').current)
 
     def test_update_load_moer_load(self):
         """Updating load with SILEREVANS should create MOER"""
@@ -166,7 +171,7 @@ class TestUpdateLoad(TestCase):
         """Updating load with forecast should work"""
         # run task
         tasks.update_load('CAISO', start_at='2014-01-01 12:00', end_at='2014-01-02 12:00',
-                            market='DAM', freq='RTHR')
+                            market='DAHR', freq='1hr')
 
         # test for side effects
         job = ETLJob.objects.filter(args__contains='CAISO').latest()
@@ -180,6 +185,8 @@ class TestUpdateLoad(TestCase):
         self.assertEqual(loads.count(), 24)
         self.assertEqual(loads.earliest('dp__timestamp').dp.id, job.datapoints.earliest('timestamp').id)
         self.assertEqual(MOER.objects.filter(dp__ba__abbrev='CAISO').count(), 0)
+        self.assertEqual(CurrentDataSet.objects.get(ba__abbrev='CAISO').past.all().count(), 24)
+        self.assertIsNotNone(CurrentDataSet.objects.get(ba__abbrev='CAISO').current)
 
     def test_update_load_moer_load_forecast(self):
         """Updating load forecast with SILEREVANS should create MOER"""
@@ -189,7 +196,7 @@ class TestUpdateLoad(TestCase):
         # run task
         tasks.update_load('CAISO', moer_alg_name=MOERAlgorithm.SILEREVANS,
                             start_at='2014-01-01 12:00', end_at='2014-01-02 12:00',
-                            market='DAM', freq='RTHR')
+                            market='DAHR', freq='1hr')
 
         # test for side effects
         job = ETLJob.objects.filter(args__contains='CAISO').latest()

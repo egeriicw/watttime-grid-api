@@ -15,7 +15,7 @@ django-rest-swagger==0.1.13
 django-filter==0.7
 dj-database-url==0.2.2
 psycopg2==2.5.2
-pyiso==0.1.6
+pyiso==0.1.7
 python-dateutil==2.2
 Fabric==1.6.1
 South==0.8.1

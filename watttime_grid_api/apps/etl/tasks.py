@@ -4,6 +4,7 @@ from pyiso.tasks import get_generation, get_load
 from apps.supply_demand.tasks import insert_generation, insert_load
 from apps.carbon.tasks import set_average_carbons
 from apps.marginal.tasks import set_moers
+from apps.griddata.tasks import update_current_set
 from apps.etl.models import ETLJob
 import logging
 import json
@@ -57,7 +58,7 @@ def update_generation(ba_name, **kwargs):
     
     # set up transformations
     # these tasks will run in parallel, so make sure they're independent!
-    transformations = []
+    transformations = [update_current_set.s()]
     if kwargs.get('set_average_carbon', True):
         # set average carbon by default
         transformations.append(set_average_carbons.s())
@@ -95,7 +96,7 @@ def update_load(ba_name, **kwargs):
     
     # set up transformations
     # these tasks will run in parallel, so make sure they're independent!
-    transformations = []
+    transformations = [update_current_set.s()]
     moer_alg_name = kwargs.get('moer_alg_name', None)
     if moer_alg_name == '0':
         # set MOER only if alg name given

@@ -85,11 +85,18 @@ schedule.update({
     #     'args': ['SPP'],
     #     'kwargs': {'yesterday': True, 'market': 'RT5M'},
     # },
-    # yesterday in CAISO every hour (should be once, just after midnight Pacific time)
+    # yesterday in CAISO once, just after midnight Pacific time
     'update-caiso-genmix-yesterday': {
         'task': 'apps.etl.tasks.update_generation',
         'schedule': crontab(hour='7', minute='20'),
         'args': ['CAISO'],
         'kwargs': {'yesterday': True, 'market': 'RTHR'},
+    },
+    # forecast in CAISO once, just after midnight Pacific time
+    'update-caiso-load-forecast': {
+        'task': 'apps.etl.tasks.update_load',
+        'schedule': crontab(hour='7', minute='20'),
+        'args': ['CAISO'],
+        'kwargs': {'market': 'DAHR', 'freq': '1hr', 'forecast': True},
     },
 })
