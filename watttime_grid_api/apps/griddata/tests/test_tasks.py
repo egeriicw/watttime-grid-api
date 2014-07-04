@@ -39,15 +39,15 @@ class TestUpdateCurrentSet(TestCase):
         self.assertEqual(CurrentDataSet.objects.all().count(), 0)
 
     def test_task_past(self):
-        tasks.update_current_set(DataPoint.objects.all())
+        tasks.update_current_set(DataPoint.objects.values_list('pk', flat=True))
         pks = [dp.pk for dp in CurrentDataSet.objects.get(ba=self.ba).past.all()]
         self.assertEqual(pks, self.past_pks)
 
     def test_task_forecast(self):
-        tasks.update_current_set(DataPoint.objects.all())
+        tasks.update_current_set(DataPoint.objects.values_list('pk', flat=True))
         pks = [dp.pk for dp in CurrentDataSet.objects.get(ba=self.ba).forecast.all()]
         self.assertEqual(pks, self.forecast_pks)
 
     def test_task_current(self):
-        tasks.update_current_set(DataPoint.objects.all())
+        tasks.update_current_set(DataPoint.objects.values_list('pk', flat=True))
         self.assertEqual(self.current, CurrentDataSet.objects.get(ba=self.ba).current)
